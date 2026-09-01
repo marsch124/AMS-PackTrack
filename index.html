@@ -1,0 +1,2280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no" />
+<title>AMS PackTrack</title>
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="PackTrack" />
+<meta name="theme-color" content="#f2ece4" />
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="apple-touch-icon" href="icons/icon-180.png" />
+<style>
+  :root{
+    --bg:#f1eee9;
+    --ink:#20242c; --ink-dim:#858c99;
+    --card:#ffffff; --line:rgba(32,36,44,.10);
+    --kraft:#b06a35; --tint:#f8efe4;
+
+    /* status colours — the colour IS the message */
+    --wait:#5f6a7a;   --wait-t:#eceff3;
+    --soon:#b06a35;   --soon-t:#f8efe4;
+    --today:#c1861a;  --today-t:#fdf2da;
+    --late:#c43c3c;   --late-t:#fbe7e6;
+    --done:#3f8f63;   --done-t:#e5f2e9;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;height:100%;}
+  /* Solid colour on <html> via longhand so the iOS home-indicator safe-area
+     is always painted — no white/dark strip can show through. Calm warm wash,
+     no glow and no neon (his standing rule about app colours). */
+  html{
+    background-color:#f4f1ea;
+    background-image:none;
+  }
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,sans-serif;
+    color:var(--ink);
+    background:transparent;
+    min-height:100dvh;
+    display:flex; flex-direction:column;
+    padding: max(env(safe-area-inset-top), 14px) 16px max(env(safe-area-inset-bottom), 16px);
+    overflow:hidden;
+    -webkit-user-select:none; user-select:none;
+  }
+  .icon-sprite{position:absolute; width:0; height:0; overflow:hidden;}
+  .hi{width:22px; height:22px; display:block;}
+
+  /* ---------- header ---------- */
+  header{display:flex; align-items:center; justify-content:space-between; padding:4px 4px 10px; min-height:46px;}
+  .brand{font-size:17px; font-weight:800; letter-spacing:.02em;}
+  .brand b{color:var(--kraft);}
+  .brand .ver{font-size:10.5px; font-weight:600; color:var(--ink-dim); margin-left:4px; vertical-align:2px;}
+  .hbtns{display:flex; gap:9px;}
+  .iconbtn{
+    width:42px; height:42px; border-radius:14px; border:none;
+    background:var(--card); color:var(--ink);
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+    padding:0; box-shadow:0 1px 3px rgba(32,36,44,.09);
+  }
+  .iconbtn:active{transform:scale(.94);}
+
+  /* ---------- filter chips ---------- */
+  .chips{display:flex; gap:8px; padding:0 2px 12px; overflow-x:auto; -webkit-overflow-scrolling:touch; flex:0 0 auto;}
+  .chips::-webkit-scrollbar{display:none;}
+  .chip{
+    flex:0 0 auto; border:1px solid var(--line); background:rgba(255,255,255,.72);
+    color:var(--ink); border-radius:999px; padding:8px 14px;
+    font-family:inherit; font-size:13.5px; font-weight:700; cursor:pointer;
+    display:flex; align-items:center; gap:7px;
+  }
+  .chip.sel{background:var(--ink); border-color:var(--ink); color:#fff;}
+  .chip .n{
+    font-size:11.5px; font-weight:800; border-radius:999px; padding:1px 6px;
+    background:rgba(32,36,44,.10);
+  }
+  .chip.sel .n{background:rgba(255,255,255,.22);}
+  .chip.alarm{border-color:rgba(196,60,60,.45); color:var(--late);}
+  .chip.alarm.sel{background:var(--late); border-color:var(--late); color:#fff;}
+
+  /* ---------- main / cards ---------- */
+  main{flex:1; min-height:0; overflow-y:auto; -webkit-overflow-scrolling:touch; position:relative;}
+  .grouphd{
+    display:flex; align-items:center; gap:9px;
+    font-size:12px; font-weight:800; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--ink); margin:16px 4px 9px;
+  }
+  .grouphd .gdot{width:10px; height:10px; border-radius:50%; flex:0 0 auto;}
+  .grouphd:first-child{margin-top:2px;}
+  .grouphd .gline{flex:1; height:1px; background:var(--line);}
+  .cards{display:flex; flex-direction:column; gap:11px;}
+  main > .cards:last-child{padding-bottom:12px;}
+
+  .ordercard{
+    display:flex; align-items:center; gap:13px; width:100%;
+    border:none; border-left:6px solid var(--oc, var(--kraft));
+    border-radius:20px; padding:14px 14px 14px 12px;
+    background:var(--oct, var(--card)); color:var(--ink); text-align:left; cursor:pointer;
+    font-family:inherit; box-shadow:0 1px 3px rgba(32,36,44,.07);
+  }
+  .ordercard:active{transform:scale(.985);}
+  .thumb{
+    flex:0 0 auto; width:52px; height:52px; border-radius:14px; overflow:hidden;
+    background:#fff; border:2px solid var(--oc, var(--kraft));
+    display:flex; align-items:center; justify-content:center; color:var(--oc, var(--kraft));
+  }
+  .thumb{position:relative;}
+  .thumb img{position:absolute; inset:0; width:100%; height:100%; object-fit:contain; display:block; background:#fff;}
+  .omid{flex:1; min-width:0;}
+  .oshop{font-size:16.5px; font-weight:800; letter-spacing:-.01em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .osub{font-size:12.5px; color:var(--ink-dim); margin-top:3px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .osub b{color:var(--c, var(--ink)); font-weight:800;}
+  .oright{flex:0 0 auto; text-align:right; min-width:52px;}
+  .onum{font-size:27px; font-weight:800; line-height:1; color:var(--c, var(--wait)); font-variant-numeric:tabular-nums; letter-spacing:-.02em;}
+  .olbl{font-size:10px; font-weight:800; color:var(--ink-dim); letter-spacing:.12em; margin-top:4px; text-transform:uppercase;}
+  .oword{font-size:15px; font-weight:800; color:var(--c); letter-spacing:-.01em; line-height:1.15;}
+  .otick{color:var(--done);}
+  .todobadge{
+    display:inline-flex; align-items:center; gap:4px; margin-top:5px;
+    font-size:11px; font-weight:800; color:var(--kraft);
+    background:var(--tint); border-radius:999px; padding:2px 8px;
+  }
+
+  .empty{text-align:center; padding:46px 22px; color:var(--ink-dim);}
+  .empty .big{font-size:17px; font-weight:800; color:var(--ink); margin-bottom:8px;}
+  .empty p{font-size:14px; line-height:1.6; margin:0 0 6px;}
+  .empty .hi{width:46px; height:46px; margin:0 auto 16px; color:var(--kraft);}
+
+  /* ---------- bottom bar ---------- */
+  .bottombar{display:flex; justify-content:center; gap:16px; padding:12px 0 2px; flex:0 0 auto;}
+  .bottombar .iconbtn{width:54px; height:54px; border-radius:50%; box-shadow:0 5px 16px rgba(32,36,44,.16);}
+  .bottombar .hi{width:25px; height:25px;}
+  .bottombar .prime{background:var(--kraft); color:#fff; width:62px; height:62px;}
+  .bottombar .prime .hi{width:29px; height:29px;}
+
+  /* ---------- slim backup nudge ---------- */
+  .nudge{
+    display:flex; align-items:center; gap:10px;
+    background:var(--card); border-radius:16px; padding:10px 12px; margin-bottom:12px;
+    font-size:13.5px; font-weight:500; box-shadow:0 1px 3px rgba(32,36,44,.08); flex:0 0 auto;
+  }
+  .nudge[hidden]{display:none;}
+  .nbtn{border:none; background:var(--ink); color:#fff; border-radius:10px; padding:8px 13px; font-weight:700; font-family:inherit; font-size:13px; cursor:pointer; flex:0 0 auto;}
+  .nx{border:none; background:none; color:var(--ink-dim); padding:6px; cursor:pointer; flex:0 0 auto;}
+  .ntxt{flex:1;}
+
+  /* ---------- order detail: the screen takes on the order's own colour ---------- */
+  html.detail-bg{ background-color:var(--pgTint, #f4f1ea); background-image:none; }
+  .dhero{
+    border-radius:24px; padding:20px; margin-bottom:16px; color:#fff;
+    background:var(--oc);
+    box-shadow:0 6px 18px rgba(32,36,44,.14);
+  }
+  .dshop{font-size:25px; font-weight:800; letter-spacing:-.02em; color:#fff;}
+  .statuspill{
+    display:inline-flex; align-items:center; gap:8px; margin-top:10px;
+    background:#fff; border-radius:999px; padding:7px 14px;
+    font-size:14.5px; font-weight:800; color:var(--c);
+  }
+  .statuspill .sdot{width:9px; height:9px; border-radius:50%; background:var(--c); flex:0 0 auto;}
+  .dwhen{font-size:14.5px; font-weight:700; color:#fff; margin-top:12px; display:flex; align-items:center; gap:7px; flex-wrap:wrap;}
+  .dwhen .hi{width:18px; height:18px; color:#fff; flex:0 0 auto; opacity:.92;}
+  .dwhen .sep{opacity:.55;}
+  .tracklink{
+    display:flex; align-items:center; justify-content:center; gap:9px;
+    margin-top:16px; width:100%; padding:14px; border-radius:15px;
+    background:#fff; color:var(--oc); font-size:16px; font-weight:800;
+    text-decoration:none; font-family:inherit; border:none; cursor:pointer;
+    box-shadow:0 3px 10px rgba(32,36,44,.14);
+  }
+  .tracklink:active{transform:scale(.98);}
+
+  .sect{margin:20px 2px 9px; font-size:12px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-dim); display:flex; align-items:center; gap:9px;}
+  .sect .gline{flex:1; height:1px; background:var(--line);}
+
+  .tickrow{
+    display:flex; align-items:center; gap:12px; width:100%; text-align:left;
+    background:var(--card); border:1px solid var(--line); border-radius:16px;
+    padding:11px 13px; margin-bottom:9px; font-family:inherit; color:var(--ink); cursor:pointer;
+  }
+  .tickrow:active{transform:scale(.99);}
+  .tickrow.on{background:var(--done-t); border-color:rgba(63,143,99,.28);}
+  .tbox{
+    flex:0 0 auto; width:30px; height:30px; border-radius:50%;
+    border:2.5px solid var(--ink-dim); display:flex; align-items:center; justify-content:center; color:transparent;
+  }
+  .tickrow.on .tbox{border-color:var(--done); background:var(--done); color:#fff;}
+  .tbox .hi{width:17px; height:17px;}
+  .tpic{flex:0 0 auto; width:46px; height:46px; border-radius:11px; overflow:hidden; background:var(--bg); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; color:var(--kraft);}
+  .tpic{position:relative;}
+  .tpic img{position:absolute; inset:0; width:100%; height:100%; object-fit:contain; display:block; background:#fff;}
+  .tmid{flex:1; min-width:0;}
+  .tname{font-size:14.5px; font-weight:700; line-height:1.35;}
+  .tickrow.on .tname{color:var(--ink-dim);}
+  .tsub{font-size:12px; color:var(--ink-dim); margin-top:3px; font-weight:600;}
+  .tdel{flex:0 0 auto; border:none; background:none; color:var(--ink-dim); padding:6px; cursor:pointer;}
+
+  .addrow{
+    display:flex; align-items:center; gap:10px; width:100%;
+    background:none; border:1.5px dashed var(--line); border-radius:16px;
+    padding:12px 13px; font-family:inherit; font-size:14px; font-weight:700;
+    color:var(--ink-dim); cursor:pointer;
+  }
+  .addrow .hi{width:19px; height:19px;}
+
+  .facts{background:var(--card); border:1px solid var(--line); border-radius:18px; padding:4px 14px; margin-bottom:10px;}
+  .fact{display:flex; gap:12px; padding:11px 0; border-top:1px solid var(--line); font-size:14px;}
+  .fact:first-child{border-top:none;}
+  .fact .k{color:var(--ink-dim); font-weight:600; flex:0 0 41%;}
+  .fact .v{font-weight:700; flex:1; word-break:break-word; -webkit-user-select:text; user-select:text;}
+
+  /* ---------- the timeline ---------- */
+  .tl{display:flex; flex-direction:column; margin-top:2px;}
+  .tlrow{display:flex; gap:12px; padding:7px 0; border-top:1px solid var(--line); min-height:50px;}
+  .tlrow:first-child{border-top:none;}
+  .tlday{flex:0 0 50px; text-align:center; padding-top:5px;}
+  .tldow{font-size:10px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-dim);}
+  .tlnum{font-size:21px; font-weight:800; line-height:1.1; font-variant-numeric:tabular-nums;}
+  .tlrow.weekend .tlday{opacity:.5;}
+  .tlrow.today .tldow, .tlrow.today .tlnum{color:var(--kraft);}
+  .tlrow.today .tlday{
+    background:var(--tint); border-radius:14px; padding:5px 0 6px;
+    flex-basis:50px; box-shadow:inset 0 0 0 2px rgba(176,106,53,.35);
+  }
+  .tlitems{flex:1; min-width:0; display:flex; flex-direction:column; gap:7px; justify-content:center;}
+  .tlpill{
+    display:flex; align-items:center; gap:9px; width:100%; text-align:left;
+    border:none; border-left:5px solid var(--oc); border-radius:14px;
+    padding:10px 12px; font-family:inherit; cursor:pointer;
+    background:var(--oct); color:var(--ink);
+  }
+  .tlpill:active{transform:scale(.985);}
+  .tlpill.window{background:transparent; box-shadow:inset 0 0 0 1.5px var(--oc);}
+  .tlps{font-size:14.5px; font-weight:800; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .tlpd{font-size:11.5px; color:var(--ink-dim); font-weight:700; margin-left:auto; flex:0 0 auto;}
+  .tlgap{flex:1; border-bottom:1px dashed transparent;}
+
+  /* ---------- overlays / sheets ---------- */
+  .overlay{
+    position:fixed; inset:0; z-index:40; display:none; flex-direction:column;
+    background:rgba(32,36,44,.38); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+    padding: max(env(safe-area-inset-top), 14px) 14px max(env(safe-area-inset-bottom), 16px);
+  }
+  .overlay.show{display:flex;}
+  .sheet{
+    margin:auto; width:min(94vw,470px); max-height:90dvh; overflow-y:auto;
+    background:var(--card); border-radius:24px; padding:20px;
+    -webkit-overflow-scrolling:touch; box-shadow:0 18px 50px rgba(32,36,44,.25);
+  }
+  .sheet h2{margin:0 0 12px; font-size:20px; display:flex; align-items:center; gap:10px;}
+  .sheet h2 .hi{color:var(--kraft); flex:0 0 auto;}
+  .sheet h3{font-size:15px; color:var(--kraft); margin:18px 0 6px;}
+  .sheet p, .sheet li{font-size:14.5px; line-height:1.55;}
+  .sheet .dim{color:var(--ink-dim);}
+  label{display:block; font-size:12.5px; color:var(--ink-dim); margin:14px 0 6px; letter-spacing:.03em; font-weight:700;}
+  input[type=text], input[type=date], input[type=number], input[type=url], textarea{
+    width:100%; padding:12px 13px; border-radius:13px; border:1px solid var(--line);
+    background:var(--bg); color:var(--ink); font-size:16px; outline:none;
+    font-family:inherit; -webkit-appearance:none; min-height:46px;
+    -webkit-user-select:text; user-select:text;
+  }
+  textarea{min-height:70px; resize:vertical; line-height:1.5;}
+  input:focus, textarea:focus{border-color:var(--kraft);}
+  .two{display:flex; gap:10px;}
+  .two > div{flex:1; min-width:0;}
+  .btnrow{display:flex; gap:10px; margin-top:20px;}
+  .btn{
+    flex:1; padding:14px; border-radius:14px; border:1px solid var(--line);
+    background:var(--bg); color:var(--ink); font-size:16px; font-weight:700; cursor:pointer; font-family:inherit;
+  }
+  .btn.primary{background:var(--ink); border-color:var(--ink); color:#fff;}
+  .btn.kraft{background:var(--kraft); border-color:var(--kraft); color:#fff;}
+  .btn.danger{background:none; border-color:rgba(196,60,60,.35); color:var(--late); flex:0 0 auto; padding:14px 16px;}
+  .btn.full{width:100%; flex:none; margin-top:10px;}
+  .btn.ok{background:var(--done); border-color:var(--done); color:#fff;}
+  .btn:active{transform:scale(.97);}
+  .closex{position:sticky; top:0; float:right; margin:-2px -2px 0 0; z-index:2; box-shadow:none; background:var(--bg);}
+
+  /* ---------- the paste box ---------- */
+  .pastebox{
+    border:1.5px dashed rgba(176,106,53,.5); border-radius:16px; background:var(--bg);
+    min-height:150px; max-height:230px; overflow-y:auto; padding:13px;
+    font-size:14px; line-height:1.5; outline:none;
+    -webkit-user-select:text; user-select:text; -webkit-user-modify:read-write;
+  }
+  .pastebox:focus{border-color:var(--kraft); border-style:solid;}
+  .pastebox:empty::before{content:attr(data-ph); color:var(--ink-dim); font-weight:600;}
+  .pastebox img{max-width:70px; max-height:70px; margin:3px; border-radius:6px; vertical-align:middle;}
+  .pastebox *{font-size:13.5px !important; color:var(--ink) !important; background:none !important;}
+
+  /* ---------- editor: item + follow-up rows ---------- */
+  .erow{display:flex; align-items:center; gap:8px; margin-bottom:8px;}
+  .erow input[type=text]{min-height:44px; padding:10px 12px; font-size:15px;}
+  .erow .qty{flex:0 0 56px; text-align:center;}
+  .epic{
+    flex:0 0 auto; width:44px; height:44px; border-radius:11px; overflow:hidden;
+    background:var(--bg); border:1px solid var(--line); cursor:pointer;
+    display:flex; align-items:center; justify-content:center; color:var(--ink-dim); padding:0;
+  }
+  .epic{position:relative;}
+  .epic img{position:absolute; inset:0; width:100%; height:100%; object-fit:contain; display:block; background:#fff;}
+  .epic .hi{width:19px; height:19px;}
+  .ex{flex:0 0 auto; border:none; background:none; color:var(--ink-dim); padding:7px; cursor:pointer;}
+
+  .accent-row{display:flex; gap:10px; margin-top:4px; flex-wrap:wrap;}
+  .cdot{width:36px; height:36px; border-radius:50%; border:3px solid transparent; cursor:pointer; padding:0;}
+  .cdot.sel{border-color:var(--ink);}
+
+  .foundnote{
+    background:var(--tint); border-radius:14px; padding:12px 14px; margin-bottom:6px;
+    font-size:13.5px; line-height:1.55; color:var(--ink);
+  }
+  .foundnote b{color:var(--kraft);}
+  .foundnote .miss{color:var(--ink-dim);}
+
+  /* ---------- foldable settings sections ---------- */
+  details.fold{border:1px solid var(--line); border-radius:16px; background:var(--bg); margin-top:12px; overflow:hidden;}
+  details.fold > summary{
+    list-style:none; display:flex; align-items:center; gap:12px;
+    padding:15px 16px; font-size:16px; font-weight:700; cursor:pointer;
+  }
+  details.fold > summary::-webkit-details-marker{display:none;}
+  details.fold > summary .hi{color:var(--kraft); flex:0 0 auto;}
+  details.fold > summary .chev{margin-left:auto; color:var(--ink-dim); transition:transform .2s ease;}
+  details.fold[open] > summary .chev{transform:rotate(90deg);}
+  details.fold > .foldbody{padding:2px 16px 16px;}
+
+  /* ---------- toast ---------- */
+  #toast{
+    position:fixed; left:50%; transform:translateX(-50%);
+    bottom:calc(max(env(safe-area-inset-bottom), 16px) + 8px);
+    z-index:60; display:flex; align-items:center; gap:12px;
+    background:var(--ink); color:#fff; border-radius:16px;
+    padding:13px 16px; font-size:14.5px; box-shadow:0 8px 30px rgba(32,36,44,.35);
+    max-width:min(92vw,420px);
+  }
+  #toast[hidden]{display:none;}
+  #toast button{
+    border:none; border-radius:10px; background:#f0c48a; color:#3a2109;
+    font-weight:700; font-size:14px; padding:9px 14px; cursor:pointer; font-family:inherit;
+  }
+
+  /* ---------- version log + snapshots ---------- */
+  .vlog .v{font-weight:700; color:var(--kraft); font-size:14px; margin-top:12px;}
+  .vlog p{margin:4px 0 0;}
+  .backup-meta{font-size:12.5px; color:var(--ink-dim); margin-top:10px;}
+  .snaprow{display:flex; align-items:center; gap:10px; padding:9px 0; border-top:1px solid var(--line); font-size:13px;}
+  .snaprow:first-child{border-top:none;}
+  .snapwhen{flex:1; font-weight:600;}
+  .snaprow .nbtn{padding:7px 12px; font-size:12.5px;}
+  .code{
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:12.5px;
+    background:var(--bg); border:1px solid var(--line); border-radius:10px;
+    padding:9px 11px; margin-top:6px; word-break:break-all;
+    -webkit-user-select:text; user-select:text;
+  }
+</style>
+</head>
+<body>
+
+<!-- Hand-drawn icon set — single wobbly strokes that don't quite close, so
+     they read as drawn rather than downloaded. stroke="currentColor". -->
+<svg class="icon-sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="icon-box" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4.9 7.9c4.7-.3 9.4-.3 14.2 0 .3 3.7.3 7.4 0 11.1-4.7.3-9.4.3-14.1 0-.3-3.7-.3-7.4-.1-11.1Z"/>
+    <path d="M4.9 7.9c2.4-1.3 4.8-2.5 7.2-3.6 2.4 1.1 4.8 2.3 7.1 3.6"/>
+    <path d="M12 4.4c0 5 0 10 .1 14.9"/>
+  </symbol>
+  <symbol id="icon-truck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M2.9 7.4c3.7-.3 7.4-.3 11.1 0 .2 2.9.2 5.7 0 8.5-3.7.3-7.4.3-11 0-.3-2.8-.3-5.6-.1-8.5Z"/>
+    <path d="M14 10.1c1.7-.1 3.3-.1 5 0 .9 1.1 1.6 2.3 2.1 3.6.1.8.1 1.6 0 2.3-2.4.2-4.7.2-7.1 0"/>
+    <path d="M7.4 15.9c1 0 1.8.8 1.8 1.8s-.8 1.8-1.8 1.8-1.8-.8-1.8-1.8.8-1.8 1.8-1.8Z"/>
+    <path d="M17.1 15.9c1 0 1.8.8 1.8 1.8s-.8 1.8-1.8 1.8-1.8-.8-1.8-1.8.8-1.8 1.8-1.8Z"/>
+  </symbol>
+  <symbol id="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M5.2 12.4c1.7 1.7 3.3 3.4 4.8 5.2 3-4.4 6.3-8.5 9.9-12.3"/>
+  </symbol>
+  <symbol id="icon-calendar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4.9 6.6c4.8-.3 9.5-.3 14.2 0 .3 4.2.3 8.4 0 12.5-4.7.3-9.4.3-14.1 0-.3-4.2-.3-8.4-.1-12.5Z"/>
+    <path d="M8.4 4.2c0 1.1 0 2.2.1 3.2M15.6 4.1c0 1.1 0 2.2.1 3.3"/>
+    <path d="M5.2 10.4c4.6-.2 9.1-.2 13.6 0"/>
+  </symbol>
+  <symbol id="icon-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12.2 4.1c4.4.1 7.8 3.6 7.7 7.9-.1 4.4-3.6 7.9-8 7.8-4.3-.1-7.7-3.5-7.7-7.8C4.2 7.7 7.7 4.1 12.2 4.1Z"/>
+    <path d="M12 7.7c-.1 1.6-.1 3.1 0 4.5 1.1.8 2.2 1.5 3.4 2.2"/>
+  </symbol>
+  <symbol id="icon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12.1 4.6c-.2 2.5-.2 5-.1 7.4.1 2.4 0 4.9-.2 7.3"/>
+    <path d="M4.7 12.2c2.5-.3 4.9-.3 7.3-.2 2.4.1 4.8 0 7.2-.2"/>
+  </symbol>
+  <symbol id="icon-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4.2 7.3c.9-.1 1.8-.2 2.7-.2M11.5 7.1c2.8-.1 5.5 0 8.3.2"/>
+    <path d="M7.05 7.2C7 6 7.95 5.05 9.2 5.05c1.3 0 2.15.95 2.15 2.15 0 1.3-.95 2.2-2.15 2.15C7.9 9.3 7.05 8.4 7.05 7.2Z"/>
+    <path d="M4.2 12.1c2.7-.2 5.4-.2 8.5-.2M17.3 11.9c.9 0 1.8.1 2.7.2"/>
+    <path d="M12.85 12c-.05-1.25.9-2.15 2.15-2.15 1.3 0 2.15.95 2.15 2.15 0 1.3-.95 2.2-2.15 2.15-1.3-.05-2.15-.95-2.15-2.15Z"/>
+    <path d="M4.2 16.9c.5-.1 1-.1 1.5-.1M10.5 16.7c3.1-.1 6.2 0 9.3.2"/>
+    <path d="M6.05 16.8C6 15.55 6.95 14.65 8.2 14.65c1.3 0 2.15.95 2.15 2.15 0 1.3-.95 2.2-2.15 2.15-1.3-.05-2.15-.95-2.15-2.15Z"/>
+  </symbol>
+  <symbol id="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M6.2 6.5c3.9 3.5 7.6 7.2 11.3 11.1"/>
+    <path d="M17.8 6.2c-3.7 3.8-7.4 7.5-11.4 11.2"/>
+  </symbol>
+  <symbol id="icon-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M9.3 5.2c2.4 2.2 4.6 4.5 6.6 7-2 2.4-4.2 4.7-6.5 6.8"/>
+  </symbol>
+  <symbol id="icon-back" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M14.7 5.2c-2.4 2.2-4.6 4.5-6.6 7 2 2.4 4.2 4.7 6.5 6.8"/>
+  </symbol>
+  <symbol id="icon-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 6.2C9.9 4.9 7.4 4.6 4.6 5c-.2 4.3-.1 8.6.1 12.8 2.6-.3 5-.1 7.2 1.2 2.2-1.4 4.6-1.6 7.3-1.3.2-4.3.2-8.6 0-12.9-2.8-.3-5.2.1-7.2 1.4Z"/>
+    <path d="M12 6.6c0 4.1 0 8.2.1 12.2"/>
+  </symbol>
+  <symbol id="icon-backup" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12.1 3.9c.1 3.3.1 6.5 0 9.8"/>
+    <path d="M8.6 10.5c1.1 1.2 2.2 2.3 3.5 3.4 1.2-1.1 2.3-2.3 3.4-3.5"/>
+    <path d="M4.8 14.9c-.2 1.7-.2 3.3 0 4.9 4.8.3 9.6.3 14.4 0 .2-1.6.2-3.2 0-4.8"/>
+  </symbol>
+  <symbol id="icon-history" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12.3 3.9c4.5.1 8 3.7 7.8 8.1-.2 4.4-3.7 7.9-8.1 7.9-4.4-.1-7.9-3.6-7.9-8"/>
+    <path d="M4.2 8.9C4.7 7 5.8 5.5 7.3 4.3"/>
+    <path d="M12 7.6c-.1 1.7-.1 3.3 0 4.9 1.2.9 2.4 1.7 3.7 2.4"/>
+  </symbol>
+  <symbol id="icon-pencil" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M14.9 5.3c1-.9 2-1.1 2.9-.3.9.7 1.5 1.5.8 2.5-2.9 3.6-6 7.1-9.3 10.4-1.2.5-2.4.9-3.7 1.1.2-1.3.5-2.6 1-3.8 2.6-3.4 5.3-6.7 8.3-9.9Z"/>
+    <path d="M13.6 6.9c1 .8 2 1.7 2.9 2.7"/>
+  </symbol>
+  <symbol id="icon-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M5.4 6.9c4.4-.3 8.8-.3 13.2 0"/>
+    <path d="M9.3 6.7c-.1-1.2.4-1.9 1.5-2.1.8-.1 1.6-.1 2.4 0 1.1.2 1.6.9 1.5 2.1"/>
+    <path d="M6.8 8.4c.4 3.7.6 7.3.6 10.9 3.1.3 6.2.3 9.3 0 .1-3.6.3-7.2.6-10.9"/>
+    <path d="M10.2 10.9c.1 2.1.1 4.2 0 6.3M13.9 10.8c.1 2.1.1 4.2 0 6.4"/>
+  </symbol>
+  <symbol id="icon-paste" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M6.4 5.8c3.8-.3 7.5-.3 11.3 0 .3 4.4.3 8.8 0 13.2-3.8.3-7.5.3-11.2 0-.3-4.4-.3-8.8-.1-13.2Z"/>
+    <path d="M9.3 5.7c-.1-1.1.4-1.7 1.5-1.8.8-.1 1.6-.1 2.4 0 1 .1 1.5.7 1.4 1.8-1.8.2-3.5.2-5.3 0Z"/>
+    <path d="M8.9 10.6c2.1-.2 4.2-.2 6.3 0M8.9 13.9c2.1-.2 4.2-.2 6.3 0M8.9 17c1.3-.1 2.6-.1 3.9 0"/>
+  </symbol>
+  <symbol id="icon-link" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M13.6 5.2c1.9-.2 3.8-.2 5.7 0 .2 1.9.2 3.8 0 5.7"/>
+    <path d="M19.1 5.4c-2.4 2.4-4.8 4.8-7.1 7.3"/>
+    <path d="M9.9 6.2c-1.7-.1-3.4-.1-5.1.1-.3 4.5-.3 9 0 13.5 4.5.3 9 .3 13.5 0 .2-1.7.2-3.4.1-5.1"/>
+  </symbol>
+  <symbol id="icon-camera" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3.9 8.9c1.5-.2 2.9-.2 4.4-.2.6-1 1.2-1.9 1.9-2.8 1.3-.1 2.5-.1 3.8 0 .7.9 1.3 1.8 1.9 2.8 1.4 0 2.8 0 4.2.2.3 3.4.3 6.8 0 10.2-5.4.3-10.8.3-16.2 0-.3-3.4-.3-6.8 0-10.2Z"/>
+    <path d="M12 10.4c1.9 0 3.4 1.5 3.4 3.4 0 1.9-1.6 3.4-3.5 3.3-1.8-.1-3.3-1.5-3.3-3.3 0-1.9 1.5-3.4 3.4-3.4Z"/>
+  </symbol>
+  <symbol id="icon-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 4.6c2.8 4.6 5.5 9.2 8 13.9-5.3.4-10.7.4-16 0 2.5-4.7 5.2-9.3 8-13.9Z"/>
+    <path d="M12 9.7c-.1 1.5-.1 3 0 4.4M12 16.4h.01"/>
+  </symbol>
+  <symbol id="icon-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12.1 4.2c3.2 0 5.6 2.5 5.5 5.7-.1 3.4-2.4 6.6-5.5 9.9-3.2-3.3-5.5-6.5-5.6-9.8-.1-3.3 2.3-5.8 5.6-5.8Z"/>
+    <path d="M12 7.9c1.2 0 2.1.9 2.1 2.1 0 1.2-1 2.1-2.2 2.1-1.2 0-2.1-1-2-2.2 0-1.2.9-2 2.1-2Z"/>
+  </symbol>
+  <symbol id="icon-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4.7 7.1c.7.7 1.3 1.4 1.9 2.2 1-1.5 2.1-2.9 3.3-4.2"/>
+    <path d="M12.6 7.6c2.4-.2 4.8-.2 7.2 0"/>
+    <path d="M4.7 14.1c.7.7 1.3 1.4 1.9 2.2 1-1.5 2.1-2.9 3.3-4.2"/>
+    <path d="M12.6 14.6c2.4-.2 4.8-.2 7.2 0"/>
+  </symbol>
+</svg>
+
+<header>
+  <div class="brand">AMS <b>PackTrack</b><span class="ver" id="brandVer"></span></div>
+  <div class="hbtns" id="hbtns"></div>
+</header>
+
+<div class="nudge" id="backupNudge" hidden>
+  <span class="ntxt">Time for a backup — keep your orders safe.</span>
+  <button class="nbtn" id="nudgeGo">Back up</button>
+  <button class="nx" id="nudgeX" aria-label="Dismiss"><svg class="hi" style="width:16px;height:16px"><use href="#icon-close"/></svg></button>
+</div>
+
+<div class="chips" id="chips"></div>
+
+<main id="main"></main>
+
+<div class="bottombar" id="bottombar"></div>
+
+<!-- ============ paste-the-mail sheet ============ -->
+<div class="overlay" id="ovPaste">
+  <div class="sheet">
+    <button class="iconbtn closex" id="pasteClose" aria-label="Close"><svg class="hi"><use href="#icon-close"/></svg></button>
+    <h2><svg class="hi"><use href="#icon-paste"/></svg>Paste the order mail</h2>
+    <p class="dim" style="margin-top:0">In Mail: <b>Select All</b> → <b>Copy</b>. Then tap the box below and <b>Paste</b>. Pasting this way brings the product pictures along too.</p>
+    <div class="pastebox" id="pasteBox" contenteditable="true" data-ph="Tap here, then Paste…"></div>
+    <button class="btn full" id="clipBtn">Or read my clipboard</button>
+    <div class="btnrow">
+      <button class="btn" id="pasteCancel">Cancel</button>
+      <button class="btn kraft" id="pasteGo">Read the mail</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ order editor — also the "here's what I found" review ============ -->
+<div class="overlay" id="ovEdit">
+  <div class="sheet">
+    <button class="iconbtn closex" id="editClose" aria-label="Close"><svg class="hi"><use href="#icon-close"/></svg></button>
+    <h2><svg class="hi"><use href="#icon-box"/></svg><span id="editTitle">New order</span></h2>
+
+    <div class="foundnote" id="foundNote" hidden></div>
+
+    <label for="fShop">Shop</label>
+    <input type="text" id="fShop" placeholder="Amazon" autocapitalize="words" />
+
+    <label>Colour</label>
+    <div class="accent-row" id="colourRow"></div>
+
+    <div class="two">
+      <div>
+        <label for="fDue">Delivery expected</label>
+        <input type="date" id="fDue" />
+      </div>
+      <div>
+        <label for="fDueTo">…or up to</label>
+        <input type="date" id="fDueTo" />
+      </div>
+    </div>
+
+    <label for="fCarrier">Delivery service</label>
+    <input type="text" id="fCarrier" list="carrierList" placeholder="DHL, Post, DPD…" autocapitalize="characters" />
+    <datalist id="carrierList"></datalist>
+
+    <label for="fPickup">Pickup place</label>
+    <input type="text" id="fPickup" list="pickupList" placeholder="Where it ends up — post office, Paketshop, front door…" autocapitalize="sentences" />
+    <datalist id="pickupList"></datalist>
+
+    <label for="fTracking">Tracking number</label>
+    <input type="text" id="fTracking" placeholder="—" autocapitalize="characters" />
+
+    <label for="fTrackUrl">Tracking link</label>
+    <input type="url" id="fTrackUrl" placeholder="https://…" autocapitalize="none" />
+
+    <h3 style="margin-top:22px">What's in the order</h3>
+    <div id="itemRows"></div>
+    <button class="addrow" id="addItemBtn"><svg class="hi"><use href="#icon-plus"/></svg>Add an item</button>
+
+    <h3 style="margin-top:22px">Follow-ups</h3>
+    <p class="dim" style="margin:0 0 8px; font-size:13px">Your own to-dos on this order — “return the small one”, “register the warranty”.</p>
+    <div id="todoRows"></div>
+    <button class="addrow" id="addTodoBtn"><svg class="hi"><use href="#icon-plus"/></svg>Add a follow-up</button>
+
+    <details class="fold" style="margin-top:18px">
+      <summary><svg class="hi"><use href="#icon-list"/></svg>More details<svg class="hi chev"><use href="#icon-chevron"/></svg></summary>
+      <div class="foldbody">
+        <label for="fOrderNo">Order number</label>
+        <input type="text" id="fOrderNo" placeholder="—" autocapitalize="characters" />
+        <label for="fOrdered">Ordered on</label>
+        <input type="date" id="fOrdered" />
+        <label for="fTotal">Total</label>
+        <input type="text" id="fTotal" placeholder="€ 0,00" />
+        <label for="fNote">Note</label>
+        <textarea id="fNote" placeholder="Anything worth remembering…"></textarea>
+      </div>
+    </details>
+
+    <div class="btnrow">
+      <button class="btn danger" id="delBtn" hidden><svg class="hi"><use href="#icon-trash"/></svg></button>
+      <button class="btn" id="editCancel">Cancel</button>
+      <button class="btn kraft" id="saveBtn">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ settings sheet ============ -->
+<div class="overlay" id="ovSettings">
+  <div class="sheet">
+    <button class="iconbtn closex" id="settingsClose" aria-label="Close"><svg class="hi"><use href="#icon-close"/></svg></button>
+    <h2><svg class="hi"><use href="#icon-settings"/></svg>Settings <span class="dim" style="font-size:13px; font-weight:400">· v<span id="appVer"></span></span></h2>
+
+    <details class="fold" id="foldHow">
+      <summary><svg class="hi"><use href="#icon-book"/></svg>How this works<svg class="hi chev"><use href="#icon-chevron"/></svg></summary>
+      <div class="foldbody">
+        <h3>What this app is for</h3>
+        <p>You order something. The confirmation mail arrives. You hand that mail to PackTrack, it pulls out what it can — shop, items, pictures, the promised delivery date, the delivery service, the tracking number — and puts the order on your home screen. Then you tick things off as they actually turn up.</p>
+
+        <h3>Getting a mail in — the main way</h3>
+        <p>Open the confirmation mail in <b>Mail</b>. <b>Select All</b>, then <b>Copy</b>. Come back here, tap the big <b>clipboard button</b> at the bottom, tap inside the dashed box and <b>Paste</b>. Then <b>Read the mail</b>.</p>
+        <p>Pasting this way matters: it carries the <b>product pictures</b> across as well, which a plain-text share never does.</p>
+
+        <h3>Getting a mail in — the one-tap way</h3>
+        <p>There's an Apple Shortcut recipe under <b>The one-tap Shortcut</b> below. Once it's set up, the mail's <b>share sheet</b> has a “Send to PackTrack” entry that opens the app with the mail already in it. Faster, but iOS only hands a Shortcut plain text — so no pictures, and a very long mail can get clipped. Use it for the quick ones and paste for the ones you want pictures on.</p>
+
+        <h3>What it looks for</h3>
+        <p>Shop, order number, order date, <b>every item in the order</b> with its own picture, the total, the <b>promised delivery date</b> — a single day or a range like “zwischen dem 3. und 5. September” — the <b>delivery service</b> (DHL, Deutsche Post, Austrian Post, DPD, GLS, Hermes, UPS, FedEx, PostNL, TNT, Amazon and others), the tracking number, the <b>tracking link</b> straight out of the mail so tracking is one tap, and the <b>pickup place</b> if it's not coming to your door. German and English mails both work.</p>
+        <p>It always shows you what it found <b>before</b> saving, and says plainly what it couldn't find. Every single field is editable, so a miss is never a dead end.</p>
+
+        <h3>The dispatch mail too</h3>
+        <p>Send the <b>shipping</b> mail in the same way when it arrives. If the order number matches one you already have, PackTrack offers to <b>update that order</b> instead of making a second one — filling in the carrier, the tracking number and the sharpened delivery date.</p>
+
+        <h3>The home screen</h3>
+        <p>One card per order, grouped into <b>Late</b>, <b>Today</b>, <b>Coming</b> and <b>Arrived</b>. The colour on the left edge is the message: red is overdue, amber is due today, kraft is coming, green is all in. The big number is <b>days to go</b>. The chips along the top filter the list.</p>
+
+        <h3>The timeline</h3>
+        <p>The button at the <b>top right</b> flips the home screen between the <b>list</b> and a <b>timeline</b> — a day-by-day strip of the days ahead. Each day shows which parcels are due to land on it, so you can see at a glance that Thursday is quiet and Friday has three things coming. Today is marked, weekends are dimmed, anything already <b>overdue</b> is banded at the top, and anything with <b>no date</b> is collected at the bottom.</p>
+        <p>When a shop promises a <b>window</b> rather than a day — “between the 5th and the 7th” — the order is drawn on every day it might turn up on, outlined rather than filled, and labelled with the window so you know why it repeats.</p>
+
+        <h3>The pickup place</h3>
+        <p>If the mail says the parcel is going somewhere other than your door — a post office, a Paketshop, a Packstation, a collection point — PackTrack picks that line out and puts it on the order. You can also type it in yourself, and the app remembers the places you've used so the next one is a tap away.</p>
+        <p>The pickup place is a <b>link</b>: tap it on the order screen and it opens in <b>Maps</b>, ready to navigate to.</p>
+
+        <h3>Colours</h3>
+        <p>Every shop gets its own clear, flat colour and keeps it — Amazon is always the same colour, Thomann is always another — so you recognise an order before you've read a word of it. On top of that the <b>status</b> colours the number: red when it's overdue, amber when it's due today, green when everything's in. Opening an order paints the whole screen in that shop's colour.</p>
+
+        <h3>Ticking things off</h3>
+        <p>Tap an order to open it. Each item has its own tick — Amazon splits deliveries, so this is how it should work. Tick items as they land; when the last one is ticked the whole order goes <b>green</b> and drops into Arrived. Nothing gets deleted, so the order stays as your record.</p>
+
+        <h3>Follow-ups</h3>
+        <p>Each order can carry your own to-dos — “return the small one”, “register the warranty”, “check the invoice”. They get their own ticks, and the <b>Follow-ups</b> chip on the home screen shows every open one across all your orders.</p>
+
+        <h3>Tracking</h3>
+        <p>If the mail carried a tracking link, the order screen shows a big <b>Track this parcel</b> button. If it only carried a number, PackTrack builds the right link itself for DHL, Austrian Post, DPD, GLS, Hermes, UPS, FedEx and PostNL.</p>
+
+        <h3>Pictures</h3>
+        <p>Product pictures come out of a pasted mail automatically. The app tries to store a copy on the device so it still shows offline; when the shop won't allow that, it keeps the link instead and the picture appears when you're online. You can also tap the little square next to any item in the editor and <b>take or choose a photo</b> yourself — those are always stored on the device.</p>
+
+        <h3>Updates</h3>
+        <p>The app checks for a new version when you open it (and when you come back to it, at most every 5 minutes). When one is live a bar appears at the bottom with an <b>Update</b> button — one tap loads it. <b>Check for app update</b> below asks immediately.</p>
+
+        <h3>Backups</h3>
+        <p>Under <b>Your data</b> you can save all your orders as a backup file, copy them to the clipboard, or restore. A restore <b>shows its work</b>: it tells you exactly how many orders came back, and a bad file leaves your live data untouched. The app also keeps its own daily snapshots on the device, and the <b>Check the safety net works</b> button proves that in front of you with real numbers.</p>
+
+        <h3>Where your data lives</h3>
+        <p>Everything is stored only on this device, inside this app. Nothing is synced or sent anywhere — which is exactly why the backup buttons exist.</p>
+      </div>
+    </details>
+
+    <details class="fold" id="foldShortcut">
+      <summary><svg class="hi"><use href="#icon-link"/></svg>The one-tap Shortcut<svg class="hi chev"><use href="#icon-chevron"/></svg></summary>
+      <div class="foldbody">
+        <p class="dim" style="margin-top:8px">Build this once in the <b>Shortcuts</b> app and every confirmation mail is two taps away from being an order. It takes about three minutes.</p>
+        <p><b>1.</b> Shortcuts → <b>+</b> → tap the shortcut's name → <b>Details</b> → switch on <b>Show in Share Sheet</b>. Under “Receive”, leave <b>Text</b> on (turn the rest off).</p>
+        <p><b>2.</b> Add the action <b>Text</b>, and put <b>Shortcut Input</b> inside it (tap the field, then pick Shortcut Input from the variable bar).</p>
+        <p><b>3.</b> Add the action <b>URL Encode</b> and point it at that Text.</p>
+        <p><b>4.</b> Add the action <b>Open URLs</b>. In the URL field type the address below, then drop the <b>URL Encoded Text</b> variable right at the end, after the <code>=</code>:</p>
+        <div class="code" id="shortcutUrl"></div>
+        <p><b>5.</b> Name it <b>Send to PackTrack</b> and save.</p>
+        <p>Now: open a confirmation mail → <b>share</b> → <b>Send to PackTrack</b>. The app opens with the mail already read, showing you what it found.</p>
+        <p class="dim" style="font-size:13px">Remember: this route is plain text only, so no product pictures. Copy-and-paste is the one that brings pictures.</p>
+        <button class="btn full" id="copyUrlBtn">Copy that address</button>
+      </div>
+    </details>
+
+    <details class="fold" id="foldData">
+      <summary><svg class="hi"><use href="#icon-backup"/></svg>Your data<svg class="hi chev"><use href="#icon-chevron"/></svg></summary>
+      <div class="foldbody">
+        <p class="dim" style="margin-top:8px">Your orders live only on this device. Every now and then, save a backup file you can keep safe or move to another phone.</p>
+        <button class="btn full" id="exportBtn">Export my data</button>
+        <button class="btn full" id="copyBtn">Copy backup to clipboard</button>
+        <button class="btn full" id="importBtn">Import / restore…</button>
+        <input type="file" id="importFile" accept=".json,application/json" style="display:none" />
+        <div class="backup-meta" id="backupMeta"></div>
+
+        <h3 style="margin-top:22px">The app's own safety net</h3>
+        <p class="dim" style="font-size:13.5px">Each day you open the app it quietly keeps a snapshot of your orders on this device — the last 10 are kept. Handy if something gets deleted by mistake. It is <b>not</b> a substitute for the export file above: snapshots live inside the app, so they go with it.</p>
+        <button class="btn full" id="selfTestBtn">Check the safety net works</button>
+        <div id="snapList"></div>
+      </div>
+    </details>
+
+    <details class="fold" id="foldVlog">
+      <summary><svg class="hi"><use href="#icon-history"/></svg>Version history<svg class="hi chev"><use href="#icon-chevron"/></svg></summary>
+      <div class="foldbody vlog" id="vlog"></div>
+    </details>
+
+    <button class="btn full" id="tidyBtn">Clear out arrived orders…</button>
+    <button class="btn full" id="updateBtn">Check for app update</button>
+  </div>
+</div>
+
+<!-- update toast -->
+<div id="toast" hidden><span id="toastMsg"></span><button id="toastAct" hidden></button></div>
+
+<script>
+(() => {
+'use strict';
+
+/* ============ version log — newest first; [0].v is THE app version ============ */
+const VERSIONLOG = [
+  { v:'1.0', when:'1 Sep 2026',
+    what:'First release. Hand a confirmation mail to the app and it reads it for you: the shop, the order number and order date, every item in the order with its own product picture, the total, the promised delivery date — a single day or a range like “zwischen dem 3. und 5. September” — the delivery service (DHL, Deutsche Post, Österreichische Post, DPD, GLS, Hermes, UPS, FedEx, PostNL, TNT, Amazon Logistics and more), the tracking number, the tracking link straight out of the mail, and the pickup place if the parcel is going to a post office, a Paketshop or a Packstation. German and English mails both work.\n\nThere are two ways to hand a mail over. Copy it in Mail and paste it into the app — this is the route that carries the product pictures across, because a rich paste keeps the images while plain text throws them away. Or set up the one-tap Apple Shortcut described in Settings and send the mail straight from its share sheet, which is faster but text-only. Either way the app shows you exactly what it found before anything is saved, says plainly what it could not find, and lets you correct every single field, so a miss is never a dead end.\n\nSend the dispatch mail the same way when it comes. If the order number matches an order you already have, PackTrack offers to fold it in rather than create a second one — filling in the carrier, the tracking number and the sharpened delivery date, and adding any pictures the first mail did not carry.\n\nThe home screen is one card per order, grouped into Late, Today, Almost here, Coming and Arrived. Every shop gets its own clear flat colour that it keeps for good, and the status colour on the number carries the message: red overdue, amber today, green all in. The button at the top right flips the whole thing into a timeline — a day-by-day strip of the days ahead showing which parcel lands when, with overdue ones banded at the top, orders with a delivery window drawn across every day they might turn up on, and anything without a date collected at the bottom.\n\nTap an order to tick items off one at a time as they actually arrive, because Amazon splits deliveries and one mail is usually several items. When the last item is ticked the order turns green and moves to Arrived. Each order also carries your own follow-ups — return the small one, register the warranty, check the invoice — with their own ticks and a home-screen chip counting every open one. If a pickup place is known, tapping it opens it in Maps.\n\nBackups, daily snapshots that prove themselves by reading back what they wrote, and self-updating are all built in. Everything is stored on this one device. Works fully offline as a home-screen app.' },
+];
+
+/* ============ storage ============ */
+const KEY = 'amspt.v1';
+const META_KEY = 'amspt.lastBackup';
+const SNAP_KEY = 'amspt.snapshots';
+const NUDGE_KEY = 'amspt.nudgeSnoozed';
+const SNAP_MAX = 10;
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+
+let state = { version:1, orders:[] };
+let view = 'list';          // 'list' | 'timeline' | 'detail'
+let lastListView = 'list';  // which of the two to come back to from an order
+let openId = null;          // order being viewed
+let filter = 'open';        // 'open' | 'todo' | 'done' | 'all'
+let draft = null;           // the order currently in the editor
+let draftIsNew = false;
+let draftFound = null;      // what the parser found, for the review note
+
+function load(){
+  try{
+    const raw = localStorage.getItem(KEY);
+    if(raw){
+      const s = JSON.parse(raw);
+      if(s && Array.isArray(s.orders)) return normalise(s);
+    }
+  }catch(e){}
+  return { version:1, orders:[] };
+}
+function normalise(s){
+  s.orders = s.orders.filter(o => o && o.id).map(o => ({
+    id: o.id,
+    createdAt: o.createdAt || new Date().toISOString(),
+    shop: o.shop || '',
+    orderNo: o.orderNo || '',
+    ordered: o.ordered || '',
+    due: o.due || '',
+    dueTo: o.dueTo || '',
+    carrier: o.carrier || '',
+    tracking: o.tracking || '',
+    trackUrl: o.trackUrl || '',
+    total: o.total || '',
+    note: o.note || '',
+    pickup: o.pickup || '',
+    got: !!o.got,
+    colour: (o.colour && PALETTE[o.colour]) ? o.colour : '',
+    items: Array.isArray(o.items) ? o.items.filter(i => i && (i.name || i.img)).map(i => ({
+      id: i.id || uid(), name: i.name || '', qty: i.qty || '', img: i.img || '',
+      got: !!i.got, gotAt: i.gotAt || ''
+    })) : [],
+    todos: Array.isArray(o.todos) ? o.todos.filter(t => t && t.text).map(t => ({
+      id: t.id || uid(), text: t.text, done: !!t.done, doneAt: t.doneAt || ''
+    })) : []
+  }));
+  return s;
+}
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){ alert('This device refused to save — storage may be full.'); } }
+function orderById(id){ return state.orders.find(o => o.id === id) || null; }
+
+/* ============ dates ============ */
+const DAY = 86400000;
+const todayISO = () => isoOf(new Date());
+function isoOf(d){ return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
+function parseISO(s){ if(!s) return null; const p = s.split('-').map(Number); if(p.length !== 3 || !p[0]) return null; return new Date(p[0], p[1]-1, p[2]); }
+function midnight(d){ const x = new Date(d); x.setHours(0,0,0,0); return x; }
+function daysTo(iso){ const d = parseISO(iso); if(!d) return null; return Math.round((midnight(d) - midnight(new Date())) / DAY); }
+function prettyDate(iso){
+  const d = parseISO(iso); if(!d) return '';
+  return d.toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'short' });
+}
+function longDate(iso){
+  const d = parseISO(iso); if(!d) return '';
+  return d.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+}
+
+/* ============ the delivery services we know ============ */
+const CARRIERS = [
+  { id:'Amazon',        re:/Amazon\s*(?:Logistics|Shipping|Transportdienstleister|Logistik)|\bAMZL\b/i,
+    url:() => 'https://www.amazon.de/gp/css/order-history' },
+  { id:'DHL',           re:/\bDHL\b/i,
+    url:n => 'https://www.dhl.de/de/privatkunden/pakete-empfangen/verfolgen.html?piececode=' + n },
+  { id:'Deutsche Post', re:/Deutsche\s*Post/i,
+    url:n => 'https://www.deutschepost.de/sendung/simpleQueryResult.html?form.sendungsnummer=' + n },
+  { id:'Post',          re:/Österreichische\s*Post|Post\s*AG|\bpost\.at\b|Austrian\s*Post/i,
+    url:n => 'https://www.post.at/s/sendungsdetails?snr=' + n },
+  { id:'DPD',           re:/\bDPD\b/i,
+    url:n => 'https://tracking.dpd.de/status/de_DE/parcel/' + n },
+  { id:'GLS',           re:/\bGLS\b/i,
+    url:n => 'https://gls-group.com/AT/de/paketverfolgung?match=' + n },
+  { id:'Hermes',        re:/\bHermes\b/i,
+    url:n => 'https://www.myhermes.de/empfangen/sendungsverfolgung/sendungsinformation/#' + n },
+  { id:'UPS',           re:/\bUPS\b/,
+    url:n => 'https://www.ups.com/track?loc=de_AT&tracknum=' + n },
+  { id:'FedEx',         re:/\bFedEx\b/i,
+    url:n => 'https://www.fedex.com/fedextrack/?trknbr=' + n },
+  { id:'PostNL',        re:/\bPostNL\b/i,
+    url:n => 'https://postnl.post/detail?barcode=' + n },
+  { id:'TNT',           re:/\bTNT\b/,
+    url:n => 'https://www.tnt.com/express/de_at/site/shipping-tools/tracking.html?searchType=con&cons=' + n },
+  { id:'GO!',           re:/\bGO!\s*Express|General\s*Overnight/i, url:() => '' },
+  { id:'Schenker',      re:/\bSchenker\b/i, url:() => '' },
+  { id:'trans-o-flex',  re:/trans-?o-?flex/i, url:() => '' },
+];
+function carrierDef(name){
+  if(!name) return null;
+  const exact = CARRIERS.find(c => c.id.toLowerCase() === String(name).trim().toLowerCase());
+  if(exact) return exact;
+  return CARRIERS.find(c => c.re.test(name)) || null;
+}
+function buildTrackUrl(carrier, number){
+  const c = carrierDef(carrier);
+  if(!c || !number) return c && c.id === 'Amazon' ? c.url() : '';
+  try{ return c.url(encodeURIComponent(String(number).replace(/\s+/g,''))) || ''; }catch(e){ return ''; }
+}
+
+/* ============ months / weekdays, German and English ============ */
+const MONTHS = {
+  jan:1, januar:1, january:1, jän:1, jaen:1, jänner:1, jaenner:1,
+  feb:2, februar:2, february:2,
+  mar:3, mär:3, maer:3, marz:3, märz:3, maerz:3, mrz:3, march:3,
+  apr:4, april:4,
+  mai:5, may:5,
+  jun:6, juni:6, june:6,
+  jul:7, juli:7, july:7,
+  aug:8, august:8,
+  sep:9, sept:9, september:9,
+  okt:10, oct:10, oktober:10, october:10,
+  nov:11, november:11,
+  dez:12, dec:12, dezember:12, december:12
+};
+function monthNo(word){
+  if(!word) return 0;
+  const w = String(word).toLowerCase().replace(/\.$/, '').trim();
+  if(MONTHS[w]) return MONTHS[w];
+  if(MONTHS[w.slice(0,4)]) return MONTHS[w.slice(0,4)];
+  if(MONTHS[w.slice(0,3)]) return MONTHS[w.slice(0,3)];
+  return 0;
+}
+/* long names only — "so" and "do" are far too common in German prose */
+const WEEKDAYS = {
+  sonntag:0, sunday:0, montag:1, monday:1, dienstag:2, tuesday:2,
+  mittwoch:3, wednesday:3, donnerstag:4, thursday:4,
+  freitag:5, friday:5, samstag:6, sonnabend:6, saturday:6
+};
+
+/* Build an ISO date, inferring a missing year so it lands near today. */
+function mkDate(y, m, d){
+  if(!m || m < 1 || m > 12 || !d || d < 1 || d > 31) return '';
+  const now = new Date();
+  let year = y;
+  if(!year){
+    year = now.getFullYear();
+    const trial = new Date(year, m-1, d);
+    const diff = Math.round((midnight(trial) - midnight(now)) / DAY);
+    if(diff < -90) year += 1;
+    else if(diff > 300) year -= 1;
+  } else if(year < 100){
+    year += 2000;
+  }
+  const dt = new Date(year, m-1, d);
+  if(dt.getMonth() !== m-1 || dt.getDate() !== d) return '';   // e.g. 31 February
+  return isoOf(dt);
+}
+
+/* The month has to be a REAL month name. Letting any word stand in for one made
+   "zwischen dem 3. und 5. September" match "dem 3" and "und 5" first, eating both
+   digits before the actual date could be read. Longest spellings come first. */
+const MONTH_WORDS =
+  'januar|jänner|jaenner|january|jan|februar|february|feb|märz|maerz|marz|march|mar|mrz' +
+  '|april|apr|mai|may|juni|june|jun|juli|july|jul|august|aug|september|sept|sep' +
+  '|oktober|october|okt|oct|november|nov|dezember|december|dez|dec';
+const MW = '(?:' + MONTH_WORDS + ')(?![a-zäöüß])';
+
+/* One pass over a piece of text, collecting every date it can recognise, in order. */
+const DATE_RE = new RegExp([
+  '(20\\d{2})-(\\d{1,2})-(\\d{1,2})',                                       // 1-3   2026-09-05
+  '(\\d{1,2})\\.[ \\t]*(\\d{1,2})\\.[ \\t]*(\\d{4}|\\d{2})?(?!\\d)',        // 4-6   05.09.2026
+  '(\\d{1,2})\\.?[ \\t]*(' + MW + ')\\.?(?:[ \\t]+(\\d{4}))?',                // 7-9   5. September 2026
+  '\\b(' + MW + ')\\.?[ \\t]+(\\d{1,2})(?!\\d)(?:st|nd|rd|th)?,?(?:[ \\t]+(\\d{4}))?'  // 10-12 September 5, 2026
+].join('|'), 'gi');
+
+/* "zwischen dem 3. und 5. September" — one month, two days. */
+const RANGE_RE = new RegExp(
+  '(\\d{1,2})\\.?\\s*(?:und|bis|to|and|[–—-])\\s*(?:[A-Za-zÄÖÜäöüß]{2,10},?\\s*)?' +
+  '(\\d{1,2})\\.?\\s*(' + MW + ')\\.?(?:\\s+(\\d{4}))?', 'i');
+function scanRange(text){
+  const m = String(text || '').match(RANGE_RE);
+  if(!m) return null;
+  const mo = monthNo(m[3]);
+  if(!mo) return null;
+  const y = m[4] ? +m[4] : 0;
+  const a = mkDate(y, mo, +m[1]), b = mkDate(y, mo, +m[2]);
+  if(!a || !b || b <= a) return null;
+  return { from:a, to:b };
+}
+
+function scanDates(text){
+  const out = [];
+  if(!text) return out;
+  DATE_RE.lastIndex = 0;
+  let m;
+  while((m = DATE_RE.exec(text)) !== null){
+    let iso = '';
+    if(m[1]) iso = mkDate(+m[1], +m[2], +m[3]);
+    else if(m[4]) iso = mkDate(m[6] ? +m[6] : 0, +m[5], +m[4]);
+    else if(m[7]){ const mo = monthNo(m[8]); if(mo) iso = mkDate(m[9] ? +m[9] : 0, mo, +m[7]); }
+    else if(m[10]){ const mo = monthNo(m[10]); if(mo) iso = mkDate(m[12] ? +m[12] : 0, mo, +m[11]); }
+    if(iso && out.indexOf(iso) === -1) out.push(iso);
+    if(out.length > 6) break;
+  }
+  return out;
+}
+
+/* "morgen", "tomorrow", "Montag" … when no real date is written out */
+function relativeDate(tail){
+  const t = ' ' + tail.toLowerCase() + ' ';
+  if(/\b(heute|today)\b/.test(t)) return todayISO();
+  if(/\b(morgen|tomorrow)\b/.test(t) && !/\bübermorgen\b/.test(t)) return isoOf(new Date(Date.now() + DAY));
+  if(/\bübermorgen\b/.test(t)) return isoOf(new Date(Date.now() + 2*DAY));
+  for(const w in WEEKDAYS){
+    if(new RegExp('\\b' + w + '\\b').test(t)){
+      const want = WEEKDAYS[w];
+      const now = new Date();
+      let add = (want - now.getDay() + 7) % 7;
+      if(add === 0) add = 7;
+      return isoOf(new Date(Date.now() + add*DAY));
+    }
+  }
+  return '';
+}
+
+/* ============================================================
+   THE MAIL READER
+   Two sources, always both used when available:
+     • the DOM of the pasted mail — product links, pictures, tracking links
+     • the plain text — order number, dates, carrier, tracking number, total
+   Everything it finds is shown for review before a single byte is saved.
+   ============================================================ */
+
+function normText(s){
+  return String(s || '')
+    .replace(/ |​| | /g, ' ')
+    .replace(/\r\n?/g, '\n')
+    .replace(/[ \t]+/g, ' ')
+    .replace(/ *\n */g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
+function blankOrder(){
+  return { id:uid(), createdAt:new Date().toISOString(), shop:'', orderNo:'', ordered:'',
+           due:'', dueTo:'', carrier:'', tracking:'', trackUrl:'', total:'', note:'',
+           got:false, colour:'', pickup:'', items:[], todos:[] };
+}
+
+/* ---- links: Amazon (and most senders) wrap every link in a redirector ---- */
+function unwrapUrl(href){
+  let u = String(href || '');
+  for(let i = 0; i < 3; i++){
+    const m = u.match(/[?&](?:U|url|u|redirect|dest|target)=([^&]+)/i);
+    if(!m) break;
+    let dec;
+    try{ dec = decodeURIComponent(m[1]); }catch(e){ break; }
+    if(!/^https?:\/\//i.test(dec)) break;
+    u = dec;
+  }
+  return u;
+}
+function hostOf(url){ try{ return new URL(url).hostname.toLowerCase(); }catch(e){ return ''; } }
+function domainOf(host){
+  const parts = String(host || '').replace(/^www\./,'').split('.').filter(Boolean);
+  if(parts.length <= 2) return parts.join('.');
+  const tail2 = parts.slice(-2).join('.');
+  if(/^(co|com|org|net|gov|ac|or)\.[a-z]{2}$/.test(tail2)) return parts.slice(-3).join('.');
+  return tail2;
+}
+
+const SHOP_PRETTY = {
+  amazon:'Amazon', ebay:'eBay', zalando:'Zalando', ikea:'IKEA', mediamarkt:'MediaMarkt',
+  otto:'OTTO', xxxlutz:'XXXLutz', thomann:'Thomann', decathlon:'Decathlon',
+  bergfreunde:'Bergfreunde', notebooksbilliger:'notebooksbilliger', galaxus:'Galaxus',
+  digitec:'Digitec', conrad:'Conrad', hornbach:'Hornbach', obi:'OBI', bauhaus:'Bauhaus',
+  hervis:'Hervis', intersport:'Intersport', gigasport:'Gigasport', sportscheck:'SportScheck',
+  aliexpress:'AliExpress', temu:'Temu', etsy:'Etsy', apple:'Apple', saturn:'Saturn',
+  alternate:'Alternate', cyberport:'Cyberport', bike24:'Bike24', canyon:'Canyon',
+  globetrotter:'Globetrotter', universal:'Universal', interspar:'Interspar', rewe:'REWE',
+  'shop-apotheke':'Shop Apotheke', 'jack-wolfskin':'Jack Wolfskin', patagonia:'Patagonia'
+};
+/* infrastructure, senders and CDNs — never the shop */
+const SHOP_NOISE = /^(amazonses|amazonaws|media-amazon|ssl-images-amazon|images-amazon|mailchimp|list-manage|sendgrid|sendgrid\.net|mandrillapp|klaviyo|braze|exacttarget|sailthru|salesforce|hubspot|doubleclick|googleapis|gstatic|google|googletagmanager|facebook|twitter|x|instagram|youtube|linkedin|pinterest|tiktok|whatsapp|apple\.co|cloudfront|akamaized|akamai|fastly|cdn|w3|schema|paypal|klarna|visa|mastercard|trustpilot|trustedshops|shopify|shopifycdn|myshopify)\./;
+const CARRIER_DOMAIN = /^(dhl|deutschepost|post|dpd|gls-group|myhermes|hermesworld|ups|fedex|postnl|tnt|dpdgroup)\./;
+
+function shopFromDom(root){
+  if(!root) return '';
+  const counts = {}, carrierCounts = {};
+  root.querySelectorAll('a[href]').forEach(a => {
+    const d = domainOf(hostOf(unwrapUrl(a.getAttribute('href'))));
+    if(!d || d.indexOf('.') === -1) return;
+    if(SHOP_NOISE.test(d + '.')) return;
+    if(CARRIER_DOMAIN.test(d + '.')){ carrierCounts[d] = (carrierCounts[d] || 0) + 1; return; }
+    counts[d] = (counts[d] || 0) + 1;
+  });
+  const pick = (obj) => Object.keys(obj).sort((a,b) => obj[b] - obj[a])[0] || '';
+  return prettyShop(pick(counts) || pick(carrierCounts));
+}
+function prettyShop(domain){
+  if(!domain) return '';
+  const first = domain.split('.')[0];
+  if(SHOP_PRETTY[first]) return SHOP_PRETTY[first];
+  if(SHOP_PRETTY[domain]) return SHOP_PRETTY[domain];
+  return first.charAt(0).toUpperCase() + first.slice(1);
+}
+function shopFromText(txt){
+  for(const k in SHOP_PRETTY){
+    if(new RegExp('\\b' + k.replace(/[-]/g,'[- ]?') + '\\b', 'i').test(txt)) return SHOP_PRETTY[k];
+  }
+  const from = txt.match(/^(?:From|Von)\s*:\s*([^<\n]{2,40})/mi);
+  if(from) return from[1].replace(/["']/g,'').trim().slice(0, 30);
+  return '';
+}
+
+/* ---- pictures ---- */
+const IMG_NOISE = /(pixel|spacer|transparent|1x1|blank|beacon|open\?|\/o\.gif|clear\.gif|logo|wordmark|badge|sprite|icon|footer|header|banner|social|facebook|twitter|instagram|appstore|app-store|googleplay|play-badge|unsubscribe|trustpilot|paypal|klarna|visa|mastercard|star|rating)/i;
+function goodImg(img){
+  const src = img.getAttribute('src') || '';
+  if(!src || /^cid:/i.test(src)) return false;
+  if(/^data:image\/gif/i.test(src)) return false;
+  if(/\/images\/I\//.test(src)) return true;                    // Amazon product art — always keep
+  if(IMG_NOISE.test(src)) return false;
+  const w = parseInt(img.getAttribute('width') || '0', 10);
+  const h = parseInt(img.getAttribute('height') || '0', 10);
+  if((w && w < 40) || (h && h < 40)) return false;
+  if(img.naturalWidth && img.naturalWidth < 40) return false;
+  return true;
+}
+function absSrc(img){
+  const s = img.getAttribute('src') || '';
+  if(/^https?:|^data:/i.test(s)) return s;
+  try{ return new URL(s, 'https://example.invalid/').href; }catch(e){ return s; }
+}
+
+/* ---- items out of the DOM ---- */
+const PRODUCT_HREF = /\/(?:dp|gp\/product|gp\/aw\/d)\/[A-Z0-9]{6,}|\/itm\/\d{6,}|\/products?\/[\w-]{3,}|\/artikel\/|\/p\/[\w-]{3,}/i;
+const NOT_A_PRODUCT = /^(?:bestellung|bestellungen|order|orders|view|ansehen|anzeigen|track|verfolg|sendungs|hilfe|help|kontakt|contact|abbestellen|unsubscribe|datenschutz|privacy|impressum|agb|terms|konto|account|mehr|more|hier|here|jetzt|now|zur|zum|shop|weiter|details|rechnung|invoice|retour|return|bewert|review|app\b|download)/i;
+
+function productKey(href){
+  const m = href.match(/\/(?:dp|gp\/product|gp\/aw\/d)\/([A-Z0-9]{6,})/i) || href.match(/\/itm\/(\d{6,})/);
+  if(m) return m[1].toUpperCase();
+  try{ return new URL(href).pathname.toLowerCase(); }catch(e){ return href.toLowerCase(); }
+}
+function itemsFromDom(root){
+  if(!root) return [];
+  const byKey = new Map();
+  root.querySelectorAll('a[href]').forEach(a => {
+    const href = unwrapUrl(a.getAttribute('href'));
+    if(!PRODUCT_HREF.test(href)) return;
+    const key = productKey(href);
+    if(!byKey.has(key)) byKey.set(key, { name:'', img:'', qty:'' });
+    const rec = byKey.get(key);
+    const t = (a.textContent || '').replace(/\s+/g,' ').trim();
+    if(t.length >= 6 && t.length <= 200 && !NOT_A_PRODUCT.test(t) && t.length > rec.name.length) rec.name = t;
+    const im = a.querySelector('img');
+    if(!rec.img && im && goodImg(im)) rec.img = absSrc(im);
+  });
+
+  // a product picture often sits beside its link rather than inside it
+  byKey.forEach((rec, key) => {
+    if(rec.img) return;
+    const a = Array.from(root.querySelectorAll('a[href]'))
+      .find(x => productKey(unwrapUrl(x.getAttribute('href'))) === key);
+    if(!a) return;
+    let node = a;
+    for(let up = 0; up < 5 && node && node !== root; up++){
+      node = node.parentElement;
+      if(!node) break;
+      const im = Array.from(node.querySelectorAll('img')).find(goodImg);
+      if(im){ rec.img = absSrc(im); break; }
+    }
+  });
+
+  // Quantity has to come from the item's OWN row. A plain character window
+  // around the name reaches backwards into the previous item and picks up
+  // its "Menge:" instead — so walk up to the smallest enclosing block.
+  const QTY_RE = /(?:Menge|Anzahl|Stück|Stk\.?|Qty|Quantity)\s*[:.]?\s*(\d{1,3})(?!\d)|\bx\s?(\d{1,2})(?!\d)/i;
+  const out = [];
+  byKey.forEach((rec, key) => {
+    if(!rec.name && !rec.img) return;
+    if(rec.name){
+      const a = Array.from(root.querySelectorAll('a[href]'))
+        .find(x => productKey(unwrapUrl(x.getAttribute('href'))) === key && (x.textContent || '').trim());
+      let node = a;
+      for(let up = 0; up < 5 && node && node !== root; up++){
+        node = node.parentElement;
+        if(!node) break;
+        const t = node.textContent || '';
+        if(t.length > 500) break;                 // too big to be this item's own row
+        const q = t.match(QTY_RE);
+        if(q){ rec.qty = q[1] || q[2] || ''; break; }
+      }
+    }
+    out.push({ id:uid(), name:rec.name || 'Item', qty:(rec.qty && rec.qty !== '1') ? rec.qty : '',
+               img:rec.img || '', got:false, gotAt:'' });
+  });
+  return out.slice(0, 25);
+}
+
+/* ---- items out of plain text, when there is no DOM to work with ---- */
+const PRICE_RE = /(?:EUR|€|CHF|USD|\$|£)\s?\d|\d[\d.,]*\s?(?:EUR|€|CHF)/i;
+const TEXT_NOISE = /^(?:hallo|hi\b|guten tag|sehr geehrte|liebe|vielen dank|danke|thank you|thanks|bestellnummer|bestellung|order|lieferadresse|rechnungsadresse|versandadresse|zahlungsart|zahlungsmittel|versandart|versandkosten|zwischensumme|summe|gesamt|mwst|ust|steuer|verkauft von|verkauf durch|versand durch|geliefert von|amazon\.|impressum|datenschutz|abbestellen|unsubscribe|©|http|www\.|menge|anzahl|qty|quantity|preis|price|artikel-?nr|ihre bestellung|your order|track|sendungsverfolgung|voraussicht|zustellung|lieferung|arriving|estimated|delivery|rechnung|invoice|kundenservice|customer service|folgen sie|klicken)/i;
+function itemsFromText(txt){
+  const lines = txt.split('\n').map(l => l.trim()).filter(Boolean);
+  const out = [], seen = new Set();
+  for(let i = 0; i < lines.length && out.length < 12; i++){
+    const L = lines[i];
+    if(L.length < 10 || L.length > 180) continue;
+    if(TEXT_NOISE.test(L)) continue;
+    if(!/[A-Za-zÄÖÜäöüß]{4}/.test(L)) continue;
+    if(/^[\d\s.,:€$-]+$/.test(L)) continue;
+    const near = [L, lines[i+1] || '', lines[i+2] || ''].join(' ');
+    if(!PRICE_RE.test(near)) continue;
+    const name = L.replace(/\s*(?:EUR|€)\s?[\d.,]+\s*$/i, '').replace(/\s+/g,' ').trim();
+    if(name.length < 8) continue;
+    const k = name.toLowerCase().slice(0, 40);
+    if(seen.has(k)) continue;
+    seen.add(k);
+    out.push({ id:uid(), name:name.slice(0,160), qty:'', img:'', got:false, gotAt:'' });
+  }
+  return out;
+}
+
+/* ---- where the parcel actually ends up ---- */
+const PICKUP_KW = /(Abholstation|Abholort|Abholung|Abholbereit|Selbstabholung|Postfiliale|Post-?Filiale|Postpartner|Post\.Partner|Packstation|Paketshop|Paket-?Shop|PaketBox|Abgabestelle|Zustellbasis|Pickup\s*(?:point|station|location)?|Collection\s*point|Parcel\s*(?:shop|locker))/i;
+function findPickup(txt){
+  const lines = String(txt || '').split('\n');
+  for(const line of lines){
+    if(!PICKUP_KW.test(line)) continue;
+    const clean = line.replace(/\s+/g, ' ').trim();
+    if(clean.length >= 4) return clean.slice(0, 100);
+  }
+  return '';
+}
+
+/* ---- the labelled facts ---- */
+const DUE_LABEL = new RegExp(
+  '(?:voraussichtlich\\w*\\s*(?:e[rns]?\\s*)?(?:liefer\\w*|zustell\\w*|ankunft)?' +
+  '|geplante[rs]?\\s*(?:lieferung|zustellung)|liefertermin|lieferdatum|lieferzeitraum' +
+  '|zustelldatum|zustellung(?:\\s*erfolgt)?|lieferung(?:\\s*(?:am|bis|zwischen|erfolgt))?|ankunft|wird\\s*geliefert|ankunftsdatum' +
+  '|estimated\\s*delivery|expected\\s*(?:delivery|arrival)|delivery\\s*(?:date|estimate|by)|scheduled\\s*delivery' +
+  '|guaranteed\\s*delivery|arriv\\w+|will\\s*arrive)\\s*[:\\-–]?\\s*', 'i');
+
+const ORDERNO_RES = [
+  /\b(\d{3}-\d{7}-\d{7})\b/,
+  /(?:Bestellnummer|Bestell-?\s?Nr\.?|Bestellnr\.?|Auftragsnummer|Auftrags-?\s?Nr\.?)\s*[:#]?\s*([A-Z0-9][A-Z0-9\/-]{4,29})/i,
+  /(?:Order|Bestellung)\s*(?:number|no\.?|#|ID|Nr\.?)\s*[:#]?\s*([A-Z0-9][A-Z0-9\/-]{4,29})/i,
+  /(?:Rechnungsnummer|Invoice\s*(?:number|no\.?))\s*[:#]?\s*([A-Z0-9][A-Z0-9\/-]{4,29})/i
+];
+const AMT = '(?:EUR|€|CHF|USD|\\$|£)\\s?\\d(?:[\\d.,]{0,12}\\d)?|\\d(?:[\\d.,]{0,12}\\d)?\\s?(?:EUR|€|CHF)';
+const TOTAL_RES = [
+  new RegExp('\\b(?:Gesamtsumme|Gesamtbetrag|Rechnungsbetrag|Bestellsumme|Endbetrag|Gesamtpreis|Summe\\s*gesamt|Order\\s*Total|Grand\\s*Total|Total\\s*(?:amount|paid|charged))\\s*[:.]?\\s*(' + AMT + ')', 'i'),
+  new RegExp('\\b(?:Gesamt|Summe|Total)\\s*[:.]?\\s*(' + AMT + ')', 'i')
+];
+const TRACK_RE = /(?:Sendungsverfolgungsnummer|Sendungsnummer|Sendungs-?\s?ID|Sendungs-?\s?Nr\.?|Trackingnummer|Tracking-?\s?(?:Nummer|number|code|ID|No\.?)|Paketnummer|Paket-?\s?Nr\.?|Waybill|AWB|Frachtbrief(?:nummer)?|Tracking)\s*[:#]?\s*([A-Z0-9][A-Z0-9\s-]{6,34}[A-Z0-9])/i;
+const TRACK_SHAPES = [
+  /\b(1Z[0-9A-Z]{16})\b/,                 // UPS
+  /\b(00340\d{15})\b/, /\b(00344\d{15})\b/, // DHL
+  /\b(\d{12,22})\b/                       // Post / DPD / generic
+];
+const TRACK_HOSTS = /(dhl\.|deutschepost\.|post\.at|dpd\.|gls-group|myhermes|hermesworld|ups\.com|fedex\.com|postnl|tnt\.com|progress-tracker|sendungsverfolgung|paketverfolgung|parceltracking|track-?trace)/i;
+
+function firstMatch(res, txt){
+  for(const re of res){ const m = txt.match(re); if(m && m[1]) return m[1].trim(); }
+  return '';
+}
+function labelTail(txt, re, len){
+  const m = txt.match(re);
+  if(!m) return '';
+  return txt.slice(m.index + m[0].length, m.index + m[0].length + (len || 110));
+}
+
+function readMail(root, rawText){
+  const txt = normText(rawText || (root ? root.textContent : ''));
+  const o = blankOrder();
+  const found = {};
+
+  /* ---- shop ---- */
+  o.shop = shopFromDom(root) || shopFromText(txt);
+  found.shop = !!o.shop;
+
+  /* ---- order number ---- */
+  o.orderNo = firstMatch(ORDERNO_RES, txt).replace(/\s+/g, '');
+  found.orderNo = !!o.orderNo;
+
+  /* ---- promised delivery ---- */
+  const tail = labelTail(txt, DUE_LABEL, 120);
+  if(tail){
+    const rng = scanRange(tail);
+    const ds = scanDates(tail);
+    if(rng){
+      o.due = rng.from; o.dueTo = rng.to;
+    } else if(ds.length){
+      o.due = ds[0];
+      // a window — "zwischen dem 5. und 8. September", "Mon 8 – Wed 10 Sep"
+      if(ds.length > 1 && /zwischen|bis|und|–|-|through|to\b|and\b/i.test(tail) && ds[1] > ds[0]) o.dueTo = ds[1];
+    } else {
+      o.due = relativeDate(tail);
+    }
+  }
+  found.due = !!o.due;
+
+  /* ---- order date ---- */
+  const oTail = labelTail(txt, /(?:Bestelldatum|Bestellt am|Bestellung vom|Datum der Bestellung|Order\s*(?:date|placed)|Placed on)\s*[:\-]?\s*/i, 60);
+  const oDates = scanDates(oTail);
+  o.ordered = oDates[0] || '';
+  found.ordered = !!o.ordered;
+
+  /* ---- carrier ---- */
+  for(const c of CARRIERS){ if(c.re.test(txt)){ o.carrier = c.id; break; } }
+  found.carrier = !!o.carrier;
+
+  /* ---- tracking number ---- */
+  const tm = txt.match(TRACK_RE);
+  if(tm && tm[1]){
+    // A <br> leaves no space, so the next sentence is glued straight onto the
+    // number ("…5544Ihre Sendung ist…"). Cut at the first ordinary word, then at
+    // any lower case at all — real tracking numbers never contain lower case.
+    o.tracking = tm[1].replace(/\s+/g, '')
+      .replace(/[A-ZÄÖÜ][a-zäöüß].*$/, '')
+      .replace(/[a-zäöüß].*$/, '')
+      .replace(/[-]+$/, '');
+  }
+  if(!o.tracking && o.carrier && o.carrier !== 'Amazon'){
+    for(const re of TRACK_SHAPES){ const m = txt.match(re); if(m){ o.tracking = m[1]; break; } }
+  }
+  if(o.tracking && o.tracking.length > 40) o.tracking = '';
+  found.tracking = !!o.tracking;
+
+  /* ---- tracking link, straight out of the mail ---- */
+  if(root){
+    const links = Array.from(root.querySelectorAll('a[href]')).map(a => unwrapUrl(a.getAttribute('href')));
+    o.trackUrl = links.find(u => /^https?:/i.test(u) && TRACK_HOSTS.test(u)) || '';
+  }
+  if(!o.trackUrl){
+    const m = txt.match(/https?:\/\/[^\s"'<>]+/g);
+    if(m) o.trackUrl = m.find(u => TRACK_HOSTS.test(u)) || '';
+  }
+  if(!o.trackUrl) o.trackUrl = buildTrackUrl(o.carrier, o.tracking);
+  found.trackUrl = !!o.trackUrl;
+
+  /* ---- pickup place ---- */
+  o.pickup = findPickup(txt);
+  found.pickup = !!o.pickup;
+
+  /* ---- total ---- */
+  o.total = firstMatch(TOTAL_RES, txt).replace(/\s+/g, ' ').trim();
+  found.total = !!o.total;
+
+  /* ---- the things in the box ---- */
+  o.items = itemsFromDom(root);
+  if(!o.items.length) o.items = itemsFromText(txt);
+  found.items = o.items.length;
+  found.pics = o.items.filter(i => i.img).length;
+
+  if(!o.shop && o.items.length) o.shop = 'Order';
+  return { order:o, found };
+}
+
+/* ============ pictures: keep a copy on the device where we're allowed ============ */
+function shrink(blob, max){
+  return new Promise((resolve) => {
+    const url = URL.createObjectURL(blob);
+    const img = new Image();
+    img.onload = () => {
+      let out = '';
+      try{
+        const s = Math.min(1, max / Math.max(img.width || 1, img.height || 1));
+        const w = Math.max(1, Math.round((img.width || 1) * s));
+        const h = Math.max(1, Math.round((img.height || 1) * s));
+        const cv = document.createElement('canvas');
+        cv.width = w; cv.height = h;
+        const ctx = cv.getContext('2d');
+        ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, w, h);
+        ctx.drawImage(img, 0, 0, w, h);
+        out = cv.toDataURL('image/jpeg', 0.82);
+      }catch(e){ out = ''; }
+      URL.revokeObjectURL(url);
+      resolve(out);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); resolve(''); };
+    img.src = url;
+  });
+}
+async function cacheImage(url){
+  if(!url || /^data:/i.test(url)) return url || '';
+  try{
+    const res = await fetch(url, { mode:'cors', credentials:'omit' });
+    if(!res.ok) return '';
+    const blob = await res.blob();
+    if(!/^image\//.test(blob.type) || blob.size > 4000000) return '';
+    return await shrink(blob, 240);
+  }catch(e){ return ''; }   // the shop won't allow it — keep the link instead
+}
+/* Try to store every picture on the device, but never hold up a save for long. */
+async function cacheOrderImages(order){
+  const jobs = order.items.filter(i => i.img && !/^data:/i.test(i.img)).slice(0, 12);
+  if(!jobs.length) return;
+  const work = Promise.all(jobs.map(async (it) => {
+    const data = await cacheImage(it.img);
+    if(data) it.img = data;
+  }));
+  await Promise.race([work, new Promise(r => setTimeout(r, 7000))]);
+}
+
+/* ============ a happy colour for every order ============
+   Each shop keeps the same colour every time, so Amazon is always Amazon —
+   picked from the shop's name, and changeable by hand in the editor. */
+const PALETTE = {
+  coral: { dot:'#df5f48', tint:'#fde7e1' },
+  sun:   { dot:'#c98d0c', tint:'#fdf1d2' },
+  mint:  { dot:'#2b9270', tint:'#dff3ea' },
+  sky:   { dot:'#357dc4', tint:'#e2edfb' },
+  lilac: { dot:'#7f61c4', tint:'#ede7fb' },
+  rose:  { dot:'#c94d87', tint:'#fbe3ee' },
+  teal:  { dot:'#1a8d9c', tint:'#ddf1f4' },
+  kraft: { dot:'#b06a35', tint:'#f8efe4' }
+};
+const PAL_KEYS = Object.keys(PALETTE);
+function hashStr(s){ let h = 0; for(let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return h; }
+function colourKey(o){
+  if(o.colour && PALETTE[o.colour]) return o.colour;
+  return PAL_KEYS[hashStr((o.shop || o.id || '').toLowerCase()) % PAL_KEYS.length];
+}
+function colourOf(o){ return PALETTE[colourKey(o)]; }
+
+/* ============ status — the colour is the message ============ */
+const ST = {
+  late:  { c:'var(--late)',  t:'var(--late-t)',  word:'Overdue' },
+  today: { c:'var(--today)', t:'var(--today-t)', word:'Due today' },
+  soon:  { c:'var(--soon)',  t:'var(--soon-t)',  word:'Almost here' },
+  wait:  { c:'var(--wait)',  t:'var(--card)',    word:'On its way' },
+  done:  { c:'var(--done)',  t:'var(--done-t)',  word:'All arrived' }
+};
+function allIn(o){ return o.items.length ? o.items.every(i => i.got) : !!o.got; }
+function lastDue(o){ return o.dueTo || o.due; }
+function statusOf(o){
+  if(allIn(o)) return 'done';
+  const ld = lastDue(o);
+  if(!ld) return 'wait';
+  const dLast = daysTo(ld);
+  const dFirst = o.due ? daysTo(o.due) : dLast;
+  if(dLast < 0) return 'late';
+  if(dFirst === 0 || dLast === 0) return 'today';
+  return dLast <= 2 ? 'soon' : 'wait';
+}
+function openTodos(o){ return o.todos.filter(t => !t.done).length; }
+function gotCount(o){ return o.items.filter(i => i.got).length; }
+function dueText(o){
+  if(!o.due && !o.dueTo) return '';
+  if(o.dueTo && o.dueTo !== o.due) return prettyDate(o.due) + ' – ' + prettyDate(o.dueTo);
+  return prettyDate(o.due);
+}
+function firstPic(o){ const i = o.items.find(x => x.img); return i ? i.img : ''; }
+
+/* ============ header, chips, bottom bar ============ */
+function renderChrome(){
+  $('brandVer').textContent = 'v' + VERSIONLOG[0].v;
+
+  $('hbtns').innerHTML = view === 'detail'
+    ? `<button class="iconbtn" id="backBtn" aria-label="Back"><svg class="hi"><use href="#icon-back"/></svg></button>
+       <button class="iconbtn" id="editBtn" aria-label="Edit"><svg class="hi"><use href="#icon-pencil"/></svg></button>`
+    : `<button class="iconbtn" id="viewBtn" aria-label="${view === 'timeline' ? 'Show the list' : 'Show the timeline'}">
+         <svg class="hi"><use href="#icon-${view === 'timeline' ? 'list' : 'calendar'}"/></svg></button>`;
+  if(view === 'detail'){
+    $('backBtn').addEventListener('click', () => { view = lastListView; openId = null; render(); });
+    $('editBtn').addEventListener('click', () => { const o = orderById(openId); if(o) openEditor(o, false, null); });
+  } else {
+    $('viewBtn').addEventListener('click', () => {
+      view = view === 'timeline' ? 'list' : 'timeline';
+      lastListView = view;
+      render();
+    });
+  }
+
+  $('bottombar').innerHTML = view !== 'detail'
+    ? `<button class="iconbtn" id="addBtn" aria-label="Add an order by hand"><svg class="hi"><use href="#icon-plus"/></svg></button>
+       <button class="iconbtn prime" id="mailBtn" aria-label="Paste an order mail"><svg class="hi"><use href="#icon-paste"/></svg></button>
+       <button class="iconbtn" id="setBtn" aria-label="Settings"><svg class="hi"><use href="#icon-settings"/></svg></button>`
+    : '';
+  if(view !== 'detail'){
+    $('addBtn').addEventListener('click', () => openEditor(blankOrder(), true, null));
+    $('mailBtn').addEventListener('click', openPaste);
+    $('setBtn').addEventListener('click', openSettings);
+  }
+
+  const chips = $('chips');
+  if(view !== 'list'){ chips.innerHTML = ''; chips.style.display = 'none'; return; }
+  chips.style.display = '';
+  const openN = state.orders.filter(o => !allIn(o)).length;
+  const lateN = state.orders.filter(o => statusOf(o) === 'late').length;
+  const todoN = state.orders.reduce((n, o) => n + openTodos(o), 0);
+  const doneN = state.orders.filter(o => allIn(o)).length;
+  const defs = [
+    { k:'open', label:'Waiting', n:openN },
+    { k:'todo', label:'Follow-ups', n:todoN },
+    { k:'done', label:'Arrived', n:doneN },
+    { k:'all',  label:'Everything', n:state.orders.length }
+  ];
+  chips.innerHTML = defs.map(d =>
+    `<button class="chip${filter === d.k ? ' sel' : ''}${d.k === 'open' && lateN ? ' alarm' : ''}" data-k="${d.k}">${d.label}${d.n ? `<span class="n">${d.n}</span>` : ''}</button>`
+  ).join('');
+  chips.querySelectorAll('.chip').forEach(b =>
+    b.addEventListener('click', () => { filter = b.dataset.k; render(); }));
+}
+
+/* ============ the home list ============ */
+function orderCard(o){
+  const st = statusOf(o);
+  const s = ST[st];
+  const pic = firstPic(o);
+  const n = o.items.length;
+  const got = gotCount(o);
+
+  const bits = [];
+  const dt = dueText(o);
+  if(dt) bits.push(`<b>${esc(dt)}</b>`);
+  if(o.carrier) bits.push(esc(o.carrier));
+  if(n > 1) bits.push(got ? `${got} of ${n} in` : `${n} items`);
+  else if(o.total) bits.push(esc(o.total));
+
+  let right;
+  if(st === 'done'){
+    right = `<svg class="hi otick" style="width:30px;height:30px;margin-left:auto"><use href="#icon-check"/></svg>`;
+  } else if(st === 'late'){
+    const d = Math.abs(daysTo(lastDue(o)));
+    right = `<div class="onum">${d}</div><div class="olbl">${d === 1 ? 'day late' : 'days late'}</div>`;
+  } else if(st === 'today'){
+    right = `<div class="oword">Today</div>`;
+  } else if(o.due || o.dueTo){
+    const d = daysTo(o.due || o.dueTo);
+    right = `<div class="onum">${d}</div><div class="olbl">${d === 1 ? 'day' : 'days'}</div>`;
+  } else {
+    right = `<div class="oword" style="color:var(--ink-dim)">No date</div>`;
+  }
+
+  const ot = openTodos(o);
+  const p = colourOf(o);
+  return `<button class="ordercard" data-id="${o.id}" style="--c:${s.c}; --oc:${st === 'done' ? 'var(--done)' : p.dot}; --oct:${st === 'done' ? 'var(--done-t)' : p.tint}">
+    <span class="thumb"><svg class="hi" style="width:26px;height:26px"><use href="#icon-box"/></svg>${pic ? `<img src="${esc(pic)}" alt="" loading="lazy" onerror="this.remove()" />` : ''}</span>
+    <span class="omid">
+      <span class="oshop">${esc(o.shop || 'Order')}</span>
+      <span class="osub">${bits.join(' · ') || esc(s.word)}</span>
+      ${ot ? `<span class="todobadge"><svg class="hi" style="width:13px;height:13px"><use href="#icon-list"/></svg>${ot} follow-up${ot === 1 ? '' : 's'}</span>` : ''}
+    </span>
+    <span class="oright">${right}</span>
+  </button>`;
+}
+
+function renderList(){
+  const main = $('main');
+  if(!state.orders.length){
+    main.innerHTML = `<div class="empty">
+      <svg class="hi"><use href="#icon-box"/></svg>
+      <div class="big">Nothing on its way</div>
+      <p>Ordered something? Open the confirmation mail in <b>Mail</b>, <b>Select All</b> → <b>Copy</b>, then tap the clipboard button below and paste it in.</p>
+      <p>The plus button adds an order by hand.</p>
+    </div>`;
+    return;
+  }
+
+  let pool;
+  if(filter === 'open') pool = state.orders.filter(o => !allIn(o));
+  else if(filter === 'todo') pool = state.orders.filter(o => openTodos(o) > 0);
+  else if(filter === 'done') pool = state.orders.filter(o => allIn(o));
+  else pool = state.orders.slice();
+
+  if(!pool.length){
+    const msg = { open:'Nothing is on its way right now.', todo:'No open follow-ups — all clear.',
+                  done:'Nothing has arrived yet.', all:'No orders yet.' }[filter];
+    main.innerHTML = `<div class="empty"><p>${esc(msg)}</p></div>`;
+    return;
+  }
+
+  const rank = { late:0, today:1, soon:2, wait:3, done:4 };
+  pool.sort((a, b) => {
+    const ra = rank[statusOf(a)], rb = rank[statusOf(b)];
+    if(ra !== rb) return ra - rb;
+    const da = lastDue(a), db = lastDue(b);
+    if(ra === 4) return (b.createdAt || '').localeCompare(a.createdAt || '');   // newest arrivals first
+    if(da && db) return da.localeCompare(db);
+    if(da) return -1;
+    if(db) return 1;
+    return (b.createdAt || '').localeCompare(a.createdAt || '');
+  });
+
+  const groups = [
+    { k:'late',  title:'Late' },
+    { k:'today', title:'Today' },
+    { k:'soon',  title:'Almost here' },
+    { k:'wait',  title:'Coming' },
+    { k:'done',  title:'Arrived' }
+  ];
+  let html = '';
+  groups.forEach(g => {
+    const rows = pool.filter(o => statusOf(o) === g.k);
+    if(!rows.length) return;
+    html += `<div class="grouphd"><span class="gdot" style="background:${ST[g.k].c}"></span>${g.title}<span class="gline"></span></div>
+             <div class="cards">${rows.map(orderCard).join('')}</div>`;
+  });
+  main.innerHTML = html;
+  main.querySelectorAll('.ordercard').forEach(b =>
+    b.addEventListener('click', () => { openId = b.dataset.id; view = 'detail'; render(); }));
+}
+
+/* ============ one order, up close ============ */
+function renderDetail(){
+  const o = orderById(openId);
+  if(!o){ view = lastListView; return renderList(); }
+  const st = statusOf(o);
+  const s = ST[st];
+  const main = $('main');
+
+  const trackUrl = o.trackUrl || buildTrackUrl(o.carrier, o.tracking);
+  const when = [];
+  const dt = dueText(o);
+  if(dt) when.push(`<span><svg class="hi"><use href="#icon-calendar"/></svg></span><span>${esc(dt)}</span>`);
+  if(o.carrier) when.push(`<span class="sep">·</span><span><svg class="hi"><use href="#icon-truck"/></svg></span><span>${esc(o.carrier)}</span>`);
+  const pickupLine = o.pickup
+    ? `<a class="dwhen" style="align-items:flex-start; text-decoration:none; color:#fff"
+          href="https://maps.apple.com/?q=${encodeURIComponent(o.pickup)}" target="_blank" rel="noopener">
+         <span><svg class="hi"><use href="#icon-pin"/></svg></span>
+         <span style="flex:1; text-decoration:underline; text-underline-offset:3px">${esc(o.pickup)}</span>
+       </a>`
+    : '';
+
+  let statusLine = s.word;
+  if(st === 'late'){
+    const d = Math.abs(daysTo(lastDue(o)));
+    statusLine = `Overdue by ${d} day${d === 1 ? '' : 's'}`;
+  } else if(st === 'wait' && (o.due || o.dueTo)){
+    const d = daysTo(o.due || o.dueTo);
+    statusLine = `${d} day${d === 1 ? '' : 's'} to go`;
+  } else if(st === 'done'){
+    const n = o.items.length;
+    statusLine = n > 1 ? `All ${n} items arrived` : 'Arrived';
+  } else if(st === 'wait' && !o.due){
+    statusLine = 'On its way — no date given';
+  }
+  if(st !== 'done' && o.items.length > 1 && gotCount(o)) statusLine += ` · ${gotCount(o)} of ${o.items.length} already in`;
+
+  const rows = o.items.length
+    ? o.items.map(i => `
+        <button class="tickrow${i.got ? ' on' : ''}" data-item="${i.id}">
+          <span class="tbox"><svg class="hi"><use href="#icon-check"/></svg></span>
+          <span class="tpic"><svg class="hi"><use href="#icon-box"/></svg>${i.img ? `<img src="${esc(i.img)}" alt="" loading="lazy" onerror="this.remove()" />` : ''}</span>
+          <span class="tmid">
+            <span class="tname">${esc(i.name || 'Item')}</span>
+            ${(i.qty && i.qty !== '1') || i.got ? `<span class="tsub">${[(i.qty && i.qty !== '1') ? '×' + esc(i.qty) : '', i.got && i.gotAt ? 'ticked ' + prettyDate(i.gotAt) : ''].filter(Boolean).join(' · ')}</span>` : ''}
+          </span>
+        </button>`).join('')
+    : `<button class="tickrow${o.got ? ' on' : ''}" data-whole="1">
+         <span class="tbox"><svg class="hi"><use href="#icon-check"/></svg></span>
+         <span class="tpic"><svg class="hi"><use href="#icon-box"/></svg></span>
+         <span class="tmid"><span class="tname">The whole order</span></span>
+       </button>`;
+
+  const todos = o.todos.map(t => `
+    <div class="tickrow${t.done ? ' on' : ''}">
+      <span class="tbox" data-todo="${t.id}"><svg class="hi"><use href="#icon-check"/></svg></span>
+      <span class="tmid" data-todo="${t.id}"><span class="tname">${esc(t.text)}</span></span>
+      <button class="tdel" data-todel="${t.id}" aria-label="Remove"><svg class="hi" style="width:17px;height:17px"><use href="#icon-close"/></svg></button>
+    </div>`).join('');
+
+  const facts = [
+    ['Order number', o.orderNo],
+    ['Ordered on', o.ordered ? longDate(o.ordered) : ''],
+    ['Total', o.total],
+    ['Pickup place', o.pickup],
+    ['Tracking number', o.tracking],
+    ['Note', o.note]
+  ].filter(f => f[1]);
+
+  const p = colourOf(o);
+  main.innerHTML = `
+    <div class="dhero" style="--c:${s.c}; --oc:${st === 'done' ? 'var(--done)' : p.dot}">
+      <div class="dshop">${esc(o.shop || 'Order')}</div>
+      <div class="statuspill"><span class="sdot"></span>${esc(statusLine)}</div>
+      ${when.length ? `<div class="dwhen">${when.join(' ')}</div>` : ''}
+      ${pickupLine}
+      ${trackUrl ? `<a class="tracklink" href="${esc(trackUrl)}" target="_blank" rel="noopener"><svg class="hi"><use href="#icon-truck"/></svg>Track this parcel</a>` : ''}
+    </div>
+
+    <div class="sect">In the box<span class="gline"></span></div>
+    ${rows}
+
+    <div class="sect">Follow-ups<span class="gline"></span></div>
+    ${todos}
+    <button class="addrow" id="addTodoInline"><svg class="hi"><use href="#icon-plus"/></svg>Add a follow-up</button>
+
+    ${facts.length ? `<div class="sect">Details<span class="gline"></span></div>
+      <div class="facts">${facts.map(f => `<div class="fact"><span class="k">${esc(f[0])}</span><span class="v">${esc(f[1])}</span></div>`).join('')}</div>` : ''}
+
+    <button class="btn full" id="editBtn2" style="margin-bottom:14px">Edit this order</button>`;
+
+  main.querySelectorAll('[data-item]').forEach(b => b.addEventListener('click', () => {
+    const it = o.items.find(x => x.id === b.dataset.item);
+    if(!it) return;
+    it.got = !it.got;
+    it.gotAt = it.got ? todayISO() : '';
+    save(); render();
+  }));
+  const whole = main.querySelector('[data-whole]');
+  if(whole) whole.addEventListener('click', () => { o.got = !o.got; save(); render(); });
+
+  main.querySelectorAll('[data-todo]').forEach(b => b.addEventListener('click', () => {
+    const t = o.todos.find(x => x.id === b.dataset.todo);
+    if(!t) return;
+    t.done = !t.done;
+    t.doneAt = t.done ? todayISO() : '';
+    save(); render();
+  }));
+  main.querySelectorAll('[data-todel]').forEach(b => b.addEventListener('click', () => {
+    const t = o.todos.find(x => x.id === b.dataset.todel);
+    if(!t) return;
+    if(!confirm(`Remove the follow-up “${t.text}”?`)) return;
+    o.todos = o.todos.filter(x => x.id !== t.id);
+    save(); render();
+  }));
+  $('addTodoInline').addEventListener('click', () => {
+    const txt = prompt('What needs following up on this order?');
+    if(!txt || !txt.trim()) return;
+    o.todos.push({ id:uid(), text:txt.trim().slice(0, 200), done:false, doneAt:'' });
+    save(); render();
+  });
+  $('editBtn2').addEventListener('click', () => openEditor(o, false, null));
+}
+
+function setPageBackground(){
+  const root = document.documentElement;
+  const o = view === 'detail' ? orderById(openId) : null;
+  if(o){
+    root.style.setProperty('--pgTint', colourOf(o).tint);
+    root.classList.add('detail-bg');
+  } else {
+    root.classList.remove('detail-bg');
+  }
+}
+/* ============ the timeline — what lands on which day ============ */
+function inWindow(o, iso){
+  const a = o.due || o.dueTo, b = o.dueTo || o.due;
+  return !!a && iso >= a && iso <= b;
+}
+/* "5–7 Sept" — compact, so a repeated pill explains itself */
+function windowText(o){
+  const a = parseISO(o.due), b = parseISO(o.dueTo);
+  if(!a || !b) return '';
+  const mA = a.toLocaleDateString('en-GB', { month:'short' });
+  const mB = b.toLocaleDateString('en-GB', { month:'short' });
+  return mA === mB ? `${a.getDate()}–${b.getDate()} ${mB}` : `${a.getDate()} ${mA} – ${b.getDate()} ${mB}`;
+}
+function tlPill(o, windowed){
+  const p = colourOf(o);
+  const n = o.items.length;
+  const got = gotCount(o);
+  const note = windowed ? ('somewhen ' + windowText(o))
+             : n > 1 ? (got ? `${got}/${n} in` : `${n} items`)
+             : (o.carrier || '');
+  return `<button class="tlpill${windowed ? ' window' : ''}" data-id="${o.id}" style="--oc:${p.dot}; --oct:${p.tint}">
+    <span class="tlps">${esc(o.shop || 'Order')}</span>
+    ${note ? `<span class="tlpd">${esc(note)}</span>` : ''}
+  </button>`;
+}
+function band(title, colour, orders){
+  return `<div class="grouphd"><span class="gdot" style="background:${colour}"></span>${title}<span class="gline"></span></div>
+          <div class="cards">${orders.map(orderCard).join('')}</div>`;
+}
+function renderTimeline(){
+  const main = $('main');
+  const live = state.orders.filter(o => !allIn(o));
+  if(!live.length){
+    main.innerHTML = `<div class="empty">
+      <svg class="hi"><use href="#icon-calendar"/></svg>
+      <div class="big">Nothing on the way</div>
+      <p>When something is on its way, this is where you'll see which day it lands.</p></div>`;
+    return;
+  }
+  const late = live.filter(o => statusOf(o) === 'late');
+  const undated = live.filter(o => !o.due && !o.dueTo);
+  const dated = live.filter(o => (o.due || o.dueTo) && statusOf(o) !== 'late');
+
+  let span = 0;
+  dated.forEach(o => { const d = daysTo(o.dueTo || o.due); if(d > span) span = d; });
+  span = Math.min(45, Math.max(span, 6));            // always show at least the week ahead
+
+  let html = '';
+  if(late.length) html += band('Overdue', 'var(--late)', late);
+
+  html += '<div class="tl">';
+  for(let i = 0; i <= span; i++){
+    const day = new Date(Date.now() + i * DAY);
+    const iso = isoOf(day);
+    const dow = day.getDay();
+    const on = dated.filter(o => inWindow(o, iso));
+    const cls = (i === 0 ? ' today' : '') + ((dow === 0 || dow === 6) ? ' weekend' : '');
+    html += `<div class="tlrow${cls}">
+      <div class="tlday">
+        <div class="tldow">${i === 0 ? 'Today' : day.toLocaleDateString('en-GB', { weekday:'short' })}</div>
+        <div class="tlnum">${day.getDate()}</div>
+      </div>
+      <div class="tlitems">${on.length
+        ? on.map(o => tlPill(o, !!(o.dueTo && o.dueTo !== o.due))).join('')
+        : '<div class="tlgap"></div>'}</div>
+    </div>`;
+  }
+  html += '</div>';
+
+  if(undated.length) html += band('No date yet', 'var(--wait)', undated);
+
+  main.innerHTML = html;
+  main.querySelectorAll('[data-id]').forEach(b =>
+    b.addEventListener('click', () => { openId = b.dataset.id; view = 'detail'; render(); }));
+}
+
+function render(){
+  renderChrome();
+  setPageBackground();
+  maybeShowBackupNudge();
+  if(view === 'detail') renderDetail();
+  else if(view === 'timeline') renderTimeline();
+  else renderList();
+  $('main').scrollTop = 0;
+}
+
+/* ============ the editor — also the "here's what I found" review ============ */
+let picInput = null;
+
+function foundNoteHtml(f){
+  if(!f) return '';
+  const labels = [
+    ['shop','the shop'], ['due','the delivery date'], ['carrier','the delivery service'],
+    ['trackUrl','a tracking link'], ['tracking','the tracking number'], ['pickup','a pickup place'],
+    ['orderNo','the order number'], ['total','the total'], ['ordered','the order date']
+  ];
+  const got = labels.filter(l => f[l[0]]).map(l => l[1]);
+  const missed = labels.filter(l => !f[l[0]]).map(l => l[1]);
+  const parts = [];
+  if(f.items) parts.push(`<b>${f.items} item${f.items === 1 ? '' : 's'}</b>${f.pics ? ` (${f.pics} with a picture)` : ' — no pictures came across'}`);
+  if(got.length) parts.push(got.join(', '));
+  let html = parts.length
+    ? `I read the mail and found ${parts.join(', plus ')}.`
+    : `I read the mail but couldn't make much of it.`;
+  if(!f.items) html += ` I couldn't pick out the individual items — add them below, or just leave it as one order to tick off.`;
+  if(missed.length) html += ` <span class="miss">Not found: ${missed.join(', ')}.</span>`;
+  html += ` Check it over, fix anything wrong, then Save.`;
+  return html;
+}
+
+function harvestRows(){
+  if(!draft) return;
+  const items = [];
+  document.querySelectorAll('#itemRows .erow').forEach(row => {
+    const id = row.dataset.row;
+    const old = draft.items.find(i => i.id === id) || { id, got:false, gotAt:'', img:'' };
+    const name = row.querySelector('.iname').value.trim();
+    const qty = row.querySelector('.qty').value.trim();
+    if(!name && !old.img) return;
+    items.push({ id:old.id, name:name || 'Item', qty, img:old.img || '', got:!!old.got, gotAt:old.gotAt || '' });
+  });
+  draft.items = items;
+
+  const todos = [];
+  document.querySelectorAll('#todoRows .erow').forEach(row => {
+    const id = row.dataset.trow;
+    const old = draft.todos.find(t => t.id === id) || { id, done:false, doneAt:'' };
+    const text = row.querySelector('.ttext').value.trim();
+    if(!text) return;
+    todos.push({ id:old.id, text:text.slice(0, 200), done:!!old.done, doneAt:old.doneAt || '' });
+  });
+  draft.todos = todos;
+}
+
+function renderItemRows(){
+  $('itemRows').innerHTML = draft.items.map(i => `
+    <div class="erow" data-row="${i.id}">
+      <button class="epic" data-pic="${i.id}" aria-label="Picture">
+        <svg class="hi"><use href="#icon-camera"/></svg>${i.img ? `<img src="${esc(i.img)}" alt="" onerror="this.remove()" />` : ''}
+      </button>
+      <input type="text" class="iname" value="${esc(i.name)}" placeholder="What is it?" />
+      <input type="text" class="qty" value="${esc(i.qty || '')}" placeholder="×" inputmode="numeric" />
+      <button class="ex" data-rm="${i.id}" aria-label="Remove"><svg class="hi" style="width:18px;height:18px"><use href="#icon-close"/></svg></button>
+    </div>`).join('');
+  $('itemRows').querySelectorAll('[data-rm]').forEach(b => b.addEventListener('click', () => {
+    harvestRows();
+    draft.items = draft.items.filter(i => i.id !== b.dataset.rm);
+    renderItemRows();
+  }));
+  $('itemRows').querySelectorAll('[data-pic]').forEach(b => b.addEventListener('click', () => {
+    harvestRows();
+    picInput.dataset.target = b.dataset.pic;
+    picInput.click();
+  }));
+}
+function renderTodoRows(){
+  $('todoRows').innerHTML = draft.todos.map(t => `
+    <div class="erow" data-trow="${t.id}">
+      <input type="text" class="ttext" value="${esc(t.text)}" placeholder="Return it, register warranty…" />
+      <button class="ex" data-trm="${t.id}" aria-label="Remove"><svg class="hi" style="width:18px;height:18px"><use href="#icon-close"/></svg></button>
+    </div>`).join('');
+  $('todoRows').querySelectorAll('[data-trm]').forEach(b => b.addEventListener('click', () => {
+    harvestRows();
+    draft.todos = draft.todos.filter(t => t.id !== b.dataset.trm);
+    renderTodoRows();
+  }));
+}
+
+function openEditor(order, isNew, found){
+  draft = JSON.parse(JSON.stringify(order));
+  draftIsNew = !!isNew;
+  draftFound = found || null;
+
+  $('editTitle').textContent = isNew ? (found ? 'Here’s what I found' : 'New order') : 'Edit order';
+  const note = $('foundNote');
+  if(found){ note.innerHTML = foundNoteHtml(found); note.hidden = false; }
+  else note.hidden = true;
+
+  $('fShop').value = draft.shop;
+  renderColourRow();
+  $('fDue').value = draft.due;
+  $('fDueTo').value = draft.dueTo;
+  $('fCarrier').value = draft.carrier;
+  $('fPickup').value = draft.pickup || '';
+  $('pickupList').innerHTML = [...new Set(state.orders.map(x => x.pickup).filter(Boolean))]
+    .map(v => `<option value="${esc(v)}"></option>`).join('');
+  $('fTracking').value = draft.tracking;
+  $('fTrackUrl').value = draft.trackUrl;
+  $('fOrderNo').value = draft.orderNo;
+  $('fOrdered').value = draft.ordered;
+  $('fTotal').value = draft.total;
+  $('fNote').value = draft.note;
+
+  renderItemRows();
+  renderTodoRows();
+
+  $('delBtn').hidden = isNew;
+  $('saveBtn').textContent = 'Save';
+  $('saveBtn').disabled = false;
+  $('ovEdit').classList.add('show');
+  $('ovEdit').querySelector('.sheet').scrollTop = 0;
+}
+function renderColourRow(){
+  const cur = colourKey(draft);
+  $('colourRow').innerHTML = PAL_KEYS.map(k =>
+    `<button class="cdot${k === cur ? ' sel' : ''}" data-col="${k}" style="background:${PALETTE[k].dot}" aria-label="${k}"></button>`).join('');
+  $('colourRow').querySelectorAll('[data-col]').forEach(b =>
+    b.addEventListener('click', () => { draft.colour = b.dataset.col; renderColourRow(); }));
+}
+/* the shop's own colour follows the shop name until it is chosen by hand */
+function refreshAutoColour(){
+  if(draft && !draft.colour) renderColourRow();
+}
+
+function closeEditor(){ $('ovEdit').classList.remove('show'); draft = null; draftFound = null; }
+
+/* When the dispatch mail follows the order mail, fold it into the order we have. */
+const nameKey = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9äöüß]+/g, '').slice(0, 40);
+function mergeInto(target, src){
+  ['shop','orderNo','ordered','total','note'].forEach(k => { if(!target[k] && src[k]) target[k] = src[k]; });
+  if(src.pickup) target.pickup = src.pickup;
+  if(src.due){ target.due = src.due; target.dueTo = src.dueTo; }
+  if(src.carrier) target.carrier = src.carrier;
+  if(src.tracking) target.tracking = src.tracking;
+  if(src.trackUrl) target.trackUrl = src.trackUrl;
+  const have = new Map(target.items.map(i => [nameKey(i.name), i]));
+  src.items.forEach(i => {
+    const twin = have.get(nameKey(i.name));
+    if(twin){ if(!twin.img && i.img) twin.img = i.img; if(!twin.qty && i.qty) twin.qty = i.qty; }
+    else { target.items.push(i); have.set(nameKey(i.name), i); }
+  });
+  src.todos.forEach(t => target.todos.push(t));
+}
+
+async function saveDraft(){
+  harvestRows();
+  const o = draft;
+  o.shop = $('fShop').value.trim() || 'Order';
+  o.due = $('fDue').value;
+  o.dueTo = $('fDueTo').value;
+  if(o.due && o.dueTo && o.dueTo < o.due){ const t = o.due; o.due = o.dueTo; o.dueTo = t; }
+  if(o.dueTo && o.dueTo === o.due) o.dueTo = '';
+  if(!o.due && o.dueTo){ o.due = o.dueTo; o.dueTo = ''; }
+  o.carrier = $('fCarrier').value.trim();
+  o.pickup = $('fPickup').value.trim();
+  o.tracking = $('fTracking').value.trim();
+  o.trackUrl = $('fTrackUrl').value.trim();
+  o.orderNo = $('fOrderNo').value.trim();
+  o.ordered = $('fOrdered').value;
+  o.total = $('fTotal').value.trim();
+  o.note = $('fNote').value.trim();
+  if(!o.trackUrl) o.trackUrl = buildTrackUrl(o.carrier, o.tracking);
+
+  const btn = $('saveBtn');
+  if(o.items.some(i => i.img && !/^data:/i.test(i.img))){
+    btn.disabled = true; btn.textContent = 'Saving pictures…';
+    await cacheOrderImages(o);
+    btn.disabled = false; btn.textContent = 'Save';
+  }
+
+  if(draftIsNew){
+    const twin = o.orderNo ? state.orders.find(x => x.orderNo && x.orderNo === o.orderNo) : null;
+    if(twin){
+      const merge = confirm(`You already have order ${o.orderNo} from ${twin.shop || 'that shop'}.\n\nOK — update that order with what this mail says.\nCancel — keep this as a separate second order.`);
+      if(merge){
+        mergeInto(twin, o);
+        save(); closeEditor();
+        openId = twin.id; view = 'detail'; render();
+        showToast('Folded into the order you already had');
+        return;
+      }
+    }
+    state.orders.unshift(o);
+  } else {
+    const idx = state.orders.findIndex(x => x.id === o.id);
+    if(idx > -1) state.orders[idx] = o; else state.orders.unshift(o);
+  }
+  save(); closeEditor();
+  openId = o.id; view = 'detail'; render();
+}
+
+/* ============ the paste sheet ============ */
+function openPaste(){
+  const box = $('pasteBox');
+  box.innerHTML = '';
+  $('ovPaste').classList.add('show');
+  setTimeout(() => { try{ box.focus(); }catch(e){} }, 150);
+}
+function readPastedMail(){
+  const box = $('pasteBox');
+  const text = box.innerText || box.textContent || '';
+  if(text.trim().length < 20){
+    alert('There’s nothing in the box yet.\n\nIn Mail: Select All → Copy. Then tap inside the dashed box here and choose Paste.');
+    return;
+  }
+  const res = readMail(box, text);
+  $('ovPaste').classList.remove('show');
+  box.innerHTML = '';
+  openEditor(res.order, true, res.found);
+}
+
+/* the Shortcut route: index.html?add=<the mail as text> */
+function handleIncoming(){
+  let add = '';
+  try{ add = new URLSearchParams(location.search).get('add') || ''; }catch(e){}
+  if(!add && location.hash.indexOf('add=') === 1){
+    try{ add = decodeURIComponent(location.hash.slice(5)); }catch(e){}
+  }
+  if(!add || add.trim().length < 20) return false;
+  try{ history.replaceState(null, '', location.pathname); }catch(e){}
+  const res = readMail(null, add);
+  openEditor(res.order, true, res.found);
+  return true;
+}
+
+/* ============ backups (export / copy / restore) ============ */
+function buildBackup(){
+  return { app:'AMS PackTrack', format:'amspt-backup', version:1,
+           exportedAt:new Date().toISOString(), data:state };
+}
+function stampBackup(){ try{ localStorage.setItem(META_KEY, String(Date.now())); }catch(e){} renderBackupMeta(); maybeShowBackupNudge(); }
+function renderBackupMeta(){
+  const el = $('backupMeta'); if(!el) return;
+  const t = parseInt(localStorage.getItem(META_KEY) || '0', 10);
+  el.textContent = t ? 'Last backup: ' + new Date(t).toLocaleDateString('en-GB', {day:'numeric', month:'long', year:'numeric'}) : 'No backup made yet.';
+}
+function flashBtn(btn, msg){
+  const orig = btn.dataset.label || btn.textContent;
+  btn.dataset.label = orig;
+  btn.textContent = msg; btn.classList.add('ok');
+  clearTimeout(btn._t);
+  btn._t = setTimeout(() => { btn.textContent = orig; btn.classList.remove('ok'); }, 1600);
+}
+
+/* ============ the app's own safety net ============
+   THE HARD-WON RULE (AMS Instructions, Aug 2026 — real data loss):
+   a blind "save whatever is in memory" overwrites a good snapshot with an
+   EMPTY one whenever it runs before the data is loaded. So: refuse to write
+   a snapshot thinner than the newest one we hold, and READ EVERY WRITE BACK
+   before calling it a snapshot. */
+function readSnapshots(){
+  try{
+    const raw = localStorage.getItem(SNAP_KEY);
+    if(!raw) return [];
+    const arr = JSON.parse(raw);
+    return Array.isArray(arr) ? arr.filter(s => s && s.at && s.data && Array.isArray(s.data.orders)) : [];
+  }catch(e){ return []; }
+}
+function writeSnapshots(list){
+  try{ localStorage.setItem(SNAP_KEY, JSON.stringify(list)); return true; }catch(e){ return false; }
+}
+function takeSnapshot(reason, force){
+  const orders = (state && Array.isArray(state.orders)) ? state.orders : null;
+  if(!orders || !orders.length) return { ok:false, why:'there was nothing to save' };
+
+  const snaps = readSnapshots();
+  const newest = snaps[0];
+  if(!force && newest && orders.length < newest.data.orders.length){
+    return { ok:false, why:`this device has ${orders.length} order${orders.length===1?'':'s'} but the last snapshot has ${newest.data.orders.length} — not overwriting it` };
+  }
+  if(!force && newest && new Date(newest.at).toDateString() === new Date().toDateString()){
+    return { ok:false, why:'already saved today' };
+  }
+  const snap = { at:new Date().toISOString(), reason:reason || 'daily', count:orders.length,
+                 data:JSON.parse(JSON.stringify(state)) };
+  const next = [snap, ...snaps].slice(0, SNAP_MAX);
+  if(!writeSnapshots(next)) return { ok:false, why:'this device refused the write (storage may be full)' };
+
+  const check = readSnapshots()[0];       // prove it: read it back and re-count
+  if(!check || check.at !== snap.at || check.data.orders.length !== orders.length){
+    return { ok:false, why:'the snapshot did not read back correctly' };
+  }
+  return { ok:true, count:orders.length };
+}
+function snapLabel(s){
+  const d = new Date(s.at);
+  return d.toLocaleDateString('en-GB', {day:'numeric', month:'short', year:'numeric'}) + ', ' +
+         d.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'});
+}
+function restoreSnapshot(at){
+  const snap = readSnapshots().find(s => s.at === at);
+  if(!snap) return alert('That snapshot is no longer there.');
+  const orders = snap.data.orders.filter(o => o && o.id);
+  if(!orders.length) return alert('That snapshot has no orders in it. Nothing was changed.');
+  if(!confirm(`Restore the snapshot from ${snapLabel(snap)}?\n\nIt replaces the ${state.orders.length} order${state.orders.length===1?'':'s'} on this device with the ${orders.length} it holds.`)) return;
+
+  takeSnapshot('before restore', true);            // so a restore is undoable
+  state = normalise({ version:1, orders });
+  save();
+  state = load();                                   // re-read: report what's really there
+  view = lastListView; openId = null; render();
+  renderSnapshotList();
+  alert(`Snapshot restored ✅\n${state.orders.length} order${state.orders.length===1?'':'s'} on this device now.`);
+}
+function renderSnapshotList(){
+  const el = $('snapList'); if(!el) return;
+  const snaps = readSnapshots();
+  if(!snaps.length){
+    el.innerHTML = `<p class="dim" style="font-size:13px; margin-top:10px">No automatic snapshots yet — the app takes one each day you open it.</p>`;
+    return;
+  }
+  el.innerHTML = snaps.map(s =>
+    `<div class="snaprow">
+       <span class="snapwhen">${snapLabel(s)}<span class="dim"> · ${s.count} order${s.count===1?'':'s'}${s.reason && s.reason !== 'daily' ? ' · ' + esc(s.reason) : ''}</span></span>
+       <button class="nbtn" data-at="${esc(s.at)}">Restore</button>
+     </div>`).join('');
+  el.querySelectorAll('button[data-at]').forEach(b =>
+    b.addEventListener('click', () => restoreSnapshot(b.dataset.at)));
+}
+function runBackupSelfTest(btn){
+  const r = takeSnapshot('checked by you', true);
+  renderSnapshotList();
+  if(!r.ok){
+    flashBtn(btn, 'Problem');
+    alert(`The safety net is NOT working ⚠️\n\n${r.why}.\n\nPlease use "Export my data" to save a file instead, and tell Claude what this said.`);
+    return;
+  }
+  const back = readSnapshots()[0];
+  flashBtn(btn, 'Proven ✓');
+  alert(`The safety net works ✅\n\nJust now the app saved a snapshot, read it back out of storage and counted what came back: ${back.data.orders.length} order${back.data.orders.length===1?'':'s'}, all present.\n\nIt keeps the last ${SNAP_MAX} daily snapshots on this device. They live in the app, so an exported file is still the way to survive a lost phone.`);
+}
+
+/* ============ the backup nudge ============ */
+function maybeShowBackupNudge(){
+  const el = $('backupNudge'); if(!el) return;
+  const snoozed = parseInt(localStorage.getItem(NUDGE_KEY) || '0', 10);
+  const last = parseInt(localStorage.getItem(META_KEY) || '0', 10);
+  const old = !last || (Date.now() - last) > 60 * DAY;
+  const show = view !== 'detail' && state.orders.length >= 3 && old && (Date.now() - snoozed) > 7 * DAY;
+  el.hidden = !show;
+}
+
+/* ============ toast + self-update (same pattern as AMS Tracking) ============ */
+let toastTimer = null;
+function showToast(msg, actionFn, actionLabel, duration){
+  const t = $('toast');
+  $('toastMsg').textContent = msg;
+  const btn = $('toastAct');
+  btn.hidden = !actionFn;
+  btn.textContent = actionLabel || '';
+  btn.onclick = actionFn || null;
+  t.hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.hidden = true; }, duration || 5000);
+}
+let lastUpdateCheck = 0;
+async function checkForUpdate(manual){
+  const nowMs = Date.now();
+  if(!manual && nowMs - lastUpdateCheck < 5 * 60000) return;
+  lastUpdateCheck = nowMs;
+  try{
+    const res = await fetch('version.json?vercheck=' + nowMs, { cache:'no-store' });
+    if(!res.ok) return;
+    const data = await res.json();
+    if(data.version && data.version !== VERSIONLOG[0].v){
+      showToast(`Version ${data.version} is ready`, applyUpdate, 'Update', 12000);
+    } else if(manual){
+      showToast(`You're on the latest version (v${VERSIONLOG[0].v})`);
+    }
+  }catch(e){
+    if(manual) showToast('Update check failed — are you online?');
+  }
+}
+function applyUpdate(){
+  const reload = () => location.reload();
+  if(navigator.serviceWorker && navigator.serviceWorker.getRegistration){
+    navigator.serviceWorker.getRegistration().then(r => r && r.update()).then(reload, reload);
+  } else reload();
+}
+
+/* ============ settings ============ */
+function openSettings(){ $('ovSettings').classList.add('show'); $('ovSettings').querySelector('.sheet').scrollTop = 0; }
+
+/* ============ wiring ============ */
+$('pasteClose').addEventListener('click', () => $('ovPaste').classList.remove('show'));
+$('pasteCancel').addEventListener('click', () => $('ovPaste').classList.remove('show'));
+$('pasteGo').addEventListener('click', readPastedMail);
+$('clipBtn').addEventListener('click', async () => {
+  try{
+    const t = await navigator.clipboard.readText();
+    if(!t || !t.trim()) return alert('Your clipboard looks empty. Copy the mail in Mail first (Select All → Copy).');
+    $('pasteBox').textContent = t;
+  }catch(e){
+    alert('This device wouldn’t hand over the clipboard.\n\nTap inside the dashed box and choose Paste instead — that route also brings the pictures across.');
+  }
+});
+/* keep pasted mail readable: strip scripts and anything that could restyle the sheet */
+$('pasteBox').addEventListener('paste', () => {
+  setTimeout(() => {
+    $('pasteBox').querySelectorAll('script,style,link,meta,iframe,object,embed').forEach(n => n.remove());
+  }, 0);
+});
+
+$('editClose').addEventListener('click', closeEditor);
+$('editCancel').addEventListener('click', closeEditor);
+$('saveBtn').addEventListener('click', () => { saveDraft(); });
+$('addItemBtn').addEventListener('click', () => {
+  harvestRows();
+  draft.items.push({ id:uid(), name:'', qty:'', img:'', got:false, gotAt:'' });
+  renderItemRows();
+  const rows = $('itemRows').querySelectorAll('.iname');
+  if(rows.length) rows[rows.length - 1].focus();
+});
+$('addTodoBtn').addEventListener('click', () => {
+  harvestRows();
+  draft.todos.push({ id:uid(), text:'', done:false, doneAt:'' });
+  renderTodoRows();
+  const rows = $('todoRows').querySelectorAll('.ttext');
+  if(rows.length) rows[rows.length - 1].focus();
+});
+$('delBtn').addEventListener('click', () => {
+  if(!draft) return;
+  if(!confirm(`Delete the order from ${draft.shop || 'this shop'}?\n\nThis cannot be undone from here — but the daily snapshot in Settings will still have it.`)) return;
+  state.orders = state.orders.filter(x => x.id !== draft.id);
+  save(); closeEditor();
+  view = lastListView; openId = null; render();
+});
+
+$('settingsClose').addEventListener('click', () => $('ovSettings').classList.remove('show'));
+$('updateBtn').addEventListener('click', () => checkForUpdate(true));
+$('selfTestBtn').addEventListener('click', (e) => runBackupSelfTest(e.currentTarget));
+$('nudgeGo').addEventListener('click', () => { openSettings(); $('foldData').open = true; });
+$('nudgeX').addEventListener('click', () => {
+  try{ localStorage.setItem(NUDGE_KEY, String(Date.now())); }catch(e){}
+  $('backupNudge').hidden = true;
+});
+
+$('tidyBtn').addEventListener('click', () => {
+  const done = state.orders.filter(allIn);
+  if(!done.length) return alert('Nothing to clear out — no orders are fully arrived yet.');
+  if(!confirm(`Clear out ${done.length} arrived order${done.length === 1 ? '' : 's'}?\n\nA snapshot is taken first, so this can be undone from "Your data" below.`)) return;
+  takeSnapshot('before clearing out', true);
+  state.orders = state.orders.filter(o => !allIn(o));
+  save(); renderSnapshotList();
+  view = lastListView; openId = null; render();
+  alert(`Cleared. ${state.orders.length} order${state.orders.length === 1 ? '' : 's'} left on this device.`);
+});
+
+$('exportBtn').addEventListener('click', () => {
+  const text = JSON.stringify(buildBackup(), null, 2);
+  const blob = new Blob([text], { type:'application/json' });
+  const url = URL.createObjectURL(blob);
+  const stamp = new Date().toISOString().slice(0,16).replace(/[:T]/g,'-');
+  const a = document.createElement('a');
+  a.href = url; a.download = `ams-packtrack-backup-${stamp}.json`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  stampBackup();
+});
+$('copyBtn').addEventListener('click', async (e) => {
+  const btn = e.currentTarget;
+  const text = JSON.stringify(buildBackup(), null, 2);
+  try{
+    if(navigator.clipboard && navigator.clipboard.writeText) await navigator.clipboard.writeText(text);
+    else throw new Error('no clipboard api');
+    flashBtn(btn, 'Copied ✓'); stampBackup();
+  }catch(err){
+    try{
+      const ta = document.createElement('textarea');
+      ta.value = text; ta.setAttribute('readonly','');
+      ta.style.position = 'fixed'; ta.style.top = '-1000px';
+      document.body.appendChild(ta);
+      ta.select(); ta.setSelectionRange(0, text.length);
+      const ok = document.execCommand('copy');
+      ta.remove();
+      flashBtn(btn, ok ? 'Copied ✓' : 'Copy failed');
+      if(ok) stampBackup();
+    }catch(e2){ flashBtn(btn, 'Copy failed'); }
+  }
+});
+$('copyUrlBtn').addEventListener('click', async (e) => {
+  const btn = e.currentTarget;
+  try{ await navigator.clipboard.writeText($('shortcutUrl').textContent); flashBtn(btn, 'Copied ✓'); }
+  catch(err){ flashBtn(btn, 'Copy failed'); }
+});
+$('importBtn').addEventListener('click', () => $('importFile').click());
+$('importFile').addEventListener('change', (e) => {
+  const file = e.target.files && e.target.files[0];
+  e.target.value = '';
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    let payload;
+    try{ payload = JSON.parse(reader.result); }catch(err){ payload = null; }
+    // Validate BEFORE touching anything — a bad file must never harm live data.
+    const data = payload && payload.format === 'amspt-backup' && payload.data;
+    const orders = data && Array.isArray(data.orders) ? data.orders.filter(o => o && o.id) : [];
+    if(!orders.length){
+      alert("That doesn't look like an AMS PackTrack backup file (no orders found in it). Nothing was changed.");
+      return;
+    }
+    if(!confirm(`Restore this backup? It replaces the ${state.orders.length} order${state.orders.length===1?'':'s'} on this device with the ${orders.length} from the file.`)) return;
+    state = normalise({ version:1, orders });
+    save();
+    state = load();                    // the restore proves itself
+    view = lastListView; openId = null; render();
+    stampBackup();
+    $('ovSettings').classList.remove('show');
+    alert(`Backup restored ✅\n${state.orders.length} order${state.orders.length===1?'':'s'} on this device now.`);
+  };
+  reader.readAsText(file);
+});
+
+/* tapping the dimmed background closes a sheet */
+['ovPaste','ovEdit','ovSettings'].forEach(id => {
+  $(id).addEventListener('click', (e) => { if(e.target.id === id) $(id).classList.remove('show'); });
+});
+
+/* ============ boot ============ */
+state = load();
+
+$('appVer').textContent = VERSIONLOG[0].v;
+$('vlog').innerHTML = VERSIONLOG.map(e =>
+  `<div class="v">v${esc(e.v)} · ${esc(e.when)}</div>` +
+  esc(e.what).split('\n\n').map(par => `<p>${par}</p>`).join('')).join('');
+$('carrierList').innerHTML = CARRIERS.map(c => `<option value="${esc(c.id)}"></option>`).join('');
+$('shortcutUrl').textContent = location.origin + location.pathname.replace(/[^/]*$/, '') + 'index.html?add=';
+
+picInput = document.createElement('input');
+picInput.type = 'file';
+picInput.accept = 'image/*';
+picInput.style.display = 'none';
+document.body.appendChild(picInput);
+picInput.addEventListener('change', async () => {
+  const f = picInput.files && picInput.files[0];
+  const id = picInput.dataset.target;
+  picInput.value = '';
+  if(!f || !id || !draft) return;
+  const data = await shrink(f, 300);
+  if(!data) return alert("Couldn't read that picture.");
+  const it = draft.items.find(x => x.id === id);
+  if(it){ it.img = data; renderItemRows(); }
+});
+
+render();
+renderBackupMeta();
+renderSnapshotList();
+maybeShowBackupNudge();
+handleIncoming();
+
+setTimeout(() => { takeSnapshot('daily'); renderSnapshotList(); }, 1500);
+checkForUpdate(false);
+document.addEventListener('visibilitychange', () => { if(!document.hidden) checkForUpdate(false); });
+window.addEventListener('pageshow', () => { if(!handleIncoming()) render(); });
+
+if('serviceWorker' in navigator) navigator.serviceWorker.register('service-worker.js?v=' + VERSIONLOG[0].v).catch(() => {});
+
+})();
+</script>
+</body>
+</html>
