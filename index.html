@@ -615,7 +615,7 @@
         <p>If the mail carried a tracking link, the order screen shows a big <b>Track this parcel</b> button. If it only carried a number, PackTrack builds the right link itself for DHL, Austrian Post, DPD, GLS, Hermes, UPS, FedEx and PostNL.</p>
 
         <h3>Pictures</h3>
-        <p>Product pictures come out of a pasted mail automatically. The app tries to store a copy on the device so it still shows offline; when the shop won't allow that, it keeps the link instead and the picture appears when you're online. You can also tap the little square next to any item in the editor and <b>take or choose a photo</b> yourself — those are always stored on the device.</p>
+        <p>Product pictures come out of a pasted mail automatically — both from shops that link every product (Amazon) and from shops that just show a picture and a name in a row (most others). The app tries to store a copy on the device so it still shows offline; when the shop won't allow that, it keeps the link instead and the picture appears when you're online. You can also tap the little square next to any item in the editor and <b>take or choose a photo</b> yourself — those are always stored on the device.</p>
 
         <h3>Updates</h3>
         <p>The app checks for a new version when you open it (and when you come back to it, at most every 5 minutes). When one is live a bar appears at the bottom with an <b>Update</b> button — one tap loads it. <b>Check for app update</b> below asks immediately.</p>
@@ -680,6 +680,8 @@
 
 /* ============ version log — newest first; [0].v is THE app version ============ */
 const VERSIONLOG = [
+  { v:'1.2', when:'1 Sep 2026',
+    what:'Pictures now come through from shops that are not Amazon. The first release could only recognise an item if the shop had wrapped it in a link to its product page — Amazon does that for everything, so Amazon mails worked perfectly, but a great many shops simply put a picture and some text in a row with no link at all. Those orders still arrived, but every single picture was quietly dropped. The app now also reads items straight out of the mail’s layout: it starts at each picture and walks outwards to the smallest block that also holds words, which is the item’s own row. And as a final safety net, if items are found but not one picture came with them while the mail plainly contains some, the pictures are matched to the items in the order they appear — far better than losing them.\n\nItem names come out cleaner as a result. A quantity written into the name the way many shops do it — “Magnet-Haken SPOT inkl. 3M-Pad BLACK × 4” — is now understood as a quantity of 4 and trimmed off the name, and trailing discount codes, prices and “Lieferzeit …” notes are stripped too, so the name is just the thing you bought. A quantity of one stays invisible, as before.\n\nThe order number is also found when the mail never labels it — “Bestellung AU105709 bestätigt” gives up its number now, while a properly labelled “Bestellnummer:” still wins whenever both are present.\n\nUnderneath all of this sits one small but far-reaching fix: table cells and line breaks join together with no space at all when a mail is read as plain text, turning “BLACK × 4” followed by a discount code into “BLACK × 4CSD6”. Everything now reads the layout with the spaces put back in, so quantities, prices and names stop running into each other.' },
   { v:'1.1', when:'1 Sep 2026',
     what:'A properly colourful home screen. The background is now a scattered confetti of soft flat shapes in all eight of the app’s shop colours — circles, rings and little tilted squares — so opening the app feels cheerful rather than beige. Every shape is a flat solid colour: there is not a single gradient anywhere in the app, on purpose. The cards sit a touch more prominently on top of the pattern so nothing gets harder to read, and the pattern stays put while the list scrolls over it. Opening an order still takes the whole screen into that shop’s own calm colour, with no confetti behind the details.\n\nTwo fixes came with it. A long delivery window on a card — “Sat 5 Sept – Mon 7 Sept” — used to run underneath the big day count on the right; card text now trims itself with a neat ellipsis instead, and a window is written the short way, “5–7 Sept”, so it fits comfortably. The full range is still spelled out in full on the order’s own screen.' },
   { v:'1.0', when:'1 Sep 2026',
@@ -1093,6 +1095,75 @@ function itemsFromDom(root){
   return out.slice(0, 25);
 }
 
+/* ---- items out of the DOM when NOTHING is linked ----
+   Amazon wraps every product in a link, so itemsFromDom finds them. Plenty of
+   shops (Shopify-style "Bestellübersicht" mails) just put a picture and some
+   text in a table row with no link at all — those used to fall through to the
+   text reader, which has no way to carry a picture, so every picture was lost.
+   This walks up from each picture to the smallest block that also holds text. */
+
+/* Table cells and <br> concatenate with NO space in textContent
+   ("BLACK × 4CSD6"), which breaks every word-boundary we rely on. */
+function blockText(node){
+  let s = '';
+  const walk = (el) => {
+    if(el.nodeType === 3){ s += el.nodeValue + ' '; return; }
+    if(el.nodeType !== 1) return;
+    const tag = el.tagName;
+    if(tag === 'SCRIPT' || tag === 'STYLE') return;
+    for(const c of el.childNodes) walk(c);
+    s += ' ';
+  };
+  walk(node);
+  return s.replace(/\s+/g, ' ').trim();
+}
+
+/* "Magnet-Haken SPOT inkl. 3M-Pad BLACK × 4 CSD6 (-29,92€) 119,80€ 89,88€"
+   → name "Magnet-Haken SPOT inkl. 3M-Pad BLACK", qty "4".
+   The × N marker reliably ends the product name in these layouts. */
+function splitNameQty(raw){
+  let t = String(raw || '').replace(/\([^)]*\)/g, ' ').replace(/\s+/g, ' ').trim();
+  let qty = '';
+  const qm = t.match(/\s[×xX]\s*(\d{1,3})(?!\d)(?![A-Za-zÄÖÜäöüß])/);
+  if(qm){
+    qty = qm[1];
+    t = t.slice(0, qm.index);
+  } else {
+    const p = t.search(/(?:€|EUR|CHF|\$|£)\s?\d|\d[\d.,]{2,}\s?(?:€|EUR|CHF)/i);
+    if(p > 4) t = t.slice(0, p);
+  }
+  t = t.replace(/\bLieferzeit\b.*$/i, '')
+       .replace(/\s+/g, ' ').trim()
+       .replace(/[·|,;:–—-]+$/, '').trim();
+  return { name:t, qty:(qty && qty !== '1') ? qty : '' };
+}
+
+function itemsFromBlocks(root){
+  if(!root) return [];
+  const out = [], seen = new Set();
+  Array.from(root.querySelectorAll('img')).filter(goodImg).forEach(im => {
+    let node = im, block = null;
+    for(let up = 0; up < 6 && node && node !== root; up++){
+      node = node.parentElement;
+      if(!node) break;
+      const t = blockText(node);
+      if(t.length >= 6){ block = node; break; }      // smallest ancestor that has words
+    }
+    if(!block) return;
+    const raw = blockText(block);
+    if(raw.length > 400) return;                     // too big to be one item's row
+    const { name, qty } = splitNameQty(raw);
+    if(name.length < 4 || name.length > 180) return;
+    if(TEXT_NOISE.test(name)) return;
+    if(!/[A-Za-zÄÖÜäöüß]{3}/.test(name)) return;
+    const k = nameKey(name);
+    if(!k || seen.has(k)) return;
+    seen.add(k);
+    out.push({ id:uid(), name:name.slice(0, 160), qty, img:absSrc(im), got:false, gotAt:'' });
+  });
+  return out.slice(0, 25);
+}
+
 /* ---- items out of plain text, when there is no DOM to work with ---- */
 const PRICE_RE = /(?:EUR|€|CHF|USD|\$|£)\s?\d|\d[\d.,]*\s?(?:EUR|€|CHF)/i;
 const TEXT_NOISE = /^(?:hallo|hi\b|guten tag|sehr geehrte|liebe|vielen dank|danke|thank you|thanks|bestellnummer|bestellung|order|lieferadresse|rechnungsadresse|versandadresse|zahlungsart|zahlungsmittel|versandart|versandkosten|zwischensumme|summe|gesamt|mwst|ust|steuer|verkauft von|verkauf durch|versand durch|geliefert von|amazon\.|impressum|datenschutz|abbestellen|unsubscribe|©|http|www\.|menge|anzahl|qty|quantity|preis|price|artikel-?nr|ihre bestellung|your order|track|sendungsverfolgung|voraussicht|zustellung|lieferung|arriving|estimated|delivery|rechnung|invoice|kundenservice|customer service|folgen sie|klicken)/i;
@@ -1141,7 +1212,10 @@ const ORDERNO_RES = [
   /\b(\d{3}-\d{7}-\d{7})\b/,
   /(?:Bestellnummer|Bestell-?\s?Nr\.?|Bestellnr\.?|Auftragsnummer|Auftrags-?\s?Nr\.?)\s*[:#]?\s*([A-Z0-9][A-Z0-9\/-]{4,29})/i,
   /(?:Order|Bestellung)\s*(?:number|no\.?|#|ID|Nr\.?)\s*[:#]?\s*([A-Z0-9][A-Z0-9\/-]{4,29})/i,
-  /(?:Rechnungsnummer|Invoice\s*(?:number|no\.?))\s*[:#]?\s*([A-Z0-9][A-Z0-9\/-]{4,29})/i
+  /(?:Rechnungsnummer|Invoice\s*(?:number|no\.?))\s*[:#]?\s*([A-Z0-9][A-Z0-9\/-]{4,29})/i,
+  // "Bestellung AU105709 bestätigt" — no label word at all, just the code.
+  // Requiring a digit inside stops it matching "Bestellung bestätigt".
+  /(?:Bestellung|Bestellnr|Order|Auftrag)\s*#?\s*([A-Z]{0,5}\d[A-Z0-9-]{3,24})\b/i
 ];
 const AMT = '(?:EUR|€|CHF|USD|\\$|£)\\s?\\d(?:[\\d.,]{0,12}\\d)?|\\d(?:[\\d.,]{0,12}\\d)?\\s?(?:EUR|€|CHF)';
 const TOTAL_RES = [
@@ -1245,7 +1319,15 @@ function readMail(root, rawText){
 
   /* ---- the things in the box ---- */
   o.items = itemsFromDom(root);
+  if(!o.items.length) o.items = itemsFromBlocks(root);
   if(!o.items.length) o.items = itemsFromText(txt);
+
+  /* Last resort: we have items but not one picture, and the mail plainly has
+     some. Pair them in the order they appear — far better than losing them. */
+  if(root && o.items.length && !o.items.some(i => i.img)){
+    const pics = Array.from(root.querySelectorAll('img')).filter(goodImg).map(absSrc);
+    if(pics.length) o.items.forEach((it, i) => { if(pics[i]) it.img = pics[i]; });
+  }
   found.items = o.items.length;
   found.pics = o.items.filter(i => i.img).length;
 
