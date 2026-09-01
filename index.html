@@ -589,6 +589,8 @@
         <p>It always shows you what it found <b>before</b> saving, and says plainly what it couldn't find. Every single field is editable, so a miss is never a dead end.</p>
 
         <h3>The dispatch mail too</h3>
+        <p>The same is true for re-reading a mail you've already sent in — to pick up pictures a older version missed, for instance. Choose to <b>update the order you already have</b> and the app fills in what's missing without duplicating anything, even if the item names have since been tidied up.</p>
+
         <p>Send the <b>shipping</b> mail in the same way when it arrives. If the order number matches one you already have, PackTrack offers to <b>update that order</b> instead of making a second one — filling in the carrier, the tracking number and the sharpened delivery date.</p>
 
         <h3>The home screen</h3>
@@ -680,6 +682,8 @@
 
 /* ============ version log — newest first; [0].v is THE app version ============ */
 const VERSIONLOG = [
+  { v:'1.3', when:'1 Sep 2026',
+    what:'Reading a mail a second time now repairs the order you already have, instead of doubling it. This matters straight after the last release: any order saved before it is missing its pictures, and the obvious fix is to paste the mail again — but the app had no way to tell that “Magnet-Haken SPOT inkl. 3M-Pad BLACK × 4” and the tidier “Magnet-Haken SPOT inkl. 3M-Pad BLACK” are the same thing, so it would have added all five items a second time.\n\nAn item is now recognised as one you already have when the two names differ by nothing more than a trailing quantity — the exact difference the improved reader creates. Its picture and quantity are filled in, and the order keeps the tidier of the two names. The rule is deliberately narrow: “Kabel” and “Kabelbinder” are still treated as two different things, and it works just as well for a short name like “Gravur × 1” as for a long one.\n\nSo to get the pictures onto an order you saved earlier: paste the same mail again and choose to update the order you already have. Nothing is duplicated, nothing you typed yourself is thrown away, and the pictures simply appear.' },
   { v:'1.2', when:'1 Sep 2026',
     what:'Pictures now come through from shops that are not Amazon. The first release could only recognise an item if the shop had wrapped it in a link to its product page — Amazon does that for everything, so Amazon mails worked perfectly, but a great many shops simply put a picture and some text in a row with no link at all. Those orders still arrived, but every single picture was quietly dropped. The app now also reads items straight out of the mail’s layout: it starts at each picture and walks outwards to the smallest block that also holds words, which is the item’s own row. And as a final safety net, if items are found but not one picture came with them while the mail plainly contains some, the pictures are matched to the items in the order they appear — far better than losing them.\n\nItem names come out cleaner as a result. A quantity written into the name the way many shops do it — “Magnet-Haken SPOT inkl. 3M-Pad BLACK × 4” — is now understood as a quantity of 4 and trimmed off the name, and trailing discount codes, prices and “Lieferzeit …” notes are stripped too, so the name is just the thing you bought. A quantity of one stays invisible, as before.\n\nThe order number is also found when the mail never labels it — “Bestellung AU105709 bestätigt” gives up its number now, while a properly labelled “Bestellnummer:” still wins whenever both are present.\n\nUnderneath all of this sits one small but far-reaching fix: table cells and line breaks join together with no space at all when a mail is read as plain text, turning “BLACK × 4” followed by a discount code into “BLACK × 4CSD6”. Everything now reads the layout with the spaces put back in, so quantities, prices and names stop running into each other.' },
   { v:'1.1', when:'1 Sep 2026',
@@ -1933,6 +1937,29 @@ function closeEditor(){ $('ovEdit').classList.remove('show'); draft = null; draf
 
 /* When the dispatch mail follows the order mail, fold it into the order we have. */
 const nameKey = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9äöüß]+/g, '').slice(0, 40);
+/* The reader keeps getting better, so the SAME item can come back under a
+   tidier name than the one already saved ("…BLACK × 4" → "…BLACK"). Without
+   this, re-reading a mail to pick up its pictures would duplicate every item
+   instead of filling the pictures in. */
+/* Same item, tidier name: the two keys must be identical apart from a trailing
+   run of digits — the quantity the newer reader trims off. A plain "one starts
+   with the other" rule was too loose (it would fuse "Kabel" into "Kabelbinder")
+   and a minimum length was too tight (it missed "Gravur × 1" → "Gravur"). */
+function sameItemName(a, b){
+  if(a === b) return true;
+  const long = a.length >= b.length ? a : b;
+  const short = a.length >= b.length ? b : a;
+  if(short.length < 4 || !long.startsWith(short)) return false;
+  return /^\d{1,3}$/.test(long.slice(short.length));
+}
+function findTwin(map, list, key){
+  if(!key) return null;
+  if(map.has(key)) return map.get(key);
+  for(const it of list){
+    if(sameItemName(nameKey(it.name), key)) return it;
+  }
+  return null;
+}
 function mergeInto(target, src){
   ['shop','orderNo','ordered','total','note'].forEach(k => { if(!target[k] && src[k]) target[k] = src[k]; });
   if(src.pickup) target.pickup = src.pickup;
@@ -1942,8 +1969,13 @@ function mergeInto(target, src){
   if(src.trackUrl) target.trackUrl = src.trackUrl;
   const have = new Map(target.items.map(i => [nameKey(i.name), i]));
   src.items.forEach(i => {
-    const twin = have.get(nameKey(i.name));
-    if(twin){ if(!twin.img && i.img) twin.img = i.img; if(!twin.qty && i.qty) twin.qty = i.qty; }
+    const twin = findTwin(have, target.items, nameKey(i.name));
+    if(twin){
+      if(!twin.img && i.img) twin.img = i.img;
+      if(!twin.qty && i.qty) twin.qty = i.qty;
+      // the newer reader trimmed the quantity off the name — take the tidier one
+      if(i.name && i.name.length < twin.name.length) twin.name = i.name;
+    }
     else { target.items.push(i); have.set(nameKey(i.name), i); }
   });
   src.todos.forEach(t => target.todos.push(t));
