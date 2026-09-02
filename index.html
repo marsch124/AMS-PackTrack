@@ -309,6 +309,15 @@
   .cdot{width:36px; height:36px; border-radius:50%; border:3px solid transparent; cursor:pointer; padding:0;}
   .cdot.sel{border-color:var(--ink);}
 
+  .switch{display:flex; align-items:center; gap:10px; font-size:13.5px; font-weight:700; margin:2px 0 12px; cursor:pointer;}
+  .switch input{width:20px; height:20px; accent-color:var(--kraft); flex:0 0 auto;}
+  .eitem{margin-bottom:10px;}
+  .eitem .erow{margin-bottom:0;}
+  .erowdate{display:none; align-items:center; gap:10px; padding:7px 0 0 52px; font-size:12.5px; font-weight:700; color:var(--ink-dim);}
+  #itemRows.withdates .erowdate{display:flex;}
+  .erowdate input[type=date]{flex:1; min-height:40px; padding:8px 11px; font-size:15px;}
+  .tracklink.alt{background:rgba(255,255,255,.92); margin-top:9px;}
+
   .foundnote{
     background:var(--tint); border-radius:14px; padding:12px 14px; margin-bottom:6px;
     font-size:13.5px; line-height:1.55; color:var(--ink);
@@ -434,9 +443,12 @@
     <path d="M10.2 10.9c.1 2.1.1 4.2 0 6.3M13.9 10.8c.1 2.1.1 4.2 0 6.4"/>
   </symbol>
   <symbol id="icon-paste" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M6.4 5.8c3.8-.3 7.5-.3 11.3 0 .3 4.4.3 8.8 0 13.2-3.8.3-7.5.3-11.2 0-.3-4.4-.3-8.8-.1-13.2Z"/>
-    <path d="M9.3 5.7c-.1-1.1.4-1.7 1.5-1.8.8-.1 1.6-.1 2.4 0 1 .1 1.5.7 1.4 1.8-1.8.2-3.5.2-5.3 0Z"/>
-    <path d="M8.9 10.6c2.1-.2 4.2-.2 6.3 0M8.9 13.9c2.1-.2 4.2-.2 6.3 0M8.9 17c1.3-.1 2.6-.1 3.9 0"/>
+    <path d="M3.4 6.4c5.8-.4 11.5-.4 17.3 0 .3 3.9.3 7.8 0 11.6-5.8.4-11.5.4-17.2 0-.3-3.9-.3-7.7-.1-11.6Z"/>
+    <path d="M3.7 6.9c2.8 2.4 5.6 4.7 8.4 6.9 2.8-2.3 5.6-4.6 8.3-7"/>
+  </symbol>
+  <symbol id="icon-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3.4 6.4c5.8-.4 11.5-.4 17.3 0 .3 3.9.3 7.8 0 11.6-5.8.4-11.5.4-17.2 0-.3-3.9-.3-7.7-.1-11.6Z"/>
+    <path d="M3.7 6.9c2.8 2.4 5.6 4.7 8.4 6.9 2.8-2.3 5.6-4.6 8.3-7"/>
   </symbol>
   <symbol id="icon-link" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
     <path d="M13.6 5.2c1.9-.2 3.8-.2 5.7 0 .2 1.9.2 3.8 0 5.7"/>
@@ -534,7 +546,11 @@
     <label for="fTrackUrl">Tracking link</label>
     <input type="url" id="fTrackUrl" placeholder="https://…" autocapitalize="none" />
 
+    <label for="fMailUrl">Link to the mail</label>
+    <input type="url" id="fMailUrl" placeholder="Paste a Spark link to the mail" autocapitalize="none" />
+
     <h3 style="margin-top:22px">What's in the order</h3>
+    <label class="switch"><input type="checkbox" id="fItemDates" />Each item has its own delivery date</label>
     <div id="itemRows"></div>
     <button class="addrow" id="addItemBtn"><svg class="hi"><use href="#icon-plus"/></svg>Add an item</button>
 
@@ -598,11 +614,20 @@
 
         <h3>The timeline</h3>
         <p>The button at the <b>top right</b> flips the home screen between the <b>list</b> and a <b>timeline</b> — a day-by-day strip of the days ahead. Each day shows which parcels are due to land on it, so you can see at a glance that Thursday is quiet and Friday has three things coming. Today is marked, weekends are dimmed, anything already <b>overdue</b> is banded at the top, and anything with <b>no date</b> is collected at the bottom.</p>
+        <p>When an order's items each carry their own date, each one appears on its own day with its name, so you can see exactly what lands when.</p>
         <p>When a shop promises a <b>window</b> rather than a day — “between the 5th and the 7th” — the order is drawn on every day it might turn up on, outlined rather than filled, and labelled with the window so you know why it repeats.</p>
 
         <h3>The pickup place</h3>
         <p>If the mail says the parcel is going somewhere other than your door — a post office, a Paketshop, a Packstation, a collection point — PackTrack picks that line out and puts it on the order. You can also type it in yourself, and the app remembers the places you've used so the next one is a tap away.</p>
         <p>The pickup place is a <b>link</b>: tap it on the order screen and it opens in <b>Maps</b>, ready to navigate to.</p>
+
+        <h3>Each item its own date</h3>
+        <p>Shops often promise different days for different things in one order — Amazon splits deliveries, and a shop may say one line ships now and another next week. Tick <b>“Each item has its own delivery date”</b> in the editor and every item gets its own date box.</p>
+        <p>Once items carry dates, they drive the order: the big number counts down to the <b>next item still outstanding</b>, the order only counts as late once the <b>last</b> one is overdue, and each item shows its own date on the order screen. Best of all, the timeline stops showing the order as one blob and puts <b>each item on the day it actually lands</b>, named. Untick the box and the order goes back to a single date for everything.</p>
+
+        <h3>A link back to the mail</h3>
+        <p>An order can hold a link straight back to the mail it came from. When one is present, the order screen shows <b>Open the original mail</b> under the tracking button, and tapping it jumps to that message.</p>
+        <p>If the mail you paste happens to contain a Spark link, PackTrack grabs it by itself. Otherwise: in <b>Spark</b>, copy a link to the message (its share menu offers this), then paste it into <b>Link to the mail</b> in the editor. Apple Mail's own <code>message://</code> links work too.</p>
 
         <h3>Colours</h3>
         <p>Every shop gets its own clear, flat colour and keeps it — Amazon is always the same colour, Thomann is always another — so you recognise an order before you've read a word of it. On top of that the <b>status</b> colours the number: red when it's overdue, amber when it's due today, green when everything's in. Opening an order paints the whole screen in that shop's colour.</p>
@@ -682,6 +707,8 @@
 
 /* ============ version log — newest first; [0].v is THE app version ============ */
 const VERSIONLOG = [
+  { v:'1.4', when:'2 Sep 2026',
+    what:'Three things you asked for. First, an order can now hold a link straight back to the mail it came from: when one is there, the order screen shows an <b>Open the original mail</b> button under the tracking button and tapping it jumps to that message. If the mail you paste already contains a Spark link the app grabs it by itself; otherwise copy a link to the message in Spark and paste it into the new “Link to the mail” box. Apple Mail’s own message: links work just as well.\n\nSecond, every item can now have its own delivery date, which is how orders really behave — Amazon splits deliveries, and shops often promise one line sooner than another. Tick “Each item has its own delivery date” in the editor and each item gets its own date box. From then on the items drive the order: the big number counts down to the next item still outstanding, the order only turns red once the last one is overdue, and each item shows its own date on the order screen. The timeline is where it pays off most — instead of one blob, each item appears on the exact day it lands, named, so a single order can be spread across three different days. Untick the box and everything goes back to one date.\n\nThird, the button for adding an order from a mail was a clipboard that everyone read as a battery. It is now plainly an envelope.' },
   { v:'1.3', when:'1 Sep 2026',
     what:'Reading a mail a second time now repairs the order you already have, instead of doubling it. This matters straight after the last release: any order saved before it is missing its pictures, and the obvious fix is to paste the mail again — but the app had no way to tell that “Magnet-Haken SPOT inkl. 3M-Pad BLACK × 4” and the tidier “Magnet-Haken SPOT inkl. 3M-Pad BLACK” are the same thing, so it would have added all five items a second time.\n\nAn item is now recognised as one you already have when the two names differ by nothing more than a trailing quantity — the exact difference the improved reader creates. Its picture and quantity are filled in, and the order keeps the tidier of the two names. The rule is deliberately narrow: “Kabel” and “Kabelbinder” are still treated as two different things, and it works just as well for a short name like “Gravur × 1” as for a long one.\n\nSo to get the pictures onto an order you saved earlier: paste the same mail again and choose to update the order you already have. Nothing is duplicated, nothing you typed yourself is thrown away, and the pictures simply appear.' },
   { v:'1.2', when:'1 Sep 2026',
@@ -737,11 +764,12 @@ function normalise(s){
     total: o.total || '',
     note: o.note || '',
     pickup: o.pickup || '',
+    mailUrl: o.mailUrl || '',
     got: !!o.got,
     colour: (o.colour && PALETTE[o.colour]) ? o.colour : '',
     items: Array.isArray(o.items) ? o.items.filter(i => i && (i.name || i.img)).map(i => ({
       id: i.id || uid(), name: i.name || '', qty: i.qty || '', img: i.img || '',
-      got: !!i.got, gotAt: i.gotAt || ''
+      due: i.due || '', got: !!i.got, gotAt: i.gotAt || ''
     })) : [],
     todos: Array.isArray(o.todos) ? o.todos.filter(t => t && t.text).map(t => ({
       id: t.id || uid(), text: t.text, done: !!t.done, doneAt: t.doneAt || ''
@@ -945,7 +973,7 @@ function normText(s){
 function blankOrder(){
   return { id:uid(), createdAt:new Date().toISOString(), shop:'', orderNo:'', ordered:'',
            due:'', dueTo:'', carrier:'', tracking:'', trackUrl:'', total:'', note:'',
-           got:false, colour:'', pickup:'', items:[], todos:[] };
+           got:false, colour:'', pickup:'', mailUrl:'', items:[], todos:[] };
 }
 
 /* ---- links: Amazon (and most senders) wrap every link in a redirector ---- */
@@ -1094,7 +1122,7 @@ function itemsFromDom(root){
       }
     }
     out.push({ id:uid(), name:rec.name || 'Item', qty:(rec.qty && rec.qty !== '1') ? rec.qty : '',
-               img:rec.img || '', got:false, gotAt:'' });
+               img:rec.img || '', due:'', got:false, gotAt:'' });
   });
   return out.slice(0, 25);
 }
@@ -1163,7 +1191,7 @@ function itemsFromBlocks(root){
     const k = nameKey(name);
     if(!k || seen.has(k)) return;
     seen.add(k);
-    out.push({ id:uid(), name:name.slice(0, 160), qty, img:absSrc(im), got:false, gotAt:'' });
+    out.push({ id:uid(), name:name.slice(0, 160), qty, img:absSrc(im), due:'', got:false, gotAt:'' });
   });
   return out.slice(0, 25);
 }
@@ -1187,9 +1215,23 @@ function itemsFromText(txt){
     const k = name.toLowerCase().slice(0, 40);
     if(seen.has(k)) continue;
     seen.add(k);
-    out.push({ id:uid(), name:name.slice(0,160), qty:'', img:'', got:false, gotAt:'' });
+    out.push({ id:uid(), name:name.slice(0,160), qty:'', img:'', due:'', got:false, gotAt:'' });
   }
   return out;
+}
+
+/* ---- a way back to the mail this came from ----
+   Spark hands out deep links in three shapes; Apple Mail uses message:. */
+const MAIL_LINK_RE = /(https:\/\/sparkmailapp\.com\/dpl\/[^\s"'<>]+|readdle-?spark:\/\/[^\s"'<>]+|message:\/\/[^\s"'<>]+)/i;
+function findMailLink(root, txt){
+  if(root){
+    const a = Array.from(root.querySelectorAll('a[href]'))
+      .map(x => x.getAttribute('href'))
+      .find(h => h && MAIL_LINK_RE.test(h));
+    if(a) return a;
+  }
+  const m = String(txt || '').match(MAIL_LINK_RE);
+  return m ? m[1] : '';
 }
 
 /* ---- where the parcel actually ends up ---- */
@@ -1317,6 +1359,10 @@ function readMail(root, rawText){
   o.pickup = findPickup(txt);
   found.pickup = !!o.pickup;
 
+  /* ---- a link back to the mail, when one was pasted along ---- */
+  o.mailUrl = findMailLink(root, txt);
+  found.mailUrl = !!o.mailUrl;
+
   /* ---- total ---- */
   o.total = firstMatch(TOTAL_RES, txt).replace(/\s+/g, ' ').trim();
   found.total = !!o.total;
@@ -1415,23 +1461,49 @@ const ST = {
   done:  { c:'var(--done)',  t:'var(--done-t)',  word:'All arrived' }
 };
 function allIn(o){ return o.items.length ? o.items.every(i => i.got) : !!o.got; }
-function lastDue(o){ return o.dueTo || o.due; }
+/* Items can each have their own delivery date (Amazon splits deliveries and
+   plenty of shops promise per line). When any do, they drive the order: the
+   countdown follows the next one still outstanding, lateness the last one. */
+function itemDueList(o, pendingOnly){
+  return o.items.filter(i => i.due && (!pendingOnly || !i.got)).map(i => i.due).sort();
+}
+function hasItemDates(o){ return o.items.some(i => i.due); }
+function effDue(o){ const d = itemDueList(o, true); return d.length ? d[0] : o.due; }
+function lastDue(o){
+  const d = itemDueList(o, true);
+  return d.length ? d[d.length - 1] : (o.dueTo || o.due);
+}
+function dueRange(o){
+  if(hasItemDates(o)) return { a:effDue(o), b:lastDue(o) };
+  return { a:o.due, b:(o.dueTo && o.dueTo !== o.due) ? o.dueTo : '' };
+}
 function statusOf(o){
   if(allIn(o)) return 'done';
   const ld = lastDue(o);
   if(!ld) return 'wait';
   const dLast = daysTo(ld);
-  const dFirst = o.due ? daysTo(o.due) : dLast;
+  const ed = effDue(o);
+  const dFirst = ed ? daysTo(ed) : dLast;
   if(dLast < 0) return 'late';
   if(dFirst === 0 || dLast === 0) return 'today';
   return dLast <= 2 ? 'soon' : 'wait';
 }
 function openTodos(o){ return o.todos.filter(t => !t.done).length; }
 function gotCount(o){ return o.items.filter(i => i.got).length; }
-function dueText(o){
-  if(!o.due && !o.dueTo) return '';
-  if(o.dueTo && o.dueTo !== o.due) return prettyDate(o.due) + ' – ' + prettyDate(o.dueTo);
-  return prettyDate(o.due);
+function dueText(o){                       // long form, for the order screen
+  const { a, b } = dueRange(o);
+  if(!a) return '';
+  return (b && b !== a) ? prettyDate(a) + ' – ' + prettyDate(b) : prettyDate(a);
+}
+function dueShort(o){                      // compact form, for cards and the timeline
+  const { a, b } = dueRange(o);
+  if(!a) return '';
+  if(!b || b === a) return prettyDate(a);
+  const da = parseISO(a), db = parseISO(b);
+  const mA = da.toLocaleDateString('en-GB', { month:'short' });
+  const mB = db.toLocaleDateString('en-GB', { month:'short' });
+  return mA === mB ? `${da.getDate()}–${db.getDate()} ${mB}`
+                   : `${da.getDate()} ${mA} – ${db.getDate()} ${mB}`;
 }
 function firstPic(o){ const i = o.items.find(x => x.img); return i ? i.img : ''; }
 
@@ -1495,8 +1567,7 @@ function orderCard(o){
   const got = gotCount(o);
 
   const bits = [];
-  const win = (o.dueTo && o.dueTo !== o.due);
-  const dt = win ? windowText(o) : dueText(o);
+  const dt = dueShort(o);
   if(dt) bits.push(`<b>${esc(dt)}</b>`);
   if(o.carrier) bits.push(esc(o.carrier));
   if(n > 1) bits.push(got ? `${got} of ${n} in` : `${n} items`);
@@ -1510,8 +1581,8 @@ function orderCard(o){
     right = `<div class="onum">${d}</div><div class="olbl">${d === 1 ? 'day late' : 'days late'}</div>`;
   } else if(st === 'today'){
     right = `<div class="oword">Today</div>`;
-  } else if(o.due || o.dueTo){
-    const d = daysTo(o.due || o.dueTo);
+  } else if(effDue(o) || lastDue(o)){
+    const d = daysTo(effDue(o) || lastDue(o));
     right = `<div class="onum">${d}</div><div class="olbl">${d === 1 ? 'day' : 'days'}</div>`;
   } else {
     right = `<div class="oword" style="color:var(--ink-dim)">No date</div>`;
@@ -1611,13 +1682,13 @@ function renderDetail(){
   if(st === 'late'){
     const d = Math.abs(daysTo(lastDue(o)));
     statusLine = `Overdue by ${d} day${d === 1 ? '' : 's'}`;
-  } else if(st === 'wait' && (o.due || o.dueTo)){
-    const d = daysTo(o.due || o.dueTo);
+  } else if(st === 'wait' && (effDue(o) || lastDue(o))){
+    const d = daysTo(effDue(o) || lastDue(o));
     statusLine = `${d} day${d === 1 ? '' : 's'} to go`;
   } else if(st === 'done'){
     const n = o.items.length;
     statusLine = n > 1 ? `All ${n} items arrived` : 'Arrived';
-  } else if(st === 'wait' && !o.due){
+  } else if(st === 'wait' && !effDue(o)){
     statusLine = 'On its way — no date given';
   }
   if(st !== 'done' && o.items.length > 1 && gotCount(o)) statusLine += ` · ${gotCount(o)} of ${o.items.length} already in`;
@@ -1629,7 +1700,11 @@ function renderDetail(){
           <span class="tpic"><svg class="hi"><use href="#icon-box"/></svg>${i.img ? `<img src="${esc(i.img)}" alt="" loading="lazy" onerror="this.remove()" />` : ''}</span>
           <span class="tmid">
             <span class="tname">${esc(i.name || 'Item')}</span>
-            ${(i.qty && i.qty !== '1') || i.got ? `<span class="tsub">${[(i.qty && i.qty !== '1') ? '×' + esc(i.qty) : '', i.got && i.gotAt ? 'ticked ' + prettyDate(i.gotAt) : ''].filter(Boolean).join(' · ')}</span>` : ''}
+            ${(i.qty && i.qty !== '1') || i.got || i.due ? `<span class="tsub">${[
+              (i.qty && i.qty !== '1') ? '×' + esc(i.qty) : '',
+              (i.due && !i.got) ? esc(prettyDate(i.due)) : '',
+              i.got && i.gotAt ? 'ticked ' + prettyDate(i.gotAt) : ''
+            ].filter(Boolean).join(' · ')}</span>` : ''}
           </span>
         </button>`).join('')
     : `<button class="tickrow${o.got ? ' on' : ''}" data-whole="1">
@@ -1662,6 +1737,7 @@ function renderDetail(){
       ${when.length ? `<div class="dwhen">${when.join(' ')}</div>` : ''}
       ${pickupLine}
       ${trackUrl ? `<a class="tracklink" href="${esc(trackUrl)}" target="_blank" rel="noopener"><svg class="hi"><use href="#icon-truck"/></svg>Track this parcel</a>` : ''}
+      ${o.mailUrl ? `<a class="tracklink alt" href="${esc(o.mailUrl)}"><svg class="hi"><use href="#icon-mail"/></svg>Open the original mail</a>` : ''}
     </div>
 
     <div class="sect">In the box<span class="gline"></span></div>
@@ -1721,22 +1797,23 @@ function setPageBackground(){
 }
 /* ============ the timeline — what lands on which day ============ */
 function inWindow(o, iso){
+  if(hasItemDates(o)) return o.items.some(i => i.due === iso && !i.got);
   const a = o.due || o.dueTo, b = o.dueTo || o.due;
   return !!a && iso >= a && iso <= b;
 }
-/* "5–7 Sept" — compact, so a repeated pill explains itself */
-function windowText(o){
-  const a = parseISO(o.due), b = parseISO(o.dueTo);
-  if(!a || !b) return '';
-  const mA = a.toLocaleDateString('en-GB', { month:'short' });
-  const mB = b.toLocaleDateString('en-GB', { month:'short' });
-  return mA === mB ? `${a.getDate()}–${b.getDate()} ${mB}` : `${a.getDate()} ${mA} – ${b.getDate()} ${mB}`;
+/* when an order is placed by its items, say which item lands that day */
+function dayLabel(o, iso){
+  if(!hasItemDates(o)) return null;
+  const its = o.items.filter(i => i.due === iso && !i.got);
+  if(!its.length) return null;
+  return its.length === 1 ? its[0].name.slice(0, 34) : its.length + ' items';
 }
-function tlPill(o, windowed){
+function tlPill(o, windowed, label){
   const p = colourOf(o);
   const n = o.items.length;
   const got = gotCount(o);
-  const note = windowed ? ('somewhen ' + windowText(o))
+  const note = label ? label
+             : windowed ? ('somewhen ' + dueShort(o))
              : n > 1 ? (got ? `${got}/${n} in` : `${n} items`)
              : (o.carrier || '');
   return `<button class="tlpill${windowed ? ' window' : ''}" data-id="${o.id}" style="--oc:${p.dot}; --oct:${p.tint}">
@@ -1759,11 +1836,11 @@ function renderTimeline(){
     return;
   }
   const late = live.filter(o => statusOf(o) === 'late');
-  const undated = live.filter(o => !o.due && !o.dueTo);
-  const dated = live.filter(o => (o.due || o.dueTo) && statusOf(o) !== 'late');
+  const undated = live.filter(o => !effDue(o) && !lastDue(o));
+  const dated = live.filter(o => (effDue(o) || lastDue(o)) && statusOf(o) !== 'late');
 
   let span = 0;
-  dated.forEach(o => { const d = daysTo(o.dueTo || o.due); if(d > span) span = d; });
+  dated.forEach(o => { const d = daysTo(lastDue(o)); if(d > span) span = d; });
   span = Math.min(45, Math.max(span, 6));            // always show at least the week ahead
 
   let html = '';
@@ -1782,7 +1859,7 @@ function renderTimeline(){
         <div class="tlnum">${day.getDate()}</div>
       </div>
       <div class="tlitems">${on.length
-        ? on.map(o => tlPill(o, !!(o.dueTo && o.dueTo !== o.due))).join('')
+        ? on.map(o => tlPill(o, !hasItemDates(o) && !!(o.dueTo && o.dueTo !== o.due), dayLabel(o, iso))).join('')
         : '<div class="tlgap"></div>'}</div>
     </div>`;
   }
@@ -1824,6 +1901,7 @@ function foundNoteHtml(f){
     ? `I read the mail and found ${parts.join(', plus ')}.`
     : `I read the mail but couldn't make much of it.`;
   if(!f.items) html += ` I couldn't pick out the individual items — add them below, or just leave it as one order to tick off.`;
+  if(f.mailUrl) html += ` It also picked up a link back to the mail.`;
   if(missed.length) html += ` <span class="miss">Not found: ${missed.join(', ')}.</span>`;
   html += ` Check it over, fix anything wrong, then Save.`;
   return html;
@@ -1832,13 +1910,15 @@ function foundNoteHtml(f){
 function harvestRows(){
   if(!draft) return;
   const items = [];
-  document.querySelectorAll('#itemRows .erow').forEach(row => {
+  document.querySelectorAll('#itemRows .eitem').forEach(row => {
     const id = row.dataset.row;
     const old = draft.items.find(i => i.id === id) || { id, got:false, gotAt:'', img:'' };
     const name = row.querySelector('.iname').value.trim();
     const qty = row.querySelector('.qty').value.trim();
+    const due = row.querySelector('.idue').value;
     if(!name && !old.img) return;
-    items.push({ id:old.id, name:name || 'Item', qty, img:old.img || '', got:!!old.got, gotAt:old.gotAt || '' });
+    items.push({ id:old.id, name:name || 'Item', qty, img:old.img || '', due,
+                 got:!!old.got, gotAt:old.gotAt || '' });
   });
   draft.items = items;
 
@@ -1855,14 +1935,18 @@ function harvestRows(){
 
 function renderItemRows(){
   $('itemRows').innerHTML = draft.items.map(i => `
-    <div class="erow" data-row="${i.id}">
-      <button class="epic" data-pic="${i.id}" aria-label="Picture">
-        <svg class="hi"><use href="#icon-camera"/></svg>${i.img ? `<img src="${esc(i.img)}" alt="" onerror="this.remove()" />` : ''}
-      </button>
-      <input type="text" class="iname" value="${esc(i.name)}" placeholder="What is it?" />
-      <input type="text" class="qty" value="${esc(i.qty || '')}" placeholder="×" inputmode="numeric" />
-      <button class="ex" data-rm="${i.id}" aria-label="Remove"><svg class="hi" style="width:18px;height:18px"><use href="#icon-close"/></svg></button>
+    <div class="eitem" data-row="${i.id}">
+      <div class="erow">
+        <button class="epic" data-pic="${i.id}" aria-label="Picture">
+          <svg class="hi"><use href="#icon-camera"/></svg>${i.img ? `<img src="${esc(i.img)}" alt="" onerror="this.remove()" />` : ''}
+        </button>
+        <input type="text" class="iname" value="${esc(i.name)}" placeholder="What is it?" />
+        <input type="text" class="qty" value="${esc(i.qty || '')}" placeholder="×" inputmode="numeric" />
+        <button class="ex" data-rm="${i.id}" aria-label="Remove"><svg class="hi" style="width:18px;height:18px"><use href="#icon-close"/></svg></button>
+      </div>
+      <div class="erowdate"><span>Arrives</span><input type="date" class="idue" value="${esc(i.due || '')}" /></div>
     </div>`).join('');
+  $('itemRows').classList.toggle('withdates', $('fItemDates').checked);
   $('itemRows').querySelectorAll('[data-rm]').forEach(b => b.addEventListener('click', () => {
     harvestRows();
     draft.items = draft.items.filter(i => i.id !== b.dataset.rm);
@@ -1907,6 +1991,8 @@ function openEditor(order, isNew, found){
     .map(v => `<option value="${esc(v)}"></option>`).join('');
   $('fTracking').value = draft.tracking;
   $('fTrackUrl').value = draft.trackUrl;
+  $('fMailUrl').value = draft.mailUrl || '';
+  $('fItemDates').checked = hasItemDates(draft);
   $('fOrderNo').value = draft.orderNo;
   $('fOrdered').value = draft.ordered;
   $('fTotal').value = draft.total;
@@ -1963,6 +2049,7 @@ function findTwin(map, list, key){
 function mergeInto(target, src){
   ['shop','orderNo','ordered','total','note'].forEach(k => { if(!target[k] && src[k]) target[k] = src[k]; });
   if(src.pickup) target.pickup = src.pickup;
+  if(src.mailUrl) target.mailUrl = src.mailUrl;
   if(src.due){ target.due = src.due; target.dueTo = src.dueTo; }
   if(src.carrier) target.carrier = src.carrier;
   if(src.tracking) target.tracking = src.tracking;
@@ -1994,6 +2081,8 @@ async function saveDraft(){
   o.pickup = $('fPickup').value.trim();
   o.tracking = $('fTracking').value.trim();
   o.trackUrl = $('fTrackUrl').value.trim();
+  o.mailUrl = $('fMailUrl').value.trim();
+  if(!$('fItemDates').checked) o.items.forEach(i => { i.due = ''; });
   o.orderNo = $('fOrderNo').value.trim();
   o.ordered = $('fOrdered').value;
   o.total = $('fTotal').value.trim();
@@ -2243,9 +2332,14 @@ $('pasteBox').addEventListener('paste', () => {
 $('editClose').addEventListener('click', closeEditor);
 $('editCancel').addEventListener('click', closeEditor);
 $('saveBtn').addEventListener('click', () => { saveDraft(); });
+$('fItemDates').addEventListener('change', () => {
+  harvestRows();
+  if(!$('fItemDates').checked) draft.items.forEach(i => { i.due = ''; });
+  renderItemRows();
+});
 $('addItemBtn').addEventListener('click', () => {
   harvestRows();
-  draft.items.push({ id:uid(), name:'', qty:'', img:'', got:false, gotAt:'' });
+  draft.items.push({ id:uid(), name:'', qty:'', img:'', due:'', got:false, gotAt:'' });
   renderItemRows();
   const rows = $('itemRows').querySelectorAll('.iname');
   if(rows.length) rows[rows.length - 1].focus();
