@@ -553,11 +553,11 @@
     <div class="suggest" id="leadSuggest" hidden></div>
 
     <label for="fCarrier">Delivery service</label>
-    <input type="text" id="fCarrier" list="carrierList" placeholder="DHL, Post, DPD…" autocapitalize="characters" />
+    <input type="text" id="fCarrier" list="carrierList" placeholder="PostNord, DHL, Budbee…" autocapitalize="characters" />
     <datalist id="carrierList"></datalist>
 
     <label for="fPickup">Pickup place</label>
-    <input type="text" id="fPickup" list="pickupList" placeholder="Where it ends up — post office, Paketshop, front door…" autocapitalize="sentences" />
+    <input type="text" id="fPickup" list="pickupList" placeholder="Where it ends up — utlämningsställe, i butik, front door…" autocapitalize="sentences" />
     <datalist id="pickupList"></datalist>
 
     <label for="fTracking">Tracking number</label>
@@ -621,7 +621,8 @@
         <p>There's an Apple Shortcut recipe under <b>The one-tap Shortcut</b> below. Once it's set up, the mail's <b>share sheet</b> has a “Send to PackTrack” entry that opens the app with the mail already in it. Faster, but iOS only hands a Shortcut plain text — so no pictures, and a very long mail can get clipped. Use it for the quick ones and paste for the ones you want pictures on.</p>
 
         <h3>What it looks for</h3>
-        <p>Shop, order number, order date, <b>every item in the order</b> with its own picture, the total, the <b>promised delivery date</b> — a single day or a range like “zwischen dem 3. und 5. September” — the <b>delivery service</b> (DHL, Deutsche Post, Austrian Post, DPD, GLS, Hermes, UPS, FedEx, PostNL, TNT, Amazon and others), the tracking number, the <b>tracking link</b> straight out of the mail so tracking is one tap, and the <b>pickup place</b> if it's not coming to your door. German and English mails both work.</p>
+        <p>Shop, order number, order date, <b>every item in the order</b> with its own picture, the total, the <b>promised delivery date</b> — a single day or a range like “zwischen dem 3. und 5. September” — the <b>delivery service</b> (PostNord, Budbee, Instabox, Bring, DHL, Deutsche Post, Austrian Post, DPD, GLS, Hermes, UPS, FedEx, PostNL, TNT, Amazon and others), the tracking number, the <b>tracking link</b> straight out of the mail so tracking is one tap, and the <b>pickup place</b> if it's not coming to your door.</p>
+        <p><b>Swedish, German and English</b> mails all work. On a Swedish mail that means ordernummer and orderdatum, beräknad leverans, totalt and att betala, antal, prices in <b>kr</b> — “699,00 kr”, “2 495,00 kr”, “699:-” — dates like “5 september” or “2026-09-05”, “idag” and “imorgon”, and a leveranstid in <b>vardagar</b>.</p>
         <p>It always shows you what it found <b>before</b> saving, and says plainly what it couldn't find. Every single field is editable, so a miss is never a dead end.</p>
 
         <h3>The dispatch mail too</h3>
@@ -638,7 +639,7 @@
         <p>When a shop promises a <b>window</b> rather than a day — “between the 5th and the 7th” — the order is drawn on every day it might turn up on, outlined rather than filled, and labelled with the window so you know why it repeats.</p>
 
         <h3>The pickup place</h3>
-        <p>If the mail says the parcel is going somewhere other than your door — a post office, a Paketshop, a Packstation, a collection point — PackTrack picks that line out and puts it on the order. You can also type it in yourself, and the app remembers the places you've used so the next one is a tap away.</p>
+        <p>If the mail says the parcel is going somewhere other than your door — ett utlämningsställe, ett postombud, “hämta i butik”, a post office, a Paketshop, a Packstation, a collection point — PackTrack picks that line out and puts it on the order. You can also type it in yourself, and the app remembers the places you've used so the next one is a tap away.</p>
         <p>The pickup place is a <b>link</b>: tap it on the order screen and it opens in <b>Maps</b>, ready to navigate to.</p>
 
         <h3>Each item its own date</h3>
@@ -646,7 +647,7 @@
         <p>Once items carry dates, they drive the order: the big number counts down to the <b>next item still outstanding</b>, the order only counts as late once the <b>last</b> one is overdue, and each item shows its own date on the order screen. Best of all, the timeline stops showing the order as one blob and puts <b>each item on the day it actually lands</b>, named. Untick the box and the order goes back to a single date for everything.</p>
 
         <h3>When the mail gives a delivery time, not a date</h3>
-        <p>Plenty of shops promise “Lieferzeit 1–3 Werktage” instead of naming a day. When PackTrack spots that and no real date was given, the review sheet offers the arithmetic: it counts forward from the order date in <b>working days only</b> — skipping weekends and Swedish röda dagar, including midsommarafton, julafton and nyårsafton — and shows you the result. It is only used if you tap <b>Use it</b>; the app never quietly invents a delivery date. If a mail names several times (“…, mit Gravur 2–4 Werktage”) the widest span is taken, which is the honest one.</p>
+        <p>Plenty of shops promise “Leveranstid 1–3 vardagar” or “Lieferzeit 1–3 Werktage” instead of naming a day. When PackTrack spots that and no real date was given, the review sheet offers the arithmetic: it counts forward from the order date in <b>working days only</b> — skipping weekends and Swedish röda dagar, including midsommarafton, julafton and nyårsafton — and shows you the result. It is only used if you tap <b>Use it</b>; the app never quietly invents a delivery date. If a mail names several times (“…, mit Gravur 2–4 Werktage”) the widest span is taken, which is the honest one.</p>
         <p>A date set this way is marked <b>(estimated)</b> on the order screen and with a <b>≈</b> on the card, so it never looks like a promise. Type a date yourself and the marking goes away.</p>
 
         <h3>Suggested follow-ups</h3>
@@ -672,7 +673,7 @@
         <p>Each order can carry your own to-dos — “return the small one”, “register the warranty”, “check the invoice”. They get their own ticks, and the <b>Follow-ups</b> chip on the home screen shows every open one across all your orders.</p>
 
         <h3>Tracking</h3>
-        <p>If the mail carried a tracking link, the order screen shows a big <b>Track this parcel</b> button. If it only carried a number, PackTrack builds the right link itself for DHL, Austrian Post, DPD, GLS, Hermes, UPS, FedEx and PostNL.</p>
+        <p>If the mail carried a tracking link, the order screen shows a big <b>Track this parcel</b> button — and that is the link the app prefers, because it came from the shop itself. If the mail only carried a number, PackTrack builds the link for PostNord, Bring, DHL, Austrian Post, DPD, GLS, Hermes, UPS, FedEx and PostNL. Budbee, Instabox and Airmee hand out a one-off link per parcel rather than a public search page, so for those the order keeps the carrier's name and uses the link from the mail.</p>
 
         <h3>Pictures</h3>
         <p>Product pictures come out of a pasted mail automatically — both from shops that link every product (Amazon) and from shops that just show a picture and a name in a row (most others). The app tries to store a copy on the device so it still shows offline; when the shop won't allow that, it keeps the link instead and the picture appears when you're online. You can also tap the little square next to any item in the editor and <b>take or choose a photo</b> yourself — those are always stored on the device.</p>
@@ -740,6 +741,8 @@
 
 /* ============ version log — newest first; [0].v is THE app version ============ */
 const VERSIONLOG = [
+  { v:'1.6', when:'2 Sep 2026',
+    what:'Swedish mails. The reader knew German and English, which was an odd thing for an app whose working-day calendar already skips midsommarafton: a Cervera confirmation went in and nothing at all came out — no shop, no order number, no total, not one item.\n\nMost of the misses were one letter wide. “Ordernummer” got as far as “Order” and then wanted the English “number”. “Totalt” is not “Total”, “Antal” is not “Anzahl”. And <b>kr</b> appeared in no price pattern anywhere, which cost far more than the total: a price standing near a line is how the app decides that line is a product at all, so a Swedish mail could never produce a single item. Amounts written the Swedish way — “2 495,00 kr”, with a space in the thousands — were not amounts either.\n\nAll of it reads now: ordernummer and orderdatum, beräknad leverans and leveransdatum, totalt, summa and att betala, antal, kr and SEK and “:-”, Swedish month and weekday names, “idag” and “imorgon”, and a leveranstid in vardagar counted in real working days. The delivery services are PostNord, Budbee, Instabox, Airmee, Bring and Best Transport, and whatever tracking link they put in the mail is used as it stands. “Hämta i butik”, “utlämningsställe”, “postombud” and “Collect in store” are recognised as pickup places.\n\nTwo things fell out of it that are not Swedish at all. A mail often says “levereras” or “Lieferung” in its opening pleasantries long before it names a date, and the app read that first one and gave up; it now tries each in turn until one actually holds a date. And “übermorgen” had never worked, because in JavaScript a word boundary does not exist in front of a “ü”.' },
   { v:'1.5', when:'2 Sep 2026',
     what:'Dates the app can work out for you — offered, never imposed. Many shops promise a delivery time rather than a date: “Lieferzeit 1–3 Werktage”. When PackTrack finds one and the mail names no actual day, the review sheet now shows the arithmetic and a <b>Use it</b> button. The count runs in working days from the order date, skipping weekends and Swedish röda dagar — långfredagen, annandag påsk, Kristi himmelsfärdsdag, nationaldagen and the rest, plus midsommarafton, julafton and nyårsafton, when nothing is delivered either. Where a mail states more than one time (“…, mit Gravur 2–4 Werktage”) the widest span is used, because that is the honest one. Nothing is filled in unless you tap the button, and a date that came from it is marked <b>(estimated)</b> on the order screen and with a <b>≈</b> on the card so it can never be mistaken for a promise — typing your own date clears the marking.\n\nFollow-ups now suggest themselves. Because the app already knows when things were promised and when they actually arrived, it can offer the to-dos that genuinely follow, each with its date already worked out: <b>chase the shop</b> three days after the promised date (or today, if it is already late), <b>return window closes</b> fourteen days after the last item arrived while you can still change your mind, and <b>register the warranty</b> a few working days after everything landed. Each suggestion says why it picked that date, and one tap adds it.\n\nFollow-ups can also carry dates of their own now, suggested or typed. A dated follow-up shows up on the timeline on the day it falls due, so returns and warranty deadlines sit alongside the parcels, and one that slips past its date turns red on the order screen.\n\nOne correction: the working-day calculations were built against Austrian public holidays by mistake. They are Swedish now.' },
   { v:'1.4', when:'2 Sep 2026',
@@ -898,8 +901,9 @@ function addWorkdays(fromISO, k){
    Only counted when a delivery word sits just before it, so a "2-4" inside a
    product name can't be mistaken for a lead time. A mail may state several
    ("…, mit Gravur 2-4 Werktage") — take the widest span, which is the honest one. */
-const LEAD_NEAR = /(Lieferzeit|Lieferfrist|Lieferung|Liefertermin|Versand|Bearbeitungszeit|Zustellung|verschickt|verschicken|ship|dispatch|delivery|deliver|arriv)/i;
-const LEAD_UNITS = '(Werktage?n?|Arbeitstage?n?|business\\s+days?|working\\s+days?|Tage?n?|days?)';
+const LEAD_NEAR = /(Lieferzeit|Lieferfrist|Lieferung|Liefertermin|Versand|Bearbeitungszeit|Zustellung|verschickt|verschicken|ship|dispatch|delivery|deliver|arriv|leveranstid|leverans|levereras|frakttid|skickas|expedieras|behandlingstid|beräknad|beräknas)/i;
+const LEAD_UNITS = '(Werktage?n?|Arbeitstage?n?|business\\s+days?|working\\s+days?|vardagar?|arbetsdagar?|Tage?n?|days?|dagar?)';
+const LEAD_NOT = /(öppet\s*köp|ångerrätt|retur|return|Rückgabe|Widerruf|garanti|warrant|guarantee)/i;
 const LEAD_RE = new RegExp(
   '(\\d{1,2})\\s*(?:[–—-]|bis|to)\\s*(\\d{1,2})\\s*' + LEAD_UNITS +
   '|(\\d{1,2})\\s*' + LEAD_UNITS, 'gi');
@@ -909,9 +913,12 @@ function findLeadTime(txt){
   let m, best = null;
   LEAD_RE.lastIndex = 0;
   while((m = LEAD_RE.exec(txt)) !== null){
-    if(!LEAD_NEAR.test(txt.slice(Math.max(0, m.index - 45), m.index))) continue;
+    const before = txt.slice(Math.max(0, m.index - 45), m.index);
+    const after = txt.slice(m.index + m[0].length, m.index + m[0].length + 30);
+    if(!LEAD_NEAR.test(before)) continue;
+    if(LEAD_NOT.test(before) || LEAD_NOT.test(after)) continue;
     const unit = String(m[3] || m[5] || '').toLowerCase();
-    const working = /werktag|arbeitstag|business|working/.test(unit);
+    const working = /werktag|arbeitstag|business|working|vardag|arbetsdag/.test(unit);
     const lo = m[1] ? +m[1] : +m[4];
     const hi = m[2] ? +m[2] : +m[4];
     if(!lo || lo > 60 || hi > 90 || hi < lo) continue;
@@ -957,6 +964,19 @@ const CARRIERS = [
     url:n => 'https://postnl.post/detail?barcode=' + n },
   { id:'TNT',           re:/\bTNT\b/,
     url:n => 'https://www.tnt.com/express/de_at/site/shipping-tools/tracking.html?searchType=con&cons=' + n },
+  /* ---- Sweden ----
+     PostNord and Bring publish a tracking page that takes the number in the
+     URL; the rest hand out a one-off link in the dispatch mail instead, so
+     there is no address to build and the mail's own link is used (see
+     TRACK_HOSTS). An empty url() simply means no Track button. */
+  { id:'PostNord',      re:/\bPostNord\b|\bpostnord\.(?:se|com|dk|no|fi)\b/i,
+    url:n => 'https://tracking.postnord.com/se/?id=' + n },
+  { id:'Bring',         re:/\bbring\.(?:se|no|com)\b|Bring\s*Parcels|Posten\s*Bring/i,
+    url:n => 'https://tracking.bring.com/tracking.html?q=' + n },
+  { id:'Budbee',        re:/\bBudbee\b/i, url:() => '' },
+  { id:'Instabox',      re:/\bInstabox\b|\bInstabee\b/i, url:() => '' },
+  { id:'Airmee',        re:/\bAirmee\b/i, url:() => '' },
+  { id:'Best Transport',re:/\bBest\s*Transport\b/i, url:() => '' },
   { id:'GO!',           re:/\bGO!\s*Express|General\s*Overnight/i, url:() => '' },
   { id:'Schenker',      re:/\bSchenker\b/i, url:() => '' },
   { id:'trans-o-flex',  re:/trans-?o-?flex/i, url:() => '' },
@@ -977,9 +997,9 @@ function buildTrackUrl(carrier, number){
 const MONTHS = {
   jan:1, januar:1, january:1, jän:1, jaen:1, jänner:1, jaenner:1,
   feb:2, februar:2, february:2,
-  mar:3, mär:3, maer:3, marz:3, märz:3, maerz:3, mrz:3, march:3,
+  mar:3, mär:3, maer:3, marz:3, märz:3, maerz:3, mrz:3, march:3, mars:3,
   apr:4, april:4,
-  mai:5, may:5,
+  mai:5, may:5, maj:5,
   jun:6, juni:6, june:6,
   jul:7, juli:7, july:7,
   aug:8, august:8,
@@ -998,9 +1018,10 @@ function monthNo(word){
 }
 /* long names only — "so" and "do" are far too common in German prose */
 const WEEKDAYS = {
-  sonntag:0, sunday:0, montag:1, monday:1, dienstag:2, tuesday:2,
-  mittwoch:3, wednesday:3, donnerstag:4, thursday:4,
-  freitag:5, friday:5, samstag:6, sonnabend:6, saturday:6
+  sonntag:0, sunday:0, söndag:0, montag:1, monday:1, måndag:1,
+  dienstag:2, tuesday:2, tisdag:2, mittwoch:3, wednesday:3, onsdag:3,
+  donnerstag:4, thursday:4, torsdag:4, freitag:5, friday:5, fredag:5,
+  samstag:6, sonnabend:6, saturday:6, lördag:6
 };
 
 /* Build an ISO date, inferring a missing year so it lands near today. */
@@ -1026,10 +1047,11 @@ function mkDate(y, m, d){
    "zwischen dem 3. und 5. September" match "dem 3" and "und 5" first, eating both
    digits before the actual date could be read. Longest spellings come first. */
 const MONTH_WORDS =
-  'januar|jänner|jaenner|january|jan|februar|february|feb|märz|maerz|marz|march|mar|mrz' +
-  '|april|apr|mai|may|juni|june|jun|juli|july|jul|august|aug|september|sept|sep' +
+  'januari|januar|jänner|jaenner|january|jan|februari|februar|february|feb' +
+  '|märz|maerz|marz|march|mars|mar|mrz' +
+  '|april|apr|maj|mai|may|juni|june|jun|juli|july|jul|augusti|august|aug|september|sept|sep' +
   '|oktober|october|okt|oct|november|nov|dezember|december|dez|dec';
-const MW = '(?:' + MONTH_WORDS + ')(?![a-zäöüß])';
+const MW = '(?:' + MONTH_WORDS + ')(?![a-zäöüåß])';
 
 /* One pass over a piece of text, collecting every date it can recognise, in order. */
 const DATE_RE = new RegExp([
@@ -1041,7 +1063,7 @@ const DATE_RE = new RegExp([
 
 /* "zwischen dem 3. und 5. September" — one month, two days. */
 const RANGE_RE = new RegExp(
-  '(\\d{1,2})\\.?\\s*(?:und|bis|to|and|[–—-])\\s*(?:[A-Za-zÄÖÜäöüß]{2,10},?\\s*)?' +
+  '(\\d{1,2})\\.?\\s*(?:und|bis|to|and|och|till|[–—-])\\s*(?:[A-Za-zÄÖÜÅäöüåß]{2,10},?\\s*)?' +
   '(\\d{1,2})\\.?\\s*(' + MW + ')\\.?(?:\\s+(\\d{4}))?', 'i');
 function scanRange(text){
   const m = String(text || '').match(RANGE_RE);
@@ -1074,9 +1096,14 @@ function scanDates(text){
 /* "morgen", "tomorrow", "Montag" … when no real date is written out */
 function relativeDate(tail){
   const t = ' ' + tail.toLowerCase() + ' ';
-  if(/\b(heute|today)\b/.test(t)) return todayISO();
-  if(/\b(morgen|tomorrow)\b/.test(t) && !/\bübermorgen\b/.test(t)) return isoOf(new Date(Date.now() + DAY));
-  if(/\bübermorgen\b/.test(t)) return isoOf(new Date(Date.now() + 2*DAY));
+  /* \b is ASCII-only in JavaScript, so \bübermorgen never matches after a
+     space — the boundary needs a word character on one side and "ü" is not
+     one. Every word here is fenced with a real "not a letter" instead, which
+     is the only thing that works for übermorgen, imorgon and övermorgon. */
+  const has = (w) => new RegExp('(?:^|[^0-9a-zà-öø-ÿ])' + w + '(?:$|[^0-9a-zà-öø-ÿ])', 'i').test(t);
+  if(has('heute') || has('today') || has('i ?dag')) return todayISO();
+  if(has('übermorgen') || has('i ?övermorgon') || has('övermorgon')) return isoOf(new Date(Date.now() + 2*DAY));
+  if(has('morgen') || has('tomorrow') || has('i ?morgon') || has('i ?morron')) return isoOf(new Date(Date.now() + DAY));
   for(const w in WEEKDAYS){
     if(new RegExp('\\b' + w + '\\b').test(t)){
       const want = WEEKDAYS[w];
@@ -1144,11 +1171,22 @@ const SHOP_PRETTY = {
   aliexpress:'AliExpress', temu:'Temu', etsy:'Etsy', apple:'Apple', saturn:'Saturn',
   alternate:'Alternate', cyberport:'Cyberport', bike24:'Bike24', canyon:'Canyon',
   globetrotter:'Globetrotter', universal:'Universal', interspar:'Interspar', rewe:'REWE',
-  'shop-apotheke':'Shop Apotheke', 'jack-wolfskin':'Jack Wolfskin', patagonia:'Patagonia'
+  'shop-apotheke':'Shop Apotheke', 'jack-wolfskin':'Jack Wolfskin', patagonia:'Patagonia',
+  /* Sweden. Only names that are safe to look for in running text — a key is
+     also searched for as a word, so "power" or "xxl" would turn any mail that
+     happens to use the word into an order from that shop. */
+  cervera:'Cervera', clasohlson:'Clas Ohlson', elgiganten:'Elgiganten',
+  webhallen:'Webhallen', komplett:'Komplett', netonnet:'NetOnNet', dustin:'Dustin',
+  proshop:'Proshop', teknikmagasinet:'Teknikmagasinet', kjell:'Kjell & Company',
+  jula:'Jula', biltema:'Biltema', byggmax:'Byggmax', granngarden:'Granngården',
+  adlibris:'Adlibris', bokus:'Bokus', apotea:'Apotea', mathem:'MatHem',
+  stadium:'Stadium', naturkompaniet:'Naturkompaniet', addnature:'Addnature',
+  sportamore:'Sportamore', royaldesign:'Royal Design', nordicnest:'Nordic Nest',
+  ellos:'Ellos', lyko:'Lyko', cdon:'CDON', fyndiq:'Fyndiq', tradera:'Tradera'
 };
 /* infrastructure, senders and CDNs — never the shop */
 const SHOP_NOISE = /^(amazonses|amazonaws|media-amazon|ssl-images-amazon|images-amazon|mailchimp|list-manage|sendgrid|sendgrid\.net|mandrillapp|klaviyo|braze|exacttarget|sailthru|salesforce|hubspot|doubleclick|googleapis|gstatic|google|googletagmanager|facebook|twitter|x|instagram|youtube|linkedin|pinterest|tiktok|whatsapp|apple\.co|cloudfront|akamaized|akamai|fastly|cdn|w3|schema|paypal|klarna|visa|mastercard|trustpilot|trustedshops|shopify|shopifycdn|myshopify)\./;
-const CARRIER_DOMAIN = /^(dhl|deutschepost|post|dpd|gls-group|myhermes|hermesworld|ups|fedex|postnl|tnt|dpdgroup)\./;
+const CARRIER_DOMAIN = /^(dhl|deutschepost|post|dpd|gls-group|myhermes|hermesworld|ups|fedex|postnl|tnt|dpdgroup|postnord|budbee|instabox|instabee|airmee|bring|dbschenker)\./;
 
 function shopFromDom(root){
   if(!root) return '';
@@ -1174,7 +1212,7 @@ function shopFromText(txt){
   for(const k in SHOP_PRETTY){
     if(new RegExp('\\b' + k.replace(/[-]/g,'[- ]?') + '\\b', 'i').test(txt)) return SHOP_PRETTY[k];
   }
-  const from = txt.match(/^(?:From|Von)\s*:\s*([^<\n]{2,40})/mi);
+  const from = txt.match(/^(?:From|Von|Från|Fran|Avsändare)\s*:\s*([^<\n]{2,40})/mi);
   if(from) return from[1].replace(/["']/g,'').trim().slice(0, 30);
   return '';
 }
@@ -1198,6 +1236,19 @@ function absSrc(img){
   if(/^https?:|^data:/i.test(s)) return s;
   try{ return new URL(s, 'https://example.invalid/').href; }catch(e){ return s; }
 }
+
+/* ---- what a price looks like ----
+   A Swedish mail writes "699,00 kr", "699 SEK" or "699:-", none of which look
+   like a European amount. This matters far beyond the total: a nearby price is
+   how the text reader decides a line is a product at all, so with no krona in
+   here a Swedish mail yields no items whatsoever. "kr" carries a lookahead so
+   it cannot match inside "kramar". */
+const CUR_PRE  = '(?:EUR|€|CHF|USD|\\$|£|SEK)';
+const CUR_POST = '(?:EUR|€|CHF|SEK|kr(?![a-zåäöé])|:-)';
+/* Swedish groups thousands with a space — "2 495,00 kr" — so an amount is not
+   simply a run of digits. The grouped shape is tried first; the plain run is
+   the fallback, and only ever wins because a currency has to follow either. */
+const NUM = '(?:\\d{1,3}(?:[ .]\\d{3})*(?:[.,]\\d{1,2})?|\\d(?:[\\d.,]{0,12}\\d)?)';
 
 /* ---- items out of the DOM ---- */
 const PRODUCT_HREF = /\/(?:dp|gp\/product|gp\/aw\/d)\/[A-Z0-9]{6,}|\/itm\/\d{6,}|\/products?\/[\w-]{3,}|\/artikel\/|\/p\/[\w-]{3,}/i;
@@ -1241,7 +1292,7 @@ function itemsFromDom(root){
   // Quantity has to come from the item's OWN row. A plain character window
   // around the name reaches backwards into the previous item and picks up
   // its "Menge:" instead — so walk up to the smallest enclosing block.
-  const QTY_RE = /(?:Menge|Anzahl|Stück|Stk\.?|Qty|Quantity)\s*[:.]?\s*(\d{1,3})(?!\d)|\bx\s?(\d{1,2})(?!\d)/i;
+  const QTY_RE = /(?:Menge|Anzahl|Stück|Stk\.?|Qty|Quantity|Antal)\s*[:.]?\s*(\d{1,3})(?!\d)|\bx\s?(\d{1,2})(?!\d)/i;
   const out = [];
   byKey.forEach((rec, key) => {
     if(!rec.name && !rec.img) return;
@@ -1293,12 +1344,12 @@ function blockText(node){
 function splitNameQty(raw){
   let t = String(raw || '').replace(/\([^)]*\)/g, ' ').replace(/\s+/g, ' ').trim();
   let qty = '';
-  const qm = t.match(/\s[×xX]\s*(\d{1,3})(?!\d)(?![A-Za-zÄÖÜäöüß])/);
+  const qm = t.match(/\s[×xX]\s*(\d{1,3})(?!\d)(?![A-Za-zÄÖÜÅäöüåß])/);
   if(qm){
     qty = qm[1];
     t = t.slice(0, qm.index);
   } else {
-    const p = t.search(/(?:€|EUR|CHF|\$|£)\s?\d|\d[\d.,]{2,}\s?(?:€|EUR|CHF)/i);
+    const p = t.search(new RegExp(CUR_PRE + '\\s?\\d|' + NUM + '\\s?' + CUR_POST, 'i'));
     if(p > 4) t = t.slice(0, p);
   }
   t = t.replace(/\bLieferzeit\b.*$/i, '')
@@ -1324,7 +1375,7 @@ function itemsFromBlocks(root){
     const { name, qty } = splitNameQty(raw);
     if(name.length < 4 || name.length > 180) return;
     if(TEXT_NOISE.test(name)) return;
-    if(!/[A-Za-zÄÖÜäöüß]{3}/.test(name)) return;
+    if(!/[A-Za-zÄÖÜÅäöüåß]{3}/.test(name)) return;
     const k = nameKey(name);
     if(!k || seen.has(k)) return;
     seen.add(k);
@@ -1334,8 +1385,8 @@ function itemsFromBlocks(root){
 }
 
 /* ---- items out of plain text, when there is no DOM to work with ---- */
-const PRICE_RE = /(?:EUR|€|CHF|USD|\$|£)\s?\d|\d[\d.,]*\s?(?:EUR|€|CHF)/i;
-const TEXT_NOISE = /^(?:hallo|hi\b|guten tag|sehr geehrte|liebe|vielen dank|danke|thank you|thanks|bestellnummer|bestellung|order|lieferadresse|rechnungsadresse|versandadresse|zahlungsart|zahlungsmittel|versandart|versandkosten|zwischensumme|summe|gesamt|mwst|ust|steuer|verkauft von|verkauf durch|versand durch|geliefert von|amazon\.|impressum|datenschutz|abbestellen|unsubscribe|©|http|www\.|menge|anzahl|qty|quantity|preis|price|artikel-?nr|ihre bestellung|your order|track|sendungsverfolgung|voraussicht|zustellung|lieferung|arriving|estimated|delivery|rechnung|invoice|kundenservice|customer service|folgen sie|klicken)/i;
+const PRICE_RE = new RegExp(CUR_PRE + '\\s?\\d|\\d[\\d.,]*\\s?' + CUR_POST, 'i');
+const TEXT_NOISE = /^(?:hallo|hi\b|guten tag|sehr geehrte|liebe|vielen dank|danke|thank you|thanks|bestellnummer|bestellung|order|lieferadresse|rechnungsadresse|versandadresse|zahlungsart|zahlungsmittel|versandart|versandkosten|zwischensumme|summe|gesamt|mwst|ust|steuer|verkauft von|verkauf durch|versand durch|geliefert von|amazon\.|impressum|datenschutz|abbestellen|unsubscribe|©|http|www\.|menge|anzahl|qty|quantity|preis|price|artikel-?nr|ihre bestellung|your order|track|sendungsverfolgung|voraussicht|zustellung|lieferung|arriving|estimated|delivery|rechnung|invoice|kundenservice|customer service|folgen sie|klicken|hej\b|tack\b|vi hoppas|fakturaadress|leveransadress|leveranss[äa]tt|leveransmetod|betals[äa]tt|betalningss[äa]tt|betalning\b|frakt\b|fraktkostnad|fraktavgift|fraktalternativ|varav|moms\b|totalt\b|totalbelopp|ordersumma|slutsumma|summa\b|delsumma|att betala|ordernummer|orderdatum|best[äa]llningsnummer|best[äa]llningsdatum|din best[äa]llning|best[äa]llning\b|produkt\b|produkter\b|antal\b|belopp\b|pris\b|styckpris|artikelnummer|kundservice|kundtj[äa]nst|vanliga fr[åa]gor|h[åa]llbarhet|integritetspolicy|k[öo]pvillkor|avregistrera|sp[åa]ra\b|leverans\b|leveranstid|leveransdatum|nyheter|kampanjer|inspiration|vi reserverar|f[öo]lj oss)/i;
 function itemsFromText(txt){
   const lines = txt.split('\n').map(l => l.trim()).filter(Boolean);
   const out = [], seen = new Set();
@@ -1343,11 +1394,13 @@ function itemsFromText(txt){
     const L = lines[i];
     if(L.length < 10 || L.length > 180) continue;
     if(TEXT_NOISE.test(L)) continue;
-    if(!/[A-Za-zÄÖÜäöüß]{4}/.test(L)) continue;
+    if(!/[A-Za-zÄÖÜÅäöüåß]{4}/.test(L)) continue;
     if(/^[\d\s.,:€$-]+$/.test(L)) continue;
     const near = [L, lines[i+1] || '', lines[i+2] || ''].join(' ');
     if(!PRICE_RE.test(near)) continue;
-    const name = L.replace(/\s*(?:EUR|€)\s?[\d.,]+\s*$/i, '').replace(/\s+/g,' ').trim();
+    const name = L.replace(/\s*(?:EUR|€|SEK)\s?[\d.,]+\s*$/i, '')
+                   .replace(/\s*[\d.,]+\s?(?:kr|SEK|:-)\s*$/i, '')
+                   .replace(/\s+/g,' ').trim();
     if(name.length < 8) continue;
     const k = name.toLowerCase().slice(0, 40);
     if(seen.has(k)) continue;
@@ -1372,7 +1425,7 @@ function findMailLink(root, txt){
 }
 
 /* ---- where the parcel actually ends up ---- */
-const PICKUP_KW = /(Abholstation|Abholort|Abholung|Abholbereit|Selbstabholung|Postfiliale|Post-?Filiale|Postpartner|Post\.Partner|Packstation|Paketshop|Paket-?Shop|PaketBox|Abgabestelle|Zustellbasis|Pickup\s*(?:point|station|location)?|Collection\s*point|Parcel\s*(?:shop|locker))/i;
+const PICKUP_KW = /(Abholstation|Abholort|Abholung|Abholbereit|Selbstabholung|Postfiliale|Post-?Filiale|Postpartner|Post\.Partner|Packstation|Paketshop|Paket-?Shop|PaketBox|Abgabestelle|Zustellbasis|Pickup\s*(?:point|station|location)?|Collection\s*point|Collect\s*in\s*store|Parcel\s*(?:shop|locker)|Hämta[sr]?\s*(?:ut\s*)?i\s*butik|Hämtställe|Hämtningsställe|Uthämtning|Utlämningsställe|Utlämnings-?ställe|Postombud|Paketombud|Ombud|Butiksupphämtning|Paketskåp|Instabox)/i;
 function findPickup(txt){
   const lines = String(txt || '').split('\n');
   for(const line of lines){
@@ -1389,29 +1442,39 @@ const DUE_LABEL = new RegExp(
   '|geplante[rs]?\\s*(?:lieferung|zustellung)|liefertermin|lieferdatum|lieferzeitraum' +
   '|zustelldatum|zustellung(?:\\s*erfolgt)?|lieferung(?:\\s*(?:am|bis|zwischen|erfolgt))?|ankunft|wird\\s*geliefert|ankunftsdatum' +
   '|estimated\\s*delivery|expected\\s*(?:delivery|arrival)|delivery\\s*(?:date|estimate|by)|scheduled\\s*delivery' +
-  '|guaranteed\\s*delivery|arriv\\w+|will\\s*arrive)\\s*[:\\-–]?\\s*', 'i');
+  '|guaranteed\\s*delivery|arriv\\w+|will\\s*arrive' +
+  /* Swedish. "leverans" on its own has to refuse the words that make it an
+     address or a shipping method, or every mail matches on its own header. */
+  '|ber[äa]knad\\s*(?:leverans|leveransdag|leveranstid|ankomst)?|ber[äa]knat\\s*leveransdatum' +
+  '|ber[äa]knas\\s*(?:vara\\s*)?(?:framme|levereras)|prelimin[äa]r\\s*leverans' +
+  '|f[öo]rv[äa]ntad\\s*(?:leverans|ankomst)|leveransdatum|leveransdag|leveransperiod' +
+  '|levereras|framme\\s*(?:hos\\s*dig)?' +
+  '|leverans(?!adress|s[äa]tt|smetod|salternativ|savgift|svillkor|f[öo]rsening|tid))\\s*[:\\-–]?\\s*', 'i');
 
 const ORDERNO_RES = [
   /\b(\d{3}-\d{7}-\d{7})\b/,
-  /(?:Bestellnummer|Bestell-?\s?Nr\.?|Bestellnr\.?|Auftragsnummer|Auftrags-?\s?Nr\.?)\s*[:#]?\s*([A-Z0-9][A-Z0-9\/-]{4,29})/i,
+  /(?:Bestellnummer|Bestell-?\s?Nr\.?|Bestellnr\.?|Auftragsnummer|Auftrags-?\s?Nr\.?|Ordernummer|Order-?\s?nr\.?|Beställningsnummer|Beställningsnr\.?)\s*[:#]?\s*([A-Z0-9][A-Z0-9\/-]{4,29})/i,
   /(?:Order|Bestellung)\s*(?:number|no\.?|#|ID|Nr\.?)\s*[:#]?\s*([A-Z0-9][A-Z0-9\/-]{4,29})/i,
-  /(?:Rechnungsnummer|Invoice\s*(?:number|no\.?))\s*[:#]?\s*([A-Z0-9][A-Z0-9\/-]{4,29})/i,
+  /(?:Rechnungsnummer|Invoice\s*(?:number|no\.?)|Fakturanummer|Fakturanr\.?)\s*[:#]?\s*([A-Z0-9][A-Z0-9\/-]{4,29})/i,
   // "Bestellung AU105709 bestätigt" — no label word at all, just the code.
   // Requiring a digit inside stops it matching "Bestellung bestätigt".
   /(?:Bestellung|Bestellnr|Order|Auftrag)\s*#?\s*([A-Z]{0,5}\d[A-Z0-9-]{3,24})\b/i
 ];
-const AMT = '(?:EUR|€|CHF|USD|\\$|£)\\s?\\d(?:[\\d.,]{0,12}\\d)?|\\d(?:[\\d.,]{0,12}\\d)?\\s?(?:EUR|€|CHF)';
+const AMT = CUR_PRE + '\\s?' + NUM + '|' + NUM + '\\s?' + CUR_POST;
 const TOTAL_RES = [
-  new RegExp('\\b(?:Gesamtsumme|Gesamtbetrag|Rechnungsbetrag|Bestellsumme|Endbetrag|Gesamtpreis|Summe\\s*gesamt|Order\\s*Total|Grand\\s*Total|Total\\s*(?:amount|paid|charged))\\s*[:.]?\\s*(' + AMT + ')', 'i'),
-  new RegExp('\\b(?:Gesamt|Summe|Total)\\s*[:.]?\\s*(' + AMT + ')', 'i')
+  new RegExp('\\b(?:Gesamtsumme|Gesamtbetrag|Rechnungsbetrag|Bestellsumme|Endbetrag|Gesamtpreis|Summe\\s*gesamt' +
+             '|Order\\s*Total|Grand\\s*Total|Total\\s*(?:amount|paid|charged)' +
+             '|Totalt\\s*att\\s*betala|Att\\s*betala|Totalbelopp|Ordersumma|Slutsumma|Summa\\s*totalt' +
+             '|Totalt(?:\\s*\\(?\\s*inkl\\.?\\s*moms\\s*\\)?)?)\\s*[:.]?\\s*(' + AMT + ')', 'i'),
+  new RegExp('\\b(?:Gesamt|Summe|Summa|Totalt|Total)\\s*[:.]?\\s*(' + AMT + ')', 'i')
 ];
-const TRACK_RE = /(?:Sendungsverfolgungsnummer|Sendungsnummer|Sendungs-?\s?ID|Sendungs-?\s?Nr\.?|Trackingnummer|Tracking-?\s?(?:Nummer|number|code|ID|No\.?)|Paketnummer|Paket-?\s?Nr\.?|Waybill|AWB|Frachtbrief(?:nummer)?|Tracking)\s*[:#]?\s*([A-Z0-9][A-Z0-9\s-]{6,34}[A-Z0-9])/i;
+const TRACK_RE = /(?:Sendungsverfolgungsnummer|Sendungsnummer|Sendungs-?\s?ID|Sendungs-?\s?Nr\.?|Trackingnummer|Tracking-?\s?(?:Nummer|number|code|ID|No\.?)|Paketnummer|Paket-?\s?Nr\.?|Waybill|AWB|Frachtbrief(?:nummer)?|Kolli-?\s?(?:ID|nummer|nr\.?)|Kollinr\.?|Sändningsnummer|Sändnings-?\s?(?:ID|nr\.?)|Försändelsenummer|Försändelse-?\s?ID|Spårningsnummer|Spårnings-?\s?(?:ID|nr\.?)|Paket-?\s?ID|Tracking)\s*[:#]?\s*([A-Z0-9][A-Z0-9\s-]{6,34}[A-Z0-9])/i;
 const TRACK_SHAPES = [
   /\b(1Z[0-9A-Z]{16})\b/,                 // UPS
   /\b(00340\d{15})\b/, /\b(00344\d{15})\b/, // DHL
   /\b(\d{12,22})\b/                       // Post / DPD / generic
 ];
-const TRACK_HOSTS = /(dhl\.|deutschepost\.|post\.at|dpd\.|gls-group|myhermes|hermesworld|ups\.com|fedex\.com|postnl|tnt\.com|progress-tracker|sendungsverfolgung|paketverfolgung|parceltracking|track-?trace)/i;
+const TRACK_HOSTS = /(dhl\.|deutschepost\.|post\.at|dpd\.|gls-group|myhermes|hermesworld|ups\.com|fedex\.com|postnl|tnt\.com|progress-tracker|sendungsverfolgung|paketverfolgung|parceltracking|track-?trace|postnord\.|budbee\.|instabox\.|instabee\.|airmee\.|bring\.|dbschenker\.|spara-brev|sparaforsandelse|spara-paket)/i;
 
 function firstMatch(res, txt){
   for(const re of res){ const m = txt.match(re); if(m && m[1]) return m[1].trim(); }
@@ -1421,6 +1484,20 @@ function labelTail(txt, re, len){
   const m = txt.match(re);
   if(!m) return '';
   return txt.slice(m.index + m[0].length, m.index + m[0].length + (len || 110));
+}
+/* Every tail a label has, not just the first. A mail says "levereras" or
+   "Lieferung" in its opening pleasantries long before it names the real date,
+   and reading only the first one threw the date away. */
+function labelTails(txt, re, len, max){
+  const g = new RegExp(re.source, re.flags.indexOf('g') === -1 ? re.flags + 'g' : re.flags);
+  const out = [];
+  let m, guard = 0;
+  while(out.length < (max || 4) && guard++ < 200 && (m = g.exec(txt)) !== null){
+    const at = m.index + m[0].length;
+    out.push(txt.slice(at, at + (len || 110)));
+    if(g.lastIndex === m.index) g.lastIndex++;
+  }
+  return out;
 }
 
 function readMail(root, rawText){
@@ -1437,26 +1514,28 @@ function readMail(root, rawText){
   found.orderNo = !!o.orderNo;
 
   /* ---- promised delivery ---- */
-  const tail = labelTail(txt, DUE_LABEL, 120);
-  if(tail){
+  for(const tail of labelTails(txt, DUE_LABEL, 120, 4)){
     const rng = scanRange(tail);
     const ds = scanDates(tail);
     if(rng){
       o.due = rng.from; o.dueTo = rng.to;
     } else if(ds.length){
       o.due = ds[0];
-      // a window — "zwischen dem 5. und 8. September", "Mon 8 – Wed 10 Sep"
-      if(ds.length > 1 && /zwischen|bis|und|–|-|through|to\b|and\b/i.test(tail) && ds[1] > ds[0]) o.dueTo = ds[1];
+      // a window — "zwischen dem 5. und 8. September", "5–8 september"
+      if(ds.length > 1 && /zwischen|bis|und|och|till|–|-|through|to\b|and\b/i.test(tail) && ds[1] > ds[0]) o.dueTo = ds[1];
     } else {
       o.due = relativeDate(tail);
     }
+    if(o.due) break;
   }
   found.due = !!o.due;
 
   /* ---- order date ---- */
-  const oTail = labelTail(txt, /(?:Bestelldatum|Bestellt am|Bestellung vom|Datum der Bestellung|Order\s*(?:date|placed)|Placed on)\s*[:\-]?\s*/i, 60);
-  const oDates = scanDates(oTail);
-  o.ordered = oDates[0] || '';
+  const O_LABEL = /(?:Bestelldatum|Bestellt am|Bestellung vom|Datum der Bestellung|Order\s*(?:date|placed)|Placed on|Orderdatum|Beställningsdatum|Beställd(?:\s*den)?|Datum för beställning|Köpdatum)\s*[:\-]?\s*/i;
+  for(const oTail of labelTails(txt, O_LABEL, 60, 4)){
+    const oDates = scanDates(oTail);
+    if(oDates[0]){ o.ordered = oDates[0]; break; }
+  }
   found.ordered = !!o.ordered;
 
   /* ---- carrier ---- */
@@ -1470,8 +1549,8 @@ function readMail(root, rawText){
     // number ("…5544Ihre Sendung ist…"). Cut at the first ordinary word, then at
     // any lower case at all — real tracking numbers never contain lower case.
     o.tracking = tm[1].replace(/\s+/g, '')
-      .replace(/[A-ZÄÖÜ][a-zäöüß].*$/, '')
-      .replace(/[a-zäöüß].*$/, '')
+      .replace(/[A-ZÄÖÜÅ][a-zäöüåß].*$/, '')
+      .replace(/[a-zäöüåß].*$/, '')
       .replace(/[-]+$/, '');
   }
   if(!o.tracking && o.carrier && o.carrier !== 'Amazon'){

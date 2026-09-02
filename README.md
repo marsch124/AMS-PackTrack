@@ -25,10 +25,16 @@ everywhere else — from the confirmation mail all the way to the parcel in your
 ## What it reads
 
 Shop (from the links in the mail), order number, order date, items + pictures,
-total, promised delivery date or date range, delivery service — DHL, Deutsche Post,
-Österreichische Post, DPD, GLS, Hermes, UPS, FedEx, PostNL, TNT, Amazon Logistics —
-tracking number, and the tracking link straight out of the mail. German and English
-mails, and German or ISO date formats.
+total, promised delivery date or date range, delivery service — PostNord, Budbee,
+Instabox, Airmee, Bring, Best Transport, DHL, Deutsche Post, Österreichische Post,
+DPD, GLS, Hermes, UPS, FedEx, PostNL, TNT, Amazon Logistics — tracking number, and
+the tracking link straight out of the mail.
+
+**Swedish, German and English** mails, in Swedish, German or ISO date formats, with
+amounts in kr, SEK, `:-`, €, CHF, $ or £. Swedish mails are read the whole way:
+ordernummer, orderdatum, beräknad leverans, totalt / summa / att betala, antal, a
+leveranstid in vardagar counted in real working days, and hämta i butik /
+utlämningsställe / postombud as a pickup place.
 
 Nothing is ever saved without showing what was found first, and every field is editable.
 
