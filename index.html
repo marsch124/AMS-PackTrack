@@ -193,9 +193,9 @@
   .tpic{position:relative;}
   .tpic img{position:absolute; inset:0; width:100%; height:100%; object-fit:contain; display:block; background:#fff;}
   .tmid{flex:1; min-width:0;}
-  .tname{font-size:14.5px; font-weight:700; line-height:1.35;}
+  .tname{display:block; font-size:14.5px; font-weight:700; line-height:1.35;}
   .tickrow.on .tname{color:var(--ink-dim);}
-  .tsub{font-size:12px; color:var(--ink-dim); margin-top:3px; font-weight:600;}
+  .tsub{display:block; font-size:12px; color:var(--ink-dim); margin-top:3px; font-weight:600;}
   .tdel{flex:0 0 auto; border:none; background:none; color:var(--ink-dim); padding:6px; cursor:pointer;}
 
   .addrow{
@@ -317,6 +317,24 @@
   #itemRows.withdates .erowdate{display:flex;}
   .erowdate input[type=date]{flex:1; min-height:40px; padding:8px 11px; font-size:15px;}
   .tracklink.alt{background:rgba(255,255,255,.92); margin-top:9px;}
+
+  .suggest{
+    display:flex; align-items:center; gap:10px; margin-top:10px;
+    background:var(--tint); border-radius:14px; padding:11px 13px;
+    font-size:13px; line-height:1.5;
+  }
+  .suggest[hidden]{display:none;}
+  .suggest span{flex:1;}
+  .suggests{display:flex; flex-direction:column; gap:8px; margin-bottom:10px;}
+  .sugg{
+    display:flex; align-items:center; gap:10px; width:100%; text-align:left;
+    background:none; border:1.5px dashed rgba(176,106,53,.45); border-radius:16px;
+    padding:11px 13px; font-family:inherit; cursor:pointer; color:var(--ink);
+  }
+  .sugg .hi{width:18px; height:18px; color:var(--kraft); flex:0 0 auto;}
+  .sugg b{font-size:14px; font-weight:800;}
+  .sugg .sw{display:block; font-size:11.5px; color:var(--ink-dim); font-weight:600; margin-top:2px;}
+  .tsub.late{color:var(--late); font-weight:800;}
 
   .foundnote{
     background:var(--tint); border-radius:14px; padding:12px 14px; margin-bottom:6px;
@@ -532,6 +550,8 @@
       </div>
     </div>
 
+    <div class="suggest" id="leadSuggest" hidden></div>
+
     <label for="fCarrier">Delivery service</label>
     <input type="text" id="fCarrier" list="carrierList" placeholder="DHL, Post, DPD…" autocapitalize="characters" />
     <datalist id="carrierList"></datalist>
@@ -625,9 +645,22 @@
         <p>Shops often promise different days for different things in one order — Amazon splits deliveries, and a shop may say one line ships now and another next week. Tick <b>“Each item has its own delivery date”</b> in the editor and every item gets its own date box.</p>
         <p>Once items carry dates, they drive the order: the big number counts down to the <b>next item still outstanding</b>, the order only counts as late once the <b>last</b> one is overdue, and each item shows its own date on the order screen. Best of all, the timeline stops showing the order as one blob and puts <b>each item on the day it actually lands</b>, named. Untick the box and the order goes back to a single date for everything.</p>
 
+        <h3>When the mail gives a delivery time, not a date</h3>
+        <p>Plenty of shops promise “Lieferzeit 1–3 Werktage” instead of naming a day. When PackTrack spots that and no real date was given, the review sheet offers the arithmetic: it counts forward from the order date in <b>working days only</b> — skipping weekends and Swedish röda dagar, including midsommarafton, julafton and nyårsafton — and shows you the result. It is only used if you tap <b>Use it</b>; the app never quietly invents a delivery date. If a mail names several times (“…, mit Gravur 2–4 Werktage”) the widest span is taken, which is the honest one.</p>
+        <p>A date set this way is marked <b>(estimated)</b> on the order screen and with a <b>≈</b> on the card, so it never looks like a promise. Type a date yourself and the marking goes away.</p>
+
+        <h3>Suggested follow-ups</h3>
+        <p>The app knows the dates, so under <b>Follow-ups</b> it offers the two or three to-dos that actually follow from them — each with a date already worked out. Tap one to add it:</p>
+        <ul>
+          <li><b>Chase the shop</b> — three days after the promised date, or today if it is already overdue.</li>
+          <li><b>Return window closes</b> — 14 days after the last item arrived, while you can still change your mind.</li>
+          <li><b>Register the warranty</b> — a few working days after everything arrived, while the receipt is still to hand.</li>
+        </ul>
+        <p>Follow-ups can carry a date of their own whether they were suggested or you typed them, and a dated one appears on the <b>timeline</b> on the day it falls due. One that slips past its date turns red on the order screen.</p>
+
         <h3>A link back to the mail</h3>
         <p>An order can hold a link straight back to the mail it came from. When one is present, the order screen shows <b>Open the original mail</b> under the tracking button, and tapping it jumps to that message.</p>
-        <p>If the mail you paste happens to contain a Spark link, PackTrack grabs it by itself. Otherwise: in <b>Spark</b>, copy a link to the message (its share menu offers this), then paste it into <b>Link to the mail</b> in the editor. Apple Mail's own <code>message://</code> links work too.</p>
+        <p>If the mail you paste happens to contain a Spark link, PackTrack grabs it by itself. Otherwise you need to get one from Spark and paste it into <b>Link to the mail</b> in the editor — a Spark link looks like <code>https://sparkmailapp.com/dpl/bl?token=…</code>. Apple Mail's own <code>message://</code> links work just as well.</p>
 
         <h3>Colours</h3>
         <p>Every shop gets its own clear, flat colour and keeps it — Amazon is always the same colour, Thomann is always another — so you recognise an order before you've read a word of it. On top of that the <b>status</b> colours the number: red when it's overdue, amber when it's due today, green when everything's in. Opening an order paints the whole screen in that shop's colour.</p>
@@ -707,6 +740,8 @@
 
 /* ============ version log — newest first; [0].v is THE app version ============ */
 const VERSIONLOG = [
+  { v:'1.5', when:'2 Sep 2026',
+    what:'Dates the app can work out for you — offered, never imposed. Many shops promise a delivery time rather than a date: “Lieferzeit 1–3 Werktage”. When PackTrack finds one and the mail names no actual day, the review sheet now shows the arithmetic and a <b>Use it</b> button. The count runs in working days from the order date, skipping weekends and Swedish röda dagar — långfredagen, annandag påsk, Kristi himmelsfärdsdag, nationaldagen and the rest, plus midsommarafton, julafton and nyårsafton, when nothing is delivered either. Where a mail states more than one time (“…, mit Gravur 2–4 Werktage”) the widest span is used, because that is the honest one. Nothing is filled in unless you tap the button, and a date that came from it is marked <b>(estimated)</b> on the order screen and with a <b>≈</b> on the card so it can never be mistaken for a promise — typing your own date clears the marking.\n\nFollow-ups now suggest themselves. Because the app already knows when things were promised and when they actually arrived, it can offer the to-dos that genuinely follow, each with its date already worked out: <b>chase the shop</b> three days after the promised date (or today, if it is already late), <b>return window closes</b> fourteen days after the last item arrived while you can still change your mind, and <b>register the warranty</b> a few working days after everything landed. Each suggestion says why it picked that date, and one tap adds it.\n\nFollow-ups can also carry dates of their own now, suggested or typed. A dated follow-up shows up on the timeline on the day it falls due, so returns and warranty deadlines sit alongside the parcels, and one that slips past its date turns red on the order screen.\n\nOne correction: the working-day calculations were built against Austrian public holidays by mistake. They are Swedish now.' },
   { v:'1.4', when:'2 Sep 2026',
     what:'Three things you asked for. First, an order can now hold a link straight back to the mail it came from: when one is there, the order screen shows an <b>Open the original mail</b> button under the tracking button and tapping it jumps to that message. If the mail you paste already contains a Spark link the app grabs it by itself; otherwise copy a link to the message in Spark and paste it into the new “Link to the mail” box. Apple Mail’s own message: links work just as well.\n\nSecond, every item can now have its own delivery date, which is how orders really behave — Amazon splits deliveries, and shops often promise one line sooner than another. Tick “Each item has its own delivery date” in the editor and each item gets its own date box. From then on the items drive the order: the big number counts down to the next item still outstanding, the order only turns red once the last one is overdue, and each item shows its own date on the order screen. The timeline is where it pays off most — instead of one blob, each item appears on the exact day it lands, named, so a single order can be spread across three different days. Untick the box and everything goes back to one date.\n\nThird, the button for adding an order from a mail was a clipboard that everyone read as a battery. It is now plainly an envelope.' },
   { v:'1.3', when:'1 Sep 2026',
@@ -765,6 +800,7 @@ function normalise(s){
     note: o.note || '',
     pickup: o.pickup || '',
     mailUrl: o.mailUrl || '',
+    estimated: !!o.estimated,
     got: !!o.got,
     colour: (o.colour && PALETTE[o.colour]) ? o.colour : '',
     items: Array.isArray(o.items) ? o.items.filter(i => i && (i.name || i.img)).map(i => ({
@@ -772,7 +808,7 @@ function normalise(s){
       due: i.due || '', got: !!i.got, gotAt: i.gotAt || ''
     })) : [],
     todos: Array.isArray(o.todos) ? o.todos.filter(t => t && t.text).map(t => ({
-      id: t.id || uid(), text: t.text, done: !!t.done, doneAt: t.doneAt || ''
+      id: t.id || uid(), text: t.text, due: t.due || '', done: !!t.done, doneAt: t.doneAt || ''
     })) : []
   }));
   return s;
@@ -794,6 +830,107 @@ function prettyDate(iso){
 function longDate(iso){
   const d = parseISO(iso); if(!d) return '';
   return d.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+}
+
+function addDays(fromISO, k){
+  const d = fromISO ? parseISO(fromISO) : midnight(new Date());
+  if(!d) return '';
+  d.setDate(d.getDate() + k);
+  return isoOf(d);
+}
+
+/* ============ working days, Sweden ============
+   A shop that says "1–3 Werktage" means working days, so weekends and röda
+   dagar have to be skipped or the estimate is wrong by days.
+   Midsommarafton, julafton and nyårsafton are not formally public holidays but
+   nothing is delivered on them, so they count here. */
+function easterSunday(y){
+  const a=y%19, b=Math.floor(y/100), c=y%100, d=Math.floor(b/4), e=b%4,
+        f=Math.floor((b+8)/25), g=Math.floor((b-f+1)/3), h=(19*a+b-d-g+15)%30,
+        i=Math.floor(c/4), k=c%4, l=(32+2*e+2*i-h-k)%7,
+        m=Math.floor((a+11*h+22*l)/451),
+        mo=Math.floor((h+l-7*m+114)/31), day=((h+l-7*m+114)%31)+1;
+  return new Date(y, mo-1, day);
+}
+const HOLIDAY_CACHE = {};
+function holidaysFor(y){
+  if(HOLIDAY_CACHE[y]) return HOLIDAY_CACHE[y];
+  const e = easterSunday(y);
+  const off = (k) => { const d = new Date(e); d.setDate(d.getDate() + k); return isoOf(d); };
+  // Midsommarafton: the Friday falling 19–25 June (the day before Midsommardagen)
+  const mid = new Date(y, 5, 19);
+  while(mid.getDay() !== 5) mid.setDate(mid.getDate() + 1);
+  const fixed = [
+    '01-01',   // Nyårsdagen
+    '01-06',   // Trettondedag jul
+    '05-01',   // Första maj
+    '06-06',   // Sveriges nationaldag
+    '12-24',   // Julafton
+    '12-25',   // Juldagen
+    '12-26',   // Annandag jul
+    '12-31'    // Nyårsafton
+  ].map(md => y + '-' + md);
+  const moving = [
+    off(-2),   // Långfredagen
+    off(1),    // Annandag påsk
+    off(39),   // Kristi himmelsfärdsdag
+    isoOf(mid) // Midsommarafton
+  ];
+  return (HOLIDAY_CACHE[y] = new Set(fixed.concat(moving)));
+}
+function isWorkday(d){
+  const g = d.getDay();
+  if(g === 0 || g === 6) return false;
+  return !holidaysFor(d.getFullYear()).has(isoOf(d));
+}
+function addWorkdays(fromISO, k){
+  const d = fromISO ? parseISO(fromISO) : midnight(new Date());
+  if(!d) return '';
+  let left = Math.max(0, k), guard = 0;
+  while(left > 0 && guard++ < 400){
+    d.setDate(d.getDate() + 1);
+    if(isWorkday(d)) left--;
+  }
+  return isoOf(d);
+}
+
+/* ============ "Lieferzeit 1-3 Werktage" ============
+   Only counted when a delivery word sits just before it, so a "2-4" inside a
+   product name can't be mistaken for a lead time. A mail may state several
+   ("…, mit Gravur 2-4 Werktage") — take the widest span, which is the honest one. */
+const LEAD_NEAR = /(Lieferzeit|Lieferfrist|Lieferung|Liefertermin|Versand|Bearbeitungszeit|Zustellung|verschickt|verschicken|ship|dispatch|delivery|deliver|arriv)/i;
+const LEAD_UNITS = '(Werktage?n?|Arbeitstage?n?|business\\s+days?|working\\s+days?|Tage?n?|days?)';
+const LEAD_RE = new RegExp(
+  '(\\d{1,2})\\s*(?:[–—-]|bis|to)\\s*(\\d{1,2})\\s*' + LEAD_UNITS +
+  '|(\\d{1,2})\\s*' + LEAD_UNITS, 'gi');
+
+function findLeadTime(txt){
+  if(!txt) return null;
+  let m, best = null;
+  LEAD_RE.lastIndex = 0;
+  while((m = LEAD_RE.exec(txt)) !== null){
+    if(!LEAD_NEAR.test(txt.slice(Math.max(0, m.index - 45), m.index))) continue;
+    const unit = String(m[3] || m[5] || '').toLowerCase();
+    const working = /werktag|arbeitstag|business|working/.test(unit);
+    const lo = m[1] ? +m[1] : +m[4];
+    const hi = m[2] ? +m[2] : +m[4];
+    if(!lo || lo > 60 || hi > 90 || hi < lo) continue;
+    if(!best) best = { lo, hi, working };
+    else best = { lo:Math.min(best.lo, lo), hi:Math.max(best.hi, hi), working:best.working || working };
+  }
+  return best;
+}
+function estimateFromLead(lead, fromISO){
+  if(!lead) return null;
+  const base = fromISO || todayISO();
+  const step = lead.working ? addWorkdays : addDays;
+  return { from: step(base, lead.lo), to: step(base, lead.hi) };
+}
+function leadWords(lead){
+  if(!lead) return '';
+  const unit = lead.working ? 'working day' : 'day';
+  const span = lead.lo === lead.hi ? String(lead.lo) : lead.lo + '–' + lead.hi;
+  return span + ' ' + unit + (lead.hi === 1 ? '' : 's');
 }
 
 /* ============ the delivery services we know ============ */
@@ -973,7 +1110,7 @@ function normText(s){
 function blankOrder(){
   return { id:uid(), createdAt:new Date().toISOString(), shop:'', orderNo:'', ordered:'',
            due:'', dueTo:'', carrier:'', tracking:'', trackUrl:'', total:'', note:'',
-           got:false, colour:'', pickup:'', mailUrl:'', items:[], todos:[] };
+           got:false, colour:'', pickup:'', mailUrl:'', estimated:false, items:[], todos:[] };
 }
 
 /* ---- links: Amazon (and most senders) wrap every link in a redirector ---- */
@@ -1359,6 +1496,10 @@ function readMail(root, rawText){
   o.pickup = findPickup(txt);
   found.pickup = !!o.pickup;
 
+  /* ---- a stated delivery time, when no actual date was given ---- */
+  found.lead = findLeadTime(txt);
+  found.leadFrom = o.ordered || todayISO();
+
   /* ---- a link back to the mail, when one was pasted along ---- */
   o.mailUrl = findMailLink(root, txt);
   found.mailUrl = !!o.mailUrl;
@@ -1507,6 +1648,38 @@ function dueShort(o){                      // compact form, for cards and the ti
 }
 function firstPic(o){ const i = o.items.find(x => x.img); return i ? i.img : ''; }
 
+/* ============ suggested follow-ups ============
+   The app already knows the dates that matter, so it can offer the two or three
+   to-dos that actually follow from them rather than leaving you to remember. */
+function lastArrivalDate(o){
+  const ds = o.items.filter(i => i.got && i.gotAt).map(i => i.gotAt).sort();
+  return ds.length ? ds[ds.length - 1] : '';
+}
+function suggestFollowUps(o){
+  const has = (t) => o.todos.some(x => nameKey(x.text) === nameKey(t));
+  const arrived = allIn(o);
+  const arrival = lastArrivalDate(o) || (arrived ? todayISO() : '');
+  const ld = lastDue(o);
+  const out = [];
+
+  if(!arrived && ld){
+    const late = daysTo(ld) < 0;
+    out.push({ text:'Chase ' + (o.shop || 'the shop'),
+               due: late ? todayISO() : addDays(ld, 3),
+               why: late ? 'it is already overdue' : 'three days after the promised date' });
+  }
+  if(arrival){
+    out.push({ text:'Return window closes', due:addDays(arrival, 14),
+               why:'14 days from delivery to change your mind' });
+  }
+  if(arrived){
+    out.push({ text:'Register the warranty', due:addWorkdays(arrival || todayISO(), 5),
+               why:'while the receipt is still to hand' });
+  }
+  return out.filter(x => x.due && !has(x.text)).slice(0, 3);
+}
+function todoLate(t){ return !t.done && t.due && daysTo(t.due) < 0; }
+
 /* ============ header, chips, bottom bar ============ */
 function renderChrome(){
   $('brandVer').textContent = 'v' + VERSIONLOG[0].v;
@@ -1568,7 +1741,7 @@ function orderCard(o){
 
   const bits = [];
   const dt = dueShort(o);
-  if(dt) bits.push(`<b>${esc(dt)}</b>`);
+  if(dt) bits.push(`<b>${o.estimated ? '≈ ' : ''}${esc(dt)}</b>`);
   if(o.carrier) bits.push(esc(o.carrier));
   if(n > 1) bits.push(got ? `${got} of ${n} in` : `${n} items`);
   else if(o.total) bits.push(esc(o.total));
@@ -1668,7 +1841,7 @@ function renderDetail(){
   const trackUrl = o.trackUrl || buildTrackUrl(o.carrier, o.tracking);
   const when = [];
   const dt = dueText(o);
-  if(dt) when.push(`<span><svg class="hi"><use href="#icon-calendar"/></svg></span><span>${esc(dt)}</span>`);
+  if(dt) when.push(`<span><svg class="hi"><use href="#icon-calendar"/></svg></span><span>${esc(dt)}${o.estimated ? ' <i style="opacity:.8;font-style:normal">(estimated)</i>' : ''}</span>`);
   if(o.carrier) when.push(`<span class="sep">·</span><span><svg class="hi"><use href="#icon-truck"/></svg></span><span>${esc(o.carrier)}</span>`);
   const pickupLine = o.pickup
     ? `<a class="dwhen" style="align-items:flex-start; text-decoration:none; color:#fff"
@@ -1716,9 +1889,19 @@ function renderDetail(){
   const todos = o.todos.map(t => `
     <div class="tickrow${t.done ? ' on' : ''}">
       <span class="tbox" data-todo="${t.id}"><svg class="hi"><use href="#icon-check"/></svg></span>
-      <span class="tmid" data-todo="${t.id}"><span class="tname">${esc(t.text)}</span></span>
+      <span class="tmid" data-todo="${t.id}">
+        <span class="tname">${esc(t.text)}</span>
+        ${t.due ? `<span class="tsub${todoLate(t) ? ' late' : ''}">${todoLate(t) ? 'was due ' : 'by '}${esc(prettyDate(t.due))}</span>` : ''}
+      </span>
       <button class="tdel" data-todel="${t.id}" aria-label="Remove"><svg class="hi" style="width:17px;height:17px"><use href="#icon-close"/></svg></button>
     </div>`).join('');
+
+  const sugg = suggestFollowUps(o);
+  const suggHtml = sugg.length ? `<div class="suggests">${sugg.map((x, i) => `
+    <button class="sugg" data-sug="${i}">
+      <svg class="hi"><use href="#icon-plus"/></svg>
+      <span><b>${esc(x.text)}</b> · ${esc(prettyDate(x.due))}<span class="sw">${esc(x.why)}</span></span>
+    </button>`).join('')}</div>` : '';
 
   const facts = [
     ['Order number', o.orderNo],
@@ -1745,6 +1928,7 @@ function renderDetail(){
 
     <div class="sect">Follow-ups<span class="gline"></span></div>
     ${todos}
+    ${suggHtml}
     <button class="addrow" id="addTodoInline"><svg class="hi"><use href="#icon-plus"/></svg>Add a follow-up</button>
 
     ${facts.length ? `<div class="sect">Details<span class="gline"></span></div>
@@ -1776,10 +1960,16 @@ function renderDetail(){
     o.todos = o.todos.filter(x => x.id !== t.id);
     save(); render();
   }));
+  main.querySelectorAll('[data-sug]').forEach(b => b.addEventListener('click', () => {
+    const x = sugg[+b.dataset.sug];
+    if(!x) return;
+    o.todos.push({ id:uid(), text:x.text, due:x.due, done:false, doneAt:'' });
+    save(); render();
+  }));
   $('addTodoInline').addEventListener('click', () => {
     const txt = prompt('What needs following up on this order?');
     if(!txt || !txt.trim()) return;
-    o.todos.push({ id:uid(), text:txt.trim().slice(0, 200), done:false, doneAt:'' });
+    o.todos.push({ id:uid(), text:txt.trim().slice(0, 200), due:'', done:false, doneAt:'' });
     save(); render();
   });
   $('editBtn2').addEventListener('click', () => openEditor(o, false, null));
@@ -1828,7 +2018,8 @@ function band(title, colour, orders){
 function renderTimeline(){
   const main = $('main');
   const live = state.orders.filter(o => !allIn(o));
-  if(!live.length){
+  const anyTodo = state.orders.some(o => o.todos.some(t => !t.done && t.due));
+  if(!live.length && !anyTodo){
     main.innerHTML = `<div class="empty">
       <svg class="hi"><use href="#icon-calendar"/></svg>
       <div class="big">Nothing on the way</div>
@@ -1841,6 +2032,9 @@ function renderTimeline(){
 
   let span = 0;
   dated.forEach(o => { const d = daysTo(lastDue(o)); if(d > span) span = d; });
+  state.orders.forEach(o => o.todos.forEach(t => {
+    if(!t.done && t.due){ const d = daysTo(t.due); if(d > span) span = d; }
+  }));
   span = Math.min(45, Math.max(span, 6));            // always show at least the week ahead
 
   let html = '';
@@ -1852,14 +2046,20 @@ function renderTimeline(){
     const iso = isoOf(day);
     const dow = day.getDay();
     const on = dated.filter(o => inWindow(o, iso));
+    const dueTodos = [];
+    state.orders.forEach(o => o.todos.forEach(t => {
+      if(!t.done && t.due === iso) dueTodos.push({ o, t });
+    }));
     const cls = (i === 0 ? ' today' : '') + ((dow === 0 || dow === 6) ? ' weekend' : '');
     html += `<div class="tlrow${cls}">
       <div class="tlday">
         <div class="tldow">${i === 0 ? 'Today' : day.toLocaleDateString('en-GB', { weekday:'short' })}</div>
         <div class="tlnum">${day.getDate()}</div>
       </div>
-      <div class="tlitems">${on.length
-        ? on.map(o => tlPill(o, !hasItemDates(o) && !!(o.dueTo && o.dueTo !== o.due), dayLabel(o, iso))).join('')
+      <div class="tlitems">${(on.length || dueTodos.length)
+        ? on.map(o => tlPill(o, !hasItemDates(o) && !!(o.dueTo && o.dueTo !== o.due), dayLabel(o, iso))).join('') +
+          dueTodos.map(({o, t}) => `<button class="tlpill window" data-id="${o.id}" style="--oc:${colourOf(o).dot}; --oct:${colourOf(o).tint}">
+             <span class="tlps">${esc(t.text)}</span><span class="tlpd">${esc(o.shop || 'follow-up')}</span></button>`).join('')
         : '<div class="tlgap"></div>'}</div>
     </div>`;
   }
@@ -1923,12 +2123,13 @@ function harvestRows(){
   draft.items = items;
 
   const todos = [];
-  document.querySelectorAll('#todoRows .erow').forEach(row => {
+  document.querySelectorAll('#todoRows .eitem').forEach(row => {
     const id = row.dataset.trow;
     const old = draft.todos.find(t => t.id === id) || { id, done:false, doneAt:'' };
     const text = row.querySelector('.ttext').value.trim();
     if(!text) return;
-    todos.push({ id:old.id, text:text.slice(0, 200), done:!!old.done, doneAt:old.doneAt || '' });
+    todos.push({ id:old.id, text:text.slice(0, 200), due:row.querySelector('.tdue').value,
+                 done:!!old.done, doneAt:old.doneAt || '' });
   });
   draft.todos = todos;
 }
@@ -1960,9 +2161,12 @@ function renderItemRows(){
 }
 function renderTodoRows(){
   $('todoRows').innerHTML = draft.todos.map(t => `
-    <div class="erow" data-trow="${t.id}">
-      <input type="text" class="ttext" value="${esc(t.text)}" placeholder="Return it, register warranty…" />
-      <button class="ex" data-trm="${t.id}" aria-label="Remove"><svg class="hi" style="width:18px;height:18px"><use href="#icon-close"/></svg></button>
+    <div class="eitem" data-trow="${t.id}">
+      <div class="erow">
+        <input type="text" class="ttext" value="${esc(t.text)}" placeholder="Return it, register warranty…" />
+        <button class="ex" data-trm="${t.id}" aria-label="Remove"><svg class="hi" style="width:18px;height:18px"><use href="#icon-close"/></svg></button>
+      </div>
+      <div class="erowdate" style="display:flex; padding-left:0"><span>By</span><input type="date" class="tdue" value="${esc(t.due || '')}" /></div>
     </div>`).join('');
   $('todoRows').querySelectorAll('[data-trm]').forEach(b => b.addEventListener('click', () => {
     harvestRows();
@@ -1998,6 +2202,8 @@ function openEditor(order, isNew, found){
   $('fTotal').value = draft.total;
   $('fNote').value = draft.note;
 
+  draftEstimated = !!draft.estimated;
+  renderLeadSuggest();
   renderItemRows();
   renderTodoRows();
 
@@ -2007,6 +2213,28 @@ function openEditor(order, isNew, found){
   $('ovEdit').classList.add('show');
   $('ovEdit').querySelector('.sheet').scrollTop = 0;
 }
+let draftEstimated = false;
+function renderLeadSuggest(){
+  const el = $('leadSuggest');
+  const lead = draftFound && draftFound.lead;
+  const est = lead ? estimateFromLead(lead, draftFound.leadFrom) : null;
+  if(!est){ el.hidden = true; el.innerHTML = ''; return; }
+  const span = est.to !== est.from
+    ? `${prettyDate(est.from)} – ${prettyDate(est.to)}`
+    : prettyDate(est.from);
+  el.hidden = false;
+  el.innerHTML =
+    `<span>No date was given, but the mail promises <b>${esc(leadWords(lead))}</b> — ` +
+    `counting only working days that lands on <b>${esc(span)}</b>.</span>` +
+    `<button class="nbtn" id="useLead" type="button">Use it</button>`;
+  $('useLead').addEventListener('click', (e) => {
+    $('fDue').value = est.from;
+    $('fDueTo').value = est.to === est.from ? '' : est.to;
+    draftEstimated = true;
+    flashBtn(e.currentTarget, 'Set ✓');
+  });
+}
+
 function renderColourRow(){
   const cur = colourKey(draft);
   $('colourRow').innerHTML = PAL_KEYS.map(k =>
@@ -2082,6 +2310,7 @@ async function saveDraft(){
   o.tracking = $('fTracking').value.trim();
   o.trackUrl = $('fTrackUrl').value.trim();
   o.mailUrl = $('fMailUrl').value.trim();
+  o.estimated = draftEstimated && !!o.due;
   if(!$('fItemDates').checked) o.items.forEach(i => { i.due = ''; });
   o.orderNo = $('fOrderNo').value.trim();
   o.ordered = $('fOrdered').value;
@@ -2332,6 +2561,7 @@ $('pasteBox').addEventListener('paste', () => {
 $('editClose').addEventListener('click', closeEditor);
 $('editCancel').addEventListener('click', closeEditor);
 $('saveBtn').addEventListener('click', () => { saveDraft(); });
+$('fDue').addEventListener('input', () => { draftEstimated = false; });
 $('fItemDates').addEventListener('change', () => {
   harvestRows();
   if(!$('fItemDates').checked) draft.items.forEach(i => { i.due = ''; });
@@ -2346,7 +2576,7 @@ $('addItemBtn').addEventListener('click', () => {
 });
 $('addTodoBtn').addEventListener('click', () => {
   harvestRows();
-  draft.todos.push({ id:uid(), text:'', done:false, doneAt:'' });
+  draft.todos.push({ id:uid(), text:'', due:'', done:false, doneAt:'' });
   renderTodoRows();
   const rows = $('todoRows').querySelectorAll('.ttext');
   if(rows.length) rows[rows.length - 1].focus();
