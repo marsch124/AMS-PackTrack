@@ -17,16 +17,20 @@
     --card:#ffffff; --line:rgba(32,36,44,.10);
     --kraft:#b06a35; --tint:#f8efe4;
 
-    /* status colours — the colour IS the message */
-    --wait:#5f6a7a;   --wait-t:#eceff3;
-    --soon:#b06a35;   --soon-t:#f8efe4;
-    --today:#c1861a;  --today-t:#fdf2da;
-    --late:#c43c3c;   --late-t:#fbe7e6;
-    --done:#3f8f63;   --done-t:#e5f2e9;
+    /* status colours — the colour IS the message. Tints are a clear notch
+       deeper than they were, so a tile stands off the wash instead of
+       melting into it — still flat, still no neon. */
+    --wait:#5f6a7a;   --wait-t:#e3e7ee;
+    --soon:#b5602a;   --soon-t:#f3d7bb;
+    --today:#c47f0a;  --today-t:#fbe1a6;
+    --late:#c62f2f;   --late-t:#f7c5c2;
+    --done:#2f9260;   --done-t:#c4e9d3;
 
     /* phase colours — WHERE the parcel is, as opposed to WHEN it is due */
-    --ship:#2a6098;   --ship-t:#d7e6f5;
-    --coll:#6a4795;   --coll-t:#e5dbf2;
+    --ship:#1f62a6;   --ship-t:#bcd6f5;
+    --coll:#6a3fa3;   --coll-t:#d4c2f2;
+    /* the small print on a tinted tile — dimmed ink, but not as far as on white */
+    --ink-soft:rgba(32,36,44,.66);
   }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
   html,body{margin:0;height:100%;}
@@ -100,16 +104,16 @@
 
   .ordercard{
     display:flex; align-items:center; gap:13px; width:100%;
-    border:none; border-left:6px solid var(--oc, var(--kraft));
+    border:none; border-left:7px solid var(--oc, var(--kraft));
     border-radius:20px; padding:14px 14px 14px 12px;
     background:var(--oct, var(--card)); color:var(--ink); text-align:left; cursor:pointer;
-    font-family:inherit; box-shadow:0 2px 7px rgba(32,36,44,.10);
+    font-family:inherit; box-shadow:0 3px 10px rgba(32,36,44,.16);
   }
   .ordercard:active{transform:scale(.985);}
   .thumbwrap{position:relative; flex:0 0 auto;}
   .thumb{
     flex:0 0 auto; width:52px; height:52px; border-radius:14px; overflow:hidden;
-    background:#fff; border:2px solid var(--oc, var(--kraft));
+    background:#fff; border:2.5px solid var(--oc, var(--kraft));
     display:flex; align-items:center; justify-content:center; color:var(--oc, var(--kraft));
   }
   .thumb{position:relative;}
@@ -127,15 +131,15 @@
     font-size:12.5px; font-weight:800; color:var(--oc); letter-spacing:-.01em;
   }
   .ophase .hi{width:15px; height:15px; flex:0 0 auto;}
-  .ophase .pcount{color:var(--ink-dim); font-weight:700;}
+  .ophase .pcount{color:var(--ink-soft); font-weight:700;}
   .thumb img{position:absolute; inset:0; width:100%; height:100%; object-fit:contain; display:block; background:#fff;}
   .omid{flex:1; min-width:0;}
   .oshop{display:block; font-size:16.5px; font-weight:800; letter-spacing:-.01em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
-  .osub{display:block; font-size:12.5px; color:var(--ink-dim); margin-top:3px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .osub{display:block; font-size:12.5px; color:var(--ink-soft); margin-top:3px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
   .osub b{color:var(--c, var(--ink)); font-weight:800;}
   .oright{flex:0 0 auto; text-align:right; min-width:52px;}
   .onum{font-size:27px; font-weight:800; line-height:1; color:var(--c, var(--wait)); font-variant-numeric:tabular-nums; letter-spacing:-.02em;}
-  .olbl{font-size:10px; font-weight:800; color:var(--ink-dim); letter-spacing:.12em; margin-top:4px; text-transform:uppercase;}
+  .olbl{font-size:10px; font-weight:800; color:var(--ink-soft); letter-spacing:.12em; margin-top:4px; text-transform:uppercase;}
   .oword{font-size:15px; font-weight:800; color:var(--c); letter-spacing:-.01em; line-height:1.15;}
   .otick{color:var(--done);}
   /* ---------- the long press ----------
@@ -297,15 +301,15 @@
   .tlitems{flex:1; min-width:0; display:flex; flex-direction:column; gap:7px; justify-content:center;}
   .tlpill{
     display:flex; align-items:center; gap:9px; width:100%; text-align:left;
-    border:none; border-left:5px solid var(--oc); border-radius:14px;
+    border:none; border-left:6px solid var(--oc); border-radius:14px;
     padding:10px 12px; font-family:inherit; cursor:pointer;
-    background:var(--oct); color:var(--ink);
+    background:var(--oct); color:var(--ink); box-shadow:0 2px 6px rgba(32,36,44,.12);
   }
   .tlpill:active{transform:scale(.985);}
   .tlic{width:15px; height:15px; color:var(--oc); flex:0 0 auto;}
   .tlpill.window{background:transparent; box-shadow:inset 0 0 0 1.5px var(--oc);}
   .tlps{font-size:14.5px; font-weight:800; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
-  .tlpd{font-size:11.5px; color:var(--ink-dim); font-weight:700; margin-left:auto; flex:0 0 auto;}
+  .tlpd{font-size:11.5px; color:var(--ink-soft); font-weight:700; margin-left:auto; flex:0 0 auto;}
   .tlgap{flex:1; border-bottom:1px dashed transparent;}
 
   /* ---------- overlays / sheets ---------- */
@@ -828,6 +832,8 @@
 
 /* ============ version log — newest first; [0].v is THE app version ============ */
 const VERSIONLOG = [
+  { v:'1.9', when:'3 Sep 2026',
+    what:'The tiles pop. Every colour a tile can wear — the shop’s own, the blue of <b>On its way</b>, the violet of <b>Ready to collect</b>, the green of <b>Arrived</b>, and the amber and red of today and overdue — is a clear notch deeper than it was, so a card stands off the background instead of melting into it. The coloured edge is a shade thicker, the picture frame a shade heavier, and each tile sits on a slightly stronger shadow. The same goes for the pills on the timeline. It is still flat colour, still warm, still no neon — just more of it. The small print on a tile is a touch darker to keep it easy to read on the deeper tint.' },
   { v:'1.8', when:'3 Sep 2026',
     what:'The app now reads <b>Swedish</b>, and it reads a carrier’s <b>text message</b> as readily as a mail.\n\nThe one that prompted it was a PostNord text — “Ditt REK från SAAB AB finns hos ICA Supermarket Spiralen, S:t Persgatan 110. Uppge 3130. Hämtas personligen senast 2026-09-17, ta med fysiskt leg.” — which the app could make nothing of. Pasted in now, it comes out as an order from SAAB AB, carried by PostNord, marked <b>Ready to collect</b> at <b>ICA Supermarket Spiralen, S:t Persgatan 110</b> (a tap opens it in Maps), containing one registered letter, with the pickup code 3130 and “bring photo ID” in the note.\n\nA ready-to-collect notice rarely says when the parcel will arrive — it says when it will be sent back. So the <b>last day to collect</b> (“Hämtas senast”, “bis spätestens”, “collect by”) now goes into the date box and the countdown runs to it, and the review sheet says so. The <b>pickup code</b> — “Uppge 3130”, “Abholcode 4711”, “PIN” — and a reminder to bring ID land in the note, where they are on the order screen when you are standing at the counter; on an order you already have, the note is added to rather than replaced.\n\nSwedish now works everywhere the app reads: dispatch and collect phrases (“har skickats”, “är på väg”, “finns hos”, “kan hämtas”), the <b>pickup place</b> lifted out of the sentence itself (“finns hos …”) rather than the whole line, delivery-date labels (“Beräknad leverans”), months and weekdays (“måndag 8 september”), “idag” and “imorgon”, order numbers, tracking labels (“Kolli-id”, “Spårningsnummer”) and the RR123456789SE shape of a registered letter, totals in kronor (“1 299 kr”), and “3–5 arbetsdagar” as a lead time. <b>PostNord</b> gets a tracking link of its own, and Bring, Budbee, Instabox, Airmee and Early Bird are recognised. When a notice names the sender — “Ditt paket från Zalando”, “Ihre Sendung von Thomann” — that becomes the shop.' },
   { v:'1.7', when:'3 Sep 2026',
@@ -1776,14 +1782,14 @@ async function cacheOrderImages(order){
    Each shop keeps the same colour every time, so Amazon is always Amazon —
    picked from the shop's name, and changeable by hand in the editor. */
 const PALETTE = {
-  coral: { dot:'#df5f48', tint:'#fde7e1' },
-  sun:   { dot:'#c98d0c', tint:'#fdf1d2' },
-  mint:  { dot:'#2b9270', tint:'#dff3ea' },
-  sky:   { dot:'#357dc4', tint:'#e2edfb' },
-  lilac: { dot:'#7f61c4', tint:'#ede7fb' },
-  rose:  { dot:'#c94d87', tint:'#fbe3ee' },
-  teal:  { dot:'#1a8d9c', tint:'#ddf1f4' },
-  kraft: { dot:'#b06a35', tint:'#f8efe4' }
+  coral: { dot:'#e0492c', tint:'#fbc9bc' },
+  sun:   { dot:'#d38f06', tint:'#fce09a' },
+  mint:  { dot:'#1f9a6e', tint:'#bfead5' },
+  sky:   { dot:'#2f7fd0', tint:'#c3dbf8' },
+  lilac: { dot:'#7d55d0', tint:'#d9ccf8' },
+  rose:  { dot:'#d33f83', tint:'#f9c6db' },
+  teal:  { dot:'#0f92a3', tint:'#b8e6ec' },
+  kraft: { dot:'#b8652a', tint:'#f3d7bb' }
 };
 const PAL_KEYS = Object.keys(PALETTE);
 function hashStr(s){ let h = 0; for(let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return h; }
