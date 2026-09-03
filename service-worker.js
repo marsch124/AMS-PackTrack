@@ -1,5 +1,5 @@
 /* AMS PackTrack — offline service worker */
-const CACHE = 'ams-packtrack-v11';
+const CACHE = 'ams-packtrack-v12';
 const ASSETS = [
   './',
   './index.html',
