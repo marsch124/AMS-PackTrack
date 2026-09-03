@@ -379,9 +379,18 @@
   .epic .hi{width:19px; height:19px;}
   .ex{flex:0 0 auto; border:none; background:none; color:var(--ink-dim); padding:7px; cursor:pointer;}
 
-  .accent-row{display:flex; gap:10px; margin-top:4px; flex-wrap:wrap;}
-  .cdot{width:36px; height:36px; border-radius:50%; border:3px solid transparent; cursor:pointer; padding:0;}
-  .cdot.sel{border-color:var(--ink);}
+  .accent-row{display:flex; gap:11px; margin-top:6px; flex-wrap:wrap;}
+  /* the colour swatches: saturated, lifted off the sheet, the chosen one ticked */
+  .cdot{
+    width:42px; height:42px; border-radius:50%; border:3px solid transparent; cursor:pointer; padding:0;
+    display:flex; align-items:center; justify-content:center;
+    filter:saturate(1.35) brightness(1.04);
+    box-shadow:0 3px 8px rgba(32,36,44,.26), inset 0 0 0 2px rgba(255,255,255,.55);
+    transition:transform .12s ease-out;
+  }
+  .cdot:active{transform:scale(.92);}
+  .cdot.sel{border-color:var(--ink); transform:scale(1.08); box-shadow:0 4px 10px rgba(32,36,44,.30), inset 0 0 0 2px rgba(255,255,255,.75);}
+  .cdot.sel::after{content:''; width:13px; height:8px; border-left:3.5px solid #fff; border-bottom:3.5px solid #fff; transform:rotate(-45deg) translate(1px,-2px);}
 
   .switch{display:flex; align-items:center; gap:10px; font-size:13.5px; font-weight:700; margin:2px 0 12px; cursor:pointer;}
   .switch input{width:20px; height:20px; accent-color:var(--kraft); flex:0 0 auto;}
@@ -832,6 +841,8 @@
 
 /* ============ version log — newest first; [0].v is THE app version ============ */
 const VERSIONLOG = [
+  { v:'1.10', when:'3 Sep 2026',
+    what:'The colour swatches in the editor pop. They were small flat dots sitting on the white sheet; they are now larger and more saturated, lifted on a soft shadow with a thin white inner ring, and the one you have chosen grows a little and carries a white tick, so the choice is obvious at a glance rather than a thin dark outline you had to look for.' },
   { v:'1.9', when:'3 Sep 2026',
     what:'The tiles pop. Every colour a tile can wear — the shop’s own, the blue of <b>On its way</b>, the violet of <b>Ready to collect</b>, the green of <b>Arrived</b>, and the amber and red of today and overdue — is a clear notch deeper than it was, so a card stands off the background instead of melting into it. The coloured edge is a shade thicker, the picture frame a shade heavier, and each tile sits on a slightly stronger shadow. The same goes for the pills on the timeline. It is still flat colour, still warm, still no neon — just more of it. The small print on a tile is a touch darker to keep it easy to read on the deeper tint.' },
   { v:'1.8', when:'3 Sep 2026',
