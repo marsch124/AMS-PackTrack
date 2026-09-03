@@ -116,11 +116,18 @@
   /* the phase glyph rides the corner of the picture, so it shows whether or
      not the item came with one */
   .phbadge{
-    position:absolute; right:-4px; bottom:-4px; width:22px; height:22px; border-radius:50%;
-    background:var(--oc); color:#fff; border:2px solid var(--oct, #fff);
+    position:absolute; right:-6px; bottom:-6px; width:29px; height:29px; border-radius:50%;
+    background:var(--oc); color:#fff; border:2.5px solid var(--oct, #fff);
     display:flex; align-items:center; justify-content:center;
   }
-  .phbadge .hi{width:12px; height:12px;}
+  .phbadge .hi{width:17px; height:17px;}
+  /* the phase said in words as well, on its own line under the date */
+  .ophase{
+    display:inline-flex; align-items:center; gap:5px; margin-top:5px;
+    font-size:12.5px; font-weight:800; color:var(--oc); letter-spacing:-.01em;
+  }
+  .ophase .hi{width:15px; height:15px; flex:0 0 auto;}
+  .ophase .pcount{color:var(--ink-dim); font-weight:700;}
   .thumb img{position:absolute; inset:0; width:100%; height:100%; object-fit:contain; display:block; background:#fff;}
   .omid{flex:1; min-width:0;}
   .oshop{display:block; font-size:16.5px; font-weight:800; letter-spacing:-.01em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
@@ -135,23 +142,23 @@
      A web page gets no haptic on iOS, so the press has to show itself: the next
      phase's colour sweeps across the tile while the finger is down and the
      phase only changes when it has filled. Lift early and nothing happens. */
-  .ordercard, .tlpill{
+  .ordercard, .tlpill, .tickrow[data-item]{
     position:relative; overflow:hidden;
     -webkit-touch-callout:none; -webkit-user-select:none; user-select:none;
   }
-  .ordercard img, .tlpill img{-webkit-touch-callout:none; pointer-events:none;}
-  .ordercard::after, .tlpill::after{
+  .ordercard img, .tlpill img, .tickrow img{-webkit-touch-callout:none; pointer-events:none;}
+  .ordercard::after, .tlpill::after, .tickrow[data-item]::after{
     content:''; position:absolute; inset:0; pointer-events:none;
     background:var(--nextc, transparent); opacity:.30;
     transform:scaleX(0); transform-origin:left center;
   }
-  .ordercard.arming::after, .tlpill.arming::after{
+  .ordercard.arming::after, .tlpill.arming::after, .tickrow.arming::after{
     transform:scaleX(1); transition:transform .46s linear;
   }
   @keyframes phasepop{ 0%{transform:scale(1);} 34%{transform:scale(1.04);} 100%{transform:scale(1);} }
   .ordercard.pop, .tlpill.pop{animation:phasepop .34s ease-out;}
   @media (prefers-reduced-motion: reduce){
-    .ordercard.arming::after, .tlpill.arming::after{transition:none;}
+    .ordercard.arming::after, .tlpill.arming::after, .tickrow.arming::after{transition:none;}
     .ordercard.pop, .tlpill.pop{animation:none;}
   }
 
@@ -163,7 +170,7 @@
     background:var(--card); color:var(--ink-dim); font-family:inherit; cursor:pointer;
     font-size:10.5px; font-weight:800; line-height:1.15; text-align:center;
   }
-  .phbtn .hi{width:22px; height:22px;}
+  .phbtn .hi{width:26px; height:26px;}
   .phbtn.past{color:var(--pc); border-color:var(--pc);}
   .phbtn.on{background:var(--pc); border-color:var(--pc); color:#fff;}
   .phhint{font-size:12px; color:var(--ink-dim); font-weight:600; margin:9px 4px 0; text-align:center;}
@@ -233,12 +240,24 @@
   }
   .tickrow:active{transform:scale(.99);}
   .tickrow.on{background:var(--done-t); border-color:rgba(63,143,99,.28);}
+  /* a parcel of its own: the row takes that phase's colour, like its card does */
+  .tickrow.phased{background:var(--ict); border-color:var(--ic); border-left:5px solid var(--ic);}
+  .tickrow.phased .tbox{border-color:var(--ic);}
+  .tibadge{
+    position:absolute; right:-5px; bottom:-5px; width:23px; height:23px; border-radius:50%;
+    background:var(--ic); color:#fff; border:2px solid var(--ict, #fff);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .tibadge .hi{width:13px; height:13px;}
+  .tsub .pword{color:var(--ic); font-weight:800;}
   .tbox{
     flex:0 0 auto; width:30px; height:30px; border-radius:50%;
     border:2.5px solid var(--ink-dim); display:flex; align-items:center; justify-content:center; color:transparent;
   }
   .tickrow.on .tbox{border-color:var(--done); background:var(--done); color:#fff;}
   .tbox .hi{width:17px; height:17px;}
+  .tickrow .tpic{overflow:visible;}
+  .tickrow .tpic img{border-radius:11px;}
   .tpic{flex:0 0 auto; width:46px; height:46px; border-radius:11px; overflow:hidden; background:var(--bg); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; color:var(--kraft);}
   .tpic{position:relative;}
   .tpic img{position:absolute; inset:0; width:100%; height:100%; object-fit:contain; display:block; background:#fff;}
@@ -687,6 +706,11 @@
         <p>If holding is awkward, open the order: the <b>Where it is</b> strip near the top does the same job with a single tap, and it shows all four states at once so you can jump straight to the right one.</p>
         <p>The timeline works the same way — hold a pill there and it steps along too.</p>
 
+        <h3>One order, several parcels</h3>
+        <p>Shops split deliveries all the time — Amazon most of all — so <b>each item can carry its own state</b>. On the order screen, <b>tap</b> an item to tick it off as before, and <b>hold</b> it to step that one item along: Ordered, On its way, Ready to collect, Arrived. The row takes that state's colour and gets its own badge, so a single order can plainly show one thing on its way, one waiting at the Paketshop and one already here.</p>
+        <p>Once any item carries a state of its own, <b>the items drive the order</b> — exactly as they already do for dates. The card on the home screen then shows the state of the parcel that is <b>furthest along</b>, because that is the one turning up next and the one there might be something to do about, and it writes the count beside it: “On its way · 1 of 3”.</p>
+        <p>Holding the order's own card still moves the whole order at once, and brings every outstanding item along with it. Undo puts every single item back exactly as it was.</p>
+
         <h3>The app reads the dispatch mail for it</h3>
         <p>When you paste in a mail that says the parcel has been sent — “Ihre Sendung ist unterwegs”, “versandt”, “has shipped”, “on its way” — the order is marked <b>On its way</b> by itself, and one that says it is waiting at a pickup point is marked <b>Ready to collect</b>. The review sheet tells you it did this before anything is saved.</p>
         <p>A mail that only <i>promises</i> to tell you later — “wir informieren Sie, sobald Ihre Sendung unterwegs ist” — is not treated as a dispatch, which is why the order confirmation itself does not trip it. And a mail can only move an order <b>forward</b>: re-reading the old confirmation after the dispatch mail will not push it back to Ordered.</p>
@@ -802,6 +826,8 @@
 
 /* ============ version log — newest first; [0].v is THE app version ============ */
 const VERSIONLOG = [
+  { v:'1.7', when:'3 Sep 2026',
+    what:'The phases now go all the way down to the individual item, because shops split deliveries and one order is very often three parcels arriving on three different days.\n\nOn the order screen, <b>tap</b> an item to tick it off as before and <b>hold</b> it to step that one item along on its own — Ordered, On its way, Ready to collect, Arrived — with the same colour sweep under your finger and the same Undo afterwards. The row then takes that state’s colour, gets its own badge and says the state in words, so one order can plainly show one thing on its way, one waiting at the Paketshop and one already in the hall.\n\nOnce any item carries a state of its own the items drive the order, exactly as they already do for dates. The card on the home screen shows the state of the parcel that is <b>furthest along</b> — that is the one turning up next, and the one there might be something to do about — and writes the count next to it, “On its way · 1 of 3”, so the word is never allowed to overstate. Holding the order’s own card still moves everything at once and brings every outstanding item with it, and Undo puts every item back exactly as it was, one by one.\n\nTwo things you asked for on the card itself. The little state badge on the picture is <b>half again as big</b>, and the state is now also <b>written out in words on its own line under the date</b> — a lorry and “On its way”, a tick and “Arrived” — so it reads without having to work out what the colour means. The icons in the Where-it-is strip grew a little too.\n\nAnd because a dispatch mail arriving for an order whose items already carry their own states could otherwise have had nothing visible to change, such a mail now also carries the parcels that are <b>behind</b> up to where it says they are — never touching one that is already further on.' },
   { v:'1.6', when:'3 Sep 2026',
     what:'The app now knows <b>where</b> a parcel is, not just when it is due — and you tell it by holding the card.\n\nUntil now an order was either not here or here, with nothing in between, so the mail that says “Ihre Sendung ist unterwegs” had nowhere to go. There are four states now: <b>Ordered</b>, <b>On its way</b>, <b>Ready to collect</b>, <b>Arrived</b>. Hold a card on the home screen for half a second and it steps to the next one. While your finger is down the next state’s colour sweeps across the whole card so you can see what is coming, and lifting before it fills cancels it — nothing changes by accident. When it does land, the entire tile takes that colour: blue for on its way, violet for ready to collect, green for arrived, and the shop’s own colour while it is merely ordered. A little badge on the picture says the same thing as a symbol: a lorry, a map pin, a tick. The timeline pills work exactly the same way.\n\nStepping a card to Arrived ticks every item off, because that is what arriving means, and holding once more takes it round to Ordered and unticks them. Every step raises an <b>Undo</b> button for a few seconds which puts the order back <i>exactly</i> as it was — the tick dates on items you had already ticked by hand included. And the list no longer jumps back to the top under your finger.\n\nBecause a hidden gesture is a gesture you forget, the order screen has a new <b>Where it is</b> strip: all four states side by side, one tap to set any of them, and the ones already passed marked off. It is also the place the app admits what it knows — an order says “On its way · 3 days to go” now, rather than pretending the two are the same fact.\n\nBest of all it usually does the marking for you. Paste a dispatch mail and the app recognises it — versandt, verschickt, unterwegs, has shipped, on its way, out for delivery, har skickats — and marks the order On its way; one that says the parcel is waiting at a pickup point is marked Ready to collect, and its card then leads with <b>where to go</b> rather than the delivery date. It is careful about it: a mail that merely promises to tell you later (“wir informieren Sie, sobald Ihre Sendung unterwegs ist”) is not a dispatch, so the order confirmation does not trip it, and a mail can only ever move an order forward — re-reading an old confirmation cannot push it back to Ordered.\n\nOne small correction came with it. The “Coming” group used to describe itself as “On its way”, which it had no way of knowing. It says Coming now, and On its way means what it says.' },
   { v:'1.5', when:'2 Sep 2026',
@@ -871,7 +897,8 @@ function normalise(s){
     colour: (o.colour && PALETTE[o.colour]) ? o.colour : '',
     items: Array.isArray(o.items) ? o.items.filter(i => i && (i.name || i.img)).map(i => ({
       id: i.id || uid(), name: i.name || '', qty: i.qty || '', img: i.img || '',
-      due: i.due || '', got: !!i.got, gotAt: i.gotAt || ''
+      due: i.due || '', got: !!i.got, gotAt: i.gotAt || '',
+      phase: (i.phase === 'shipped' || i.phase === 'collect') ? i.phase : ''
     })) : [],
     todos: Array.isArray(o.todos) ? o.todos.filter(t => t && t.text).map(t => ({
       id: t.id || uid(), text: t.text, due: t.due || '', done: !!t.done, doneAt: t.doneAt || ''
@@ -1752,9 +1779,36 @@ const PH = {
   collect: { word:'Ready to collect',  tab:'To collect',icon:'pin',   dot:'var(--coll)', tint:'var(--coll-t)', pc:'var(--coll)' },
   arrived: { word:'All arrived',       tab:'Arrived',   icon:'check', dot:'var(--done)', tint:'var(--done-t)', pc:'var(--done)' }
 };
+/* One order, several parcels: shops split deliveries, so an item has to be able
+   to say where IT has got to. Items drive the order when any of them do — the
+   same rule per-item dates already follow. */
+function itemPhase(i){
+  if(i.got) return 'arrived';
+  return (i.phase === 'shipped' || i.phase === 'collect') ? i.phase : 'ordered';
+}
+function hasItemPhases(o){ return o.items.some(i => i.phase === 'shipped' || i.phase === 'collect'); }
 function phaseOf(o){
   if(allIn(o)) return 'arrived';
+  if(hasItemPhases(o)){
+    /* the FURTHEST-ON parcel still outstanding, because that is the one turning
+       up next and the one there might be something to do about */
+    let best = 0;
+    o.items.forEach(i => {
+      if(i.got) return;
+      const k = PHASE_ORDER.indexOf(itemPhase(i));
+      if(k > best) best = k;
+    });
+    return PHASE_ORDER[best];
+  }
   return (o.phase === 'shipped' || o.phase === 'collect') ? o.phase : 'ordered';
+}
+/* when the items disagree, say how many are at the phase the order is showing */
+function phaseSplit(o){
+  const ph = phaseOf(o);
+  if(ph === 'arrived' || ph === 'ordered' || !hasItemPhases(o)) return null;
+  const n = o.items.length;
+  const at = o.items.filter(i => itemPhase(i) === ph).length;
+  return at < n ? { at, n } : null;
 }
 /* A tile wears its shop's own colour until something is known about where it
    is; from then on it wears the phase, because that is the newer news. */
@@ -1772,12 +1826,12 @@ function nextPhase(o){
    whole previous shape is kept and put back verbatim. */
 function phaseSnapshot(o){
   return { phase:o.phase || '', phaseAt:o.phaseAt || '', got:!!o.got,
-           items:o.items.map(i => ({ id:i.id, got:!!i.got, gotAt:i.gotAt || '' })) };
+           items:o.items.map(i => ({ id:i.id, got:!!i.got, gotAt:i.gotAt || '', phase:i.phase || '' })) };
 }
 function restorePhase(o, snap){
   o.phase = snap.phase; o.phaseAt = snap.phaseAt; o.got = snap.got;
   const was = new Map(snap.items.map(i => [i.id, i]));
-  o.items.forEach(i => { const w = was.get(i.id); if(w){ i.got = w.got; i.gotAt = w.gotAt; } });
+  o.items.forEach(i => { const w = was.get(i.id); if(w){ i.got = w.got; i.gotAt = w.gotAt; i.phase = w.phase; } });
 }
 function setPhase(o, ph){
   const snap = phaseSnapshot(o);
@@ -1785,7 +1839,7 @@ function setPhase(o, ph){
   const today = todayISO();
   if(ph === 'arrived'){
     o.phase = '';
-    if(o.items.length) o.items.forEach(i => { if(!i.got){ i.got = true; i.gotAt = today; } });
+    if(o.items.length) o.items.forEach(i => { i.phase = ''; if(!i.got){ i.got = true; i.gotAt = today; } });
     else o.got = true;
   } else {
     /* only coming back OFF arrival unticks anything — an order that is merely
@@ -1795,10 +1849,42 @@ function setPhase(o, ph){
       else o.got = false;
     }
     o.phase = (ph === 'ordered') ? '' : ph;
+    /* the whole order moved together, so its parcels stop disagreeing. o.phase
+       is kept in step as well, so clearing every item cannot resurrect a stale
+       order-level phase underneath. */
+    o.items.forEach(i => { if(!i.got) i.phase = o.phase; });
   }
   o.phaseAt = today;
   save();
   return snap;
+}
+/* ...and one parcel out of several can be moved on its own */
+function setItemPhase(o, it, ph){
+  const snap = phaseSnapshot(o);
+  const today = todayISO();
+  if(ph === 'arrived'){
+    it.phase = '';
+    if(!it.got){ it.got = true; it.gotAt = today; }
+  } else {
+    if(it.got){ it.got = false; it.gotAt = ''; }
+    it.phase = (ph === 'ordered') ? '' : ph;
+  }
+  o.phaseAt = today;
+  save();
+  return snap;
+}
+function stepItemTo(orderId, itemId, ph){
+  const o = orderById(orderId);
+  const it = o && o.items.find(x => x.id === itemId);
+  if(!it || itemPhase(it) === ph) return;
+  const snap = setItemPhase(o, it, ph);
+  keepScroll = $('main').scrollTop;
+  render();
+  showToast((it.name || 'Item').slice(0, 22) + ' · ' + PH[ph].word, () => {
+    const t = orderById(orderId);
+    if(t){ restorePhase(t, snap); save(); keepScroll = $('main').scrollTop; render(); }
+    hideToast();
+  }, 'Undo', 6000);
 }
 /* the one thing both the long press and the phase strip call */
 function stepOrderTo(id, ph){
@@ -1824,32 +1910,45 @@ function stepOrderTo(id, ph){
 const HOLD_MS = 520;
 let popId = null;            // the tile to pop once the next render has drawn it
 let holdFiredAt = 0;         // guards the click that iOS sends after the press
-function attachTileHold(el, id){
+function attachHold(el, spec){
   let timer = null, sx = 0, sy = 0;
   const cancel = () => { clearTimeout(timer); timer = null; el.classList.remove('arming'); };
   el.addEventListener('contextmenu', (e) => e.preventDefault());
   el.addEventListener('pointerdown', (e) => {
     if(e.pointerType === 'mouse' && e.button !== 0) return;
-    const o = orderById(id); if(!o) return;
+    const nx = spec.next();
+    if(!nx) return;
     sx = e.clientX; sy = e.clientY;
-    el.style.setProperty('--nextc', PH[nextPhase(o)].dot || colourOf(o).dot);
+    el.style.setProperty('--nextc', nx.dot || nx.fallback || 'var(--kraft)');
     requestAnimationFrame(() => { if(timer) el.classList.add('arming'); });
     timer = setTimeout(() => {
       timer = null;
       el.classList.remove('arming');
       holdFiredAt = Date.now();
-      stepOrderTo(id, nextPhase(o));
+      spec.hold();
     }, HOLD_MS);
   });
   el.addEventListener('pointermove', (e) => {
     if(timer && (Math.abs(e.clientX - sx) > 10 || Math.abs(e.clientY - sy) > 10)) cancel();
   });
   ['pointerup', 'pointercancel', 'pointerleave'].forEach(t => el.addEventListener(t, cancel));
-  /* the press has already redrawn the list, so the click that follows can land
+  /* the press has already redrawn the screen, so the click that follows can land
      on a brand new element — the guard has to be global, not per tile */
   el.addEventListener('click', () => {
     if(Date.now() - holdFiredAt < 700) return;
-    openId = id; view = 'detail'; render();
+    spec.tap();
+  });
+}
+function attachTileHold(el, id){
+  attachHold(el, {
+    next: () => {
+      const o = orderById(id);
+      if(!o) return null;
+      const n = PH[nextPhase(o)];
+      return { dot:n.dot, fallback:colourOf(o).dot };
+    },
+    hold: () => { const o = orderById(id); if(o) stepOrderTo(id, nextPhase(o)); },
+    tap:  () => { openId = id; view = 'detail'; render(); }
   });
 }
 function popTile(){
@@ -1978,6 +2077,7 @@ function orderCard(o){
   }
 
   const ot = openTodos(o);
+  const split = phaseSplit(o);
   const tc = tileColour(o);
   return `<button class="ordercard" data-id="${o.id}" style="--c:${s.c}; --oc:${tc.dot}; --oct:${tc.tint}">
     <span class="thumbwrap">
@@ -1987,6 +2087,9 @@ function orderCard(o){
     <span class="omid">
       <span class="oshop">${esc(o.shop || 'Order')}</span>
       <span class="osub">${bits.join(' · ') || esc(s.word)}</span>
+      ${ph === 'ordered' ? '' : `<span class="ophase">
+        <svg class="hi"><use href="#icon-${PH[ph].icon}"/></svg>${esc(ph === 'arrived' ? 'Arrived' : PH[ph].word)}${
+          split ? `<span class="pcount">· ${split.at} of ${split.n}</span>` : ''}</span>`}
       ${ot ? `<span class="todobadge"><svg class="hi" style="width:13px;height:13px"><use href="#icon-list"/></svg>${ot} follow-up${ot === 1 ? '' : 's'}</span>` : ''}
     </span>
     <span class="oright">${right}</span>
@@ -2083,23 +2186,33 @@ function renderDetail(){
   } else if(st === 'wait' && !effDue(o)){
     statusLine = 'No date given';
   }
-  if(ph === 'shipped' || ph === 'collect') statusLine = PH[ph].word + ' · ' + statusLine;
+  if(ph === 'shipped' || ph === 'collect'){
+    const sp = phaseSplit(o);
+    statusLine = PH[ph].word + (sp ? ` (${sp.at} of ${sp.n})` : '') + ' · ' + statusLine;
+  }
   if(st !== 'done' && o.items.length > 1 && gotCount(o)) statusLine += ` · ${gotCount(o)} of ${o.items.length} already in`;
 
   const rows = o.items.length
-    ? o.items.map(i => `
-        <button class="tickrow${i.got ? ' on' : ''}" data-item="${i.id}">
+    ? o.items.map(i => {
+        const ip = itemPhase(i);
+        const mid = ip === 'ordered' || ip === 'arrived' ? null : PH[ip];
+        const sub = [
+          (i.qty && i.qty !== '1') ? '×' + esc(i.qty) : '',
+          (i.due && !i.got) ? esc(prettyDate(i.due)) : '',
+          i.got && i.gotAt ? 'ticked ' + prettyDate(i.gotAt) : '',
+          mid ? `<span class="pword">${esc(mid.word)}</span>` : ''
+        ].filter(Boolean);
+        return `
+        <button class="tickrow${i.got ? ' on' : ''}${mid ? ' phased' : ''}" data-item="${i.id}"${
+          mid ? ` style="--ic:${mid.dot}; --ict:${mid.tint}"` : ''}>
           <span class="tbox"><svg class="hi"><use href="#icon-check"/></svg></span>
-          <span class="tpic"><svg class="hi"><use href="#icon-box"/></svg>${i.img ? `<img src="${esc(i.img)}" alt="" loading="lazy" onerror="this.remove()" />` : ''}</span>
+          <span class="tpic"><svg class="hi"><use href="#icon-box"/></svg>${i.img ? `<img src="${esc(i.img)}" alt="" loading="lazy" onerror="this.remove()" />` : ''}${
+            mid ? `<span class="tibadge"><svg class="hi"><use href="#icon-${mid.icon}"/></svg></span>` : ''}</span>
           <span class="tmid">
             <span class="tname">${esc(i.name || 'Item')}</span>
-            ${(i.qty && i.qty !== '1') || i.got || i.due ? `<span class="tsub">${[
-              (i.qty && i.qty !== '1') ? '×' + esc(i.qty) : '',
-              (i.due && !i.got) ? esc(prettyDate(i.due)) : '',
-              i.got && i.gotAt ? 'ticked ' + prettyDate(i.gotAt) : ''
-            ].filter(Boolean).join(' · ')}</span>` : ''}
+            ${sub.length ? `<span class="tsub">${sub.join(' · ')}</span>` : ''}
           </span>
-        </button>`).join('')
+        </button>`; }).join('')
     : `<button class="tickrow${o.got ? ' on' : ''}" data-whole="1">
          <span class="tbox"><svg class="hi"><use href="#icon-check"/></svg></span>
          <span class="tpic"><svg class="hi"><use href="#icon-box"/></svg></span>
@@ -2138,8 +2251,8 @@ function renderDetail(){
         <svg class="hi"><use href="#icon-${PH[k].icon}"/></svg>${esc(PH[k].tab)}
       </button>`).join('')}</div>
     <div class="phhint">${ph === 'arrived'
-        ? 'Everything is ticked off. Tap a step back to reopen the order.'
-        : 'Tap where it is now — or hold its card on the home screen to step it along.'}</div>`;
+        ? 'All ticked off. Tap a step back to reopen it.'
+        : 'Sets the whole order · or hold its card on the home screen'}</div>`;
 
   const p = tileColour(o);
   main.innerHTML = `
@@ -2156,6 +2269,7 @@ function renderDetail(){
     ${phaseStrip}
 
     <div class="sect">In the box<span class="gline"></span></div>
+    ${o.items.length > 1 ? '<div class="phhint" style="margin:0 4px 10px">Tap to tick off · hold to move one parcel along</div>' : ''}
     ${rows}
 
     <div class="sect">Follow-ups<span class="gline"></span></div>
@@ -2171,12 +2285,26 @@ function renderDetail(){
   main.querySelectorAll('[data-phase]').forEach(b =>
     b.addEventListener('click', () => stepOrderTo(o.id, b.dataset.phase)));
 
-  main.querySelectorAll('[data-item]').forEach(b => b.addEventListener('click', () => {
-    const it = o.items.find(x => x.id === b.dataset.item);
-    if(!it) return;
-    it.got = !it.got;
-    it.gotAt = it.got ? todayISO() : '';
-    save(); render();
+  main.querySelectorAll('[data-item]').forEach(b => attachHold(b, {
+    next: () => {
+      const it = o.items.find(x => x.id === b.dataset.item);
+      if(!it) return null;
+      const n = PH[PHASE_ORDER[(PHASE_ORDER.indexOf(itemPhase(it)) + 1) % PHASE_ORDER.length]];
+      return { dot:n.dot, fallback:colourOf(o).dot };
+    },
+    hold: () => {
+      const it = o.items.find(x => x.id === b.dataset.item);
+      if(!it) return;
+      stepItemTo(o.id, it.id, PHASE_ORDER[(PHASE_ORDER.indexOf(itemPhase(it)) + 1) % PHASE_ORDER.length]);
+    },
+    tap: () => {
+      const it = o.items.find(x => x.id === b.dataset.item);
+      if(!it) return;
+      it.got = !it.got;
+      it.gotAt = it.got ? todayISO() : '';
+      if(it.got) it.phase = '';
+      save(); render();
+    }
   }));
   const whole = main.querySelector('[data-whole]');
   if(whole) whole.addEventListener('click', () => { o.got = !o.got; save(); render(); });
@@ -2355,13 +2483,13 @@ function harvestRows(){
   const items = [];
   document.querySelectorAll('#itemRows .eitem').forEach(row => {
     const id = row.dataset.row;
-    const old = draft.items.find(i => i.id === id) || { id, got:false, gotAt:'', img:'' };
+    const old = draft.items.find(i => i.id === id) || { id, got:false, gotAt:'', img:'', phase:'' };
     const name = row.querySelector('.iname').value.trim();
     const qty = row.querySelector('.qty').value.trim();
     const due = row.querySelector('.idue').value;
     if(!name && !old.img) return;
     items.push({ id:old.id, name:name || 'Item', qty, img:old.img || '', due,
-                 got:!!old.got, gotAt:old.gotAt || '' });
+                 got:!!old.got, gotAt:old.gotAt || '', phase:old.phase || '' });
   });
   draft.items = items;
 
@@ -2530,6 +2658,12 @@ function mergeInto(target, src){
   if(src.phase && PHASE_ORDER.indexOf(src.phase) > PHASE_ORDER.indexOf(phaseOf(target))){
     target.phase = src.phase;
     target.phaseAt = todayISO();
+    /* items drive the order once any of them carry a phase, so a mail that only
+       set the order's would otherwise be invisible. Only ones that are BEHIND
+       are moved up; anything already further on is left alone. */
+    target.items.forEach(i => {
+      if(!i.got && PHASE_ORDER.indexOf(itemPhase(i)) < PHASE_ORDER.indexOf(src.phase)) i.phase = src.phase;
+    });
   }
   const have = new Map(target.items.map(i => [nameKey(i.name), i]));
   src.items.forEach(i => {
