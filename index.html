@@ -23,6 +23,10 @@
     --today:#c1861a;  --today-t:#fdf2da;
     --late:#c43c3c;   --late-t:#fbe7e6;
     --done:#3f8f63;   --done-t:#e5f2e9;
+
+    /* phase colours — WHERE the parcel is, as opposed to WHEN it is due */
+    --ship:#2a6098;   --ship-t:#d7e6f5;
+    --coll:#6a4795;   --coll-t:#e5dbf2;
   }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
   html,body{margin:0;height:100%;}
@@ -102,12 +106,21 @@
     font-family:inherit; box-shadow:0 2px 7px rgba(32,36,44,.10);
   }
   .ordercard:active{transform:scale(.985);}
+  .thumbwrap{position:relative; flex:0 0 auto;}
   .thumb{
     flex:0 0 auto; width:52px; height:52px; border-radius:14px; overflow:hidden;
     background:#fff; border:2px solid var(--oc, var(--kraft));
     display:flex; align-items:center; justify-content:center; color:var(--oc, var(--kraft));
   }
   .thumb{position:relative;}
+  /* the phase glyph rides the corner of the picture, so it shows whether or
+     not the item came with one */
+  .phbadge{
+    position:absolute; right:-4px; bottom:-4px; width:22px; height:22px; border-radius:50%;
+    background:var(--oc); color:#fff; border:2px solid var(--oct, #fff);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .phbadge .hi{width:12px; height:12px;}
   .thumb img{position:absolute; inset:0; width:100%; height:100%; object-fit:contain; display:block; background:#fff;}
   .omid{flex:1; min-width:0;}
   .oshop{display:block; font-size:16.5px; font-weight:800; letter-spacing:-.01em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
@@ -118,6 +131,43 @@
   .olbl{font-size:10px; font-weight:800; color:var(--ink-dim); letter-spacing:.12em; margin-top:4px; text-transform:uppercase;}
   .oword{font-size:15px; font-weight:800; color:var(--c); letter-spacing:-.01em; line-height:1.15;}
   .otick{color:var(--done);}
+  /* ---------- the long press ----------
+     A web page gets no haptic on iOS, so the press has to show itself: the next
+     phase's colour sweeps across the tile while the finger is down and the
+     phase only changes when it has filled. Lift early and nothing happens. */
+  .ordercard, .tlpill{
+    position:relative; overflow:hidden;
+    -webkit-touch-callout:none; -webkit-user-select:none; user-select:none;
+  }
+  .ordercard img, .tlpill img{-webkit-touch-callout:none; pointer-events:none;}
+  .ordercard::after, .tlpill::after{
+    content:''; position:absolute; inset:0; pointer-events:none;
+    background:var(--nextc, transparent); opacity:.30;
+    transform:scaleX(0); transform-origin:left center;
+  }
+  .ordercard.arming::after, .tlpill.arming::after{
+    transform:scaleX(1); transition:transform .46s linear;
+  }
+  @keyframes phasepop{ 0%{transform:scale(1);} 34%{transform:scale(1.04);} 100%{transform:scale(1);} }
+  .ordercard.pop, .tlpill.pop{animation:phasepop .34s ease-out;}
+  @media (prefers-reduced-motion: reduce){
+    .ordercard.arming::after, .tlpill.arming::after{transition:none;}
+    .ordercard.pop, .tlpill.pop{animation:none;}
+  }
+
+  /* ---------- the phase strip on an order ---------- */
+  .phaserow{display:flex; gap:7px; margin:2px 0 0;}
+  .phbtn{
+    flex:1 1 0; min-width:0; display:flex; flex-direction:column; align-items:center; gap:6px;
+    border:2px solid var(--line); border-radius:15px; padding:11px 3px 10px;
+    background:var(--card); color:var(--ink-dim); font-family:inherit; cursor:pointer;
+    font-size:10.5px; font-weight:800; line-height:1.15; text-align:center;
+  }
+  .phbtn .hi{width:22px; height:22px;}
+  .phbtn.past{color:var(--pc); border-color:var(--pc);}
+  .phbtn.on{background:var(--pc); border-color:var(--pc); color:#fff;}
+  .phhint{font-size:12px; color:var(--ink-dim); font-weight:600; margin:9px 4px 0; text-align:center;}
+
   .todobadge{
     display:inline-flex; align-items:center; gap:4px; margin-top:5px;
     font-size:11px; font-weight:800; color:var(--kraft);
@@ -233,6 +283,7 @@
     background:var(--oct); color:var(--ink);
   }
   .tlpill:active{transform:scale(.985);}
+  .tlic{width:15px; height:15px; color:var(--oc); flex:0 0 auto;}
   .tlpill.window{background:transparent; box-shadow:inset 0 0 0 1.5px var(--oc);}
   .tlps{font-size:14.5px; font-weight:800; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
   .tlpd{font-size:11.5px; color:var(--ink-dim); font-weight:700; margin-left:auto; flex:0 0 auto;}
@@ -629,8 +680,19 @@
 
         <p>Send the <b>shipping</b> mail in the same way when it arrives. If the order number matches one you already have, PackTrack offers to <b>update that order</b> instead of making a second one — filling in the carrier, the tracking number and the sharpened delivery date.</p>
 
+        <h3>Where it is — and the long press</h3>
+        <p>A parcel goes through four states, and the app now keeps track of which one it is in: <b>Ordered</b>, <b>On its way</b>, <b>Ready to collect</b>, <b>Arrived</b>. This is a different question from <i>when</i> it is due, which is what the big number and the group headings answer.</p>
+        <p><b>Hold a card down</b> on the home screen for half a second and it steps to the next state. While your finger is down the next state's colour sweeps across the card, so you can see what is about to happen — <b>lift before it fills and nothing changes</b>. When it does change, the whole card takes that state's colour: <b>blue</b> for on its way, <b>violet</b> for ready to collect, <b>green</b> for arrived, and the shop's own colour while it is only ordered. A small badge on the picture carries the same message as a symbol — a lorry, a map pin, a tick.</p>
+        <p>A card that steps all the way to <b>Arrived</b> ticks every item off for you, which is what arriving means; holding it once more takes it back round to <b>Ordered</b> and unticks them again. Every step raises an <b>Undo</b> button for a few seconds, and it puts the order back exactly as it was — including the dates on items you had already ticked by hand.</p>
+        <p>If holding is awkward, open the order: the <b>Where it is</b> strip near the top does the same job with a single tap, and it shows all four states at once so you can jump straight to the right one.</p>
+        <p>The timeline works the same way — hold a pill there and it steps along too.</p>
+
+        <h3>The app reads the dispatch mail for it</h3>
+        <p>When you paste in a mail that says the parcel has been sent — “Ihre Sendung ist unterwegs”, “versandt”, “has shipped”, “on its way” — the order is marked <b>On its way</b> by itself, and one that says it is waiting at a pickup point is marked <b>Ready to collect</b>. The review sheet tells you it did this before anything is saved.</p>
+        <p>A mail that only <i>promises</i> to tell you later — “wir informieren Sie, sobald Ihre Sendung unterwegs ist” — is not treated as a dispatch, which is why the order confirmation itself does not trip it. And a mail can only move an order <b>forward</b>: re-reading the old confirmation after the dispatch mail will not push it back to Ordered.</p>
+
         <h3>The home screen</h3>
-        <p>One card per order, grouped into <b>Late</b>, <b>Today</b>, <b>Coming</b> and <b>Arrived</b>. The colour on the left edge is the message: red is overdue, amber is due today, kraft is coming, green is all in. The big number is <b>days to go</b>. The chips along the top filter the list.</p>
+        <p>One card per order, grouped into <b>Late</b>, <b>Today</b>, <b>Coming</b> and <b>Arrived</b>. The big number is <b>days to go</b>, and its colour is the message: red is overdue, amber is due today, green is all in. The card's own colour says <b>where</b> the parcel is (see above). The chips along the top filter the list.</p>
 
         <h3>The timeline</h3>
         <p>The button at the <b>top right</b> flips the home screen between the <b>list</b> and a <b>timeline</b> — a day-by-day strip of the days ahead. Each day shows which parcels are due to land on it, so you can see at a glance that Thursday is quiet and Friday has three things coming. Today is marked, weekends are dimmed, anything already <b>overdue</b> is banded at the top, and anything with <b>no date</b> is collected at the bottom.</p>
@@ -740,6 +802,8 @@
 
 /* ============ version log — newest first; [0].v is THE app version ============ */
 const VERSIONLOG = [
+  { v:'1.6', when:'3 Sep 2026',
+    what:'The app now knows <b>where</b> a parcel is, not just when it is due — and you tell it by holding the card.\n\nUntil now an order was either not here or here, with nothing in between, so the mail that says “Ihre Sendung ist unterwegs” had nowhere to go. There are four states now: <b>Ordered</b>, <b>On its way</b>, <b>Ready to collect</b>, <b>Arrived</b>. Hold a card on the home screen for half a second and it steps to the next one. While your finger is down the next state’s colour sweeps across the whole card so you can see what is coming, and lifting before it fills cancels it — nothing changes by accident. When it does land, the entire tile takes that colour: blue for on its way, violet for ready to collect, green for arrived, and the shop’s own colour while it is merely ordered. A little badge on the picture says the same thing as a symbol: a lorry, a map pin, a tick. The timeline pills work exactly the same way.\n\nStepping a card to Arrived ticks every item off, because that is what arriving means, and holding once more takes it round to Ordered and unticks them. Every step raises an <b>Undo</b> button for a few seconds which puts the order back <i>exactly</i> as it was — the tick dates on items you had already ticked by hand included. And the list no longer jumps back to the top under your finger.\n\nBecause a hidden gesture is a gesture you forget, the order screen has a new <b>Where it is</b> strip: all four states side by side, one tap to set any of them, and the ones already passed marked off. It is also the place the app admits what it knows — an order says “On its way · 3 days to go” now, rather than pretending the two are the same fact.\n\nBest of all it usually does the marking for you. Paste a dispatch mail and the app recognises it — versandt, verschickt, unterwegs, has shipped, on its way, out for delivery, har skickats — and marks the order On its way; one that says the parcel is waiting at a pickup point is marked Ready to collect, and its card then leads with <b>where to go</b> rather than the delivery date. It is careful about it: a mail that merely promises to tell you later (“wir informieren Sie, sobald Ihre Sendung unterwegs ist”) is not a dispatch, so the order confirmation does not trip it, and a mail can only ever move an order forward — re-reading an old confirmation cannot push it back to Ordered.\n\nOne small correction came with it. The “Coming” group used to describe itself as “On its way”, which it had no way of knowing. It says Coming now, and On its way means what it says.' },
   { v:'1.5', when:'2 Sep 2026',
     what:'Dates the app can work out for you — offered, never imposed. Many shops promise a delivery time rather than a date: “Lieferzeit 1–3 Werktage”. When PackTrack finds one and the mail names no actual day, the review sheet now shows the arithmetic and a <b>Use it</b> button. The count runs in working days from the order date, skipping weekends and Swedish röda dagar — långfredagen, annandag påsk, Kristi himmelsfärdsdag, nationaldagen and the rest, plus midsommarafton, julafton and nyårsafton, when nothing is delivered either. Where a mail states more than one time (“…, mit Gravur 2–4 Werktage”) the widest span is used, because that is the honest one. Nothing is filled in unless you tap the button, and a date that came from it is marked <b>(estimated)</b> on the order screen and with a <b>≈</b> on the card so it can never be mistaken for a promise — typing your own date clears the marking.\n\nFollow-ups now suggest themselves. Because the app already knows when things were promised and when they actually arrived, it can offer the to-dos that genuinely follow, each with its date already worked out: <b>chase the shop</b> three days after the promised date (or today, if it is already late), <b>return window closes</b> fourteen days after the last item arrived while you can still change your mind, and <b>register the warranty</b> a few working days after everything landed. Each suggestion says why it picked that date, and one tap adds it.\n\nFollow-ups can also carry dates of their own now, suggested or typed. A dated follow-up shows up on the timeline on the day it falls due, so returns and warranty deadlines sit alongside the parcels, and one that slips past its date turns red on the order screen.\n\nOne correction: the working-day calculations were built against Austrian public holidays by mistake. They are Swedish now.' },
   { v:'1.4', when:'2 Sep 2026',
@@ -801,6 +865,8 @@ function normalise(s){
     pickup: o.pickup || '',
     mailUrl: o.mailUrl || '',
     estimated: !!o.estimated,
+    phase: (o.phase === 'shipped' || o.phase === 'collect') ? o.phase : '',
+    phaseAt: o.phaseAt || '',
     got: !!o.got,
     colour: (o.colour && PALETTE[o.colour]) ? o.colour : '',
     items: Array.isArray(o.items) ? o.items.filter(i => i && (i.name || i.img)).map(i => ({
@@ -1110,7 +1176,8 @@ function normText(s){
 function blankOrder(){
   return { id:uid(), createdAt:new Date().toISOString(), shop:'', orderNo:'', ordered:'',
            due:'', dueTo:'', carrier:'', tracking:'', trackUrl:'', total:'', note:'',
-           got:false, colour:'', pickup:'', mailUrl:'', estimated:false, items:[], todos:[] };
+           got:false, colour:'', pickup:'', mailUrl:'', estimated:false,
+           phase:'', phaseAt:'', items:[], todos:[] };
 }
 
 /* ---- links: Amazon (and most senders) wrap every link in a redirector ---- */
@@ -1417,6 +1484,23 @@ function firstMatch(res, txt){
   for(const re of res){ const m = txt.match(re); if(m && m[1]) return m[1].trim(); }
   return '';
 }
+/* ============ what the mail says about where it is ============
+   A dispatch mail is the commonest reason to touch an order at all, so the app
+   should recognise one rather than make him say it twice. */
+const SHIPPED_RE = /(ist unterwegs|sind unterwegs|unterwegs zu|versandt|verschickt|versendet|abgeschickt|Versandbest[äa]tigung|Versandmitteilung|hat (?:unser|das) Lager verlassen|Sendungsverfolgung ist|has (?:been )?shipped|have (?:been )?shipped|is on (?:its|the) way|are on (?:their|the) way|on its way|dispatched|shipping confirmation|shipment confirmation|out for delivery|har skickats|[äa]r p[åa] v[äa]g)/i;
+const COLLECT_RE = /(zur Abholung bereit|abholbereit|bereit zur Abholung|liegt (?:f[üu]r Sie )?(?:zur Abholung )?bereit|kann(?:st du|en Sie)? abgeholt werden|zum Abholen bereit|ready (?:for|to) (?:collect|collection|pick ?-?up)|available for collection|awaiting collection|redo (?:att h[äa]mtas|f[öo]r upph[äa]mtning)|kan h[äa]mtas)/i;
+/* "we'll let you know as soon as it's on its way" is a promise, not a dispatch */
+const PROMISE_RE = /\b(sobald|sowie|wenn|falls|once|when|as soon as|informieren|benachrichtigen|melden uns|notify|let you know|n[äa]r)\b/i;
+function mailPhase(txt){
+  const t = String(txt || '');
+  const said = (re) => {
+    const m = t.match(re);
+    return !!m && !PROMISE_RE.test(t.slice(Math.max(0, m.index - 46), m.index));
+  };
+  if(said(COLLECT_RE)) return 'collect';
+  return said(SHIPPED_RE) ? 'shipped' : '';
+}
+
 function labelTail(txt, re, len){
   const m = txt.match(re);
   if(!m) return '';
@@ -1495,6 +1579,10 @@ function readMail(root, rawText){
   /* ---- pickup place ---- */
   o.pickup = findPickup(txt);
   found.pickup = !!o.pickup;
+
+  /* ---- where the mail says the parcel has got to ---- */
+  o.phase = mailPhase(txt);
+  found.phase = o.phase;
 
   /* ---- a stated delivery time, when no actual date was given ---- */
   found.lead = findLeadTime(txt);
@@ -1598,7 +1686,7 @@ const ST = {
   late:  { c:'var(--late)',  t:'var(--late-t)',  word:'Overdue' },
   today: { c:'var(--today)', t:'var(--today-t)', word:'Due today' },
   soon:  { c:'var(--soon)',  t:'var(--soon-t)',  word:'Almost here' },
-  wait:  { c:'var(--wait)',  t:'var(--card)',    word:'On its way' },
+  wait:  { c:'var(--wait)',  t:'var(--card)',    word:'Coming' },
   done:  { c:'var(--done)',  t:'var(--done-t)',  word:'All arrived' }
 };
 function allIn(o){ return o.items.length ? o.items.every(i => i.got) : !!o.got; }
@@ -1647,6 +1735,131 @@ function dueShort(o){                      // compact form, for cards and the ti
                    : `${da.getDate()} ${mA} – ${db.getDate()} ${mB}`;
 }
 function firstPic(o){ const i = o.items.find(x => x.img); return i ? i.img : ''; }
+
+/* ============ phase — WHERE it is, as opposed to WHEN it is due ============
+   The status colours above answer "when": overdue, today, coming. They cannot
+   answer "where", which is the other half of the question — the shop still has
+   it, it is underway, it is waiting to be collected, or it is here.
+
+   Arrival is deliberately NOT stored as a phase. An order has arrived when its
+   items are ticked, which is the one truth the app already had, and a second
+   place to record the same fact would sooner or later disagree with the first.
+   So only the two middle phases live in the data and the ends are worked out. */
+const PHASE_ORDER = ['ordered', 'shipped', 'collect', 'arrived'];
+const PH = {
+  ordered: { word:'Ordered',           tab:'Ordered',   icon:'box',   dot:'', tint:'', pc:'var(--kraft)' },
+  shipped: { word:'On its way',        tab:'On its way',icon:'truck', dot:'var(--ship)', tint:'var(--ship-t)', pc:'var(--ship)' },
+  collect: { word:'Ready to collect',  tab:'To collect',icon:'pin',   dot:'var(--coll)', tint:'var(--coll-t)', pc:'var(--coll)' },
+  arrived: { word:'All arrived',       tab:'Arrived',   icon:'check', dot:'var(--done)', tint:'var(--done-t)', pc:'var(--done)' }
+};
+function phaseOf(o){
+  if(allIn(o)) return 'arrived';
+  return (o.phase === 'shipped' || o.phase === 'collect') ? o.phase : 'ordered';
+}
+/* A tile wears its shop's own colour until something is known about where it
+   is; from then on it wears the phase, because that is the newer news. */
+function tileColour(o){
+  const ph = phaseOf(o);
+  return ph === 'ordered' ? colourOf(o) : { dot:PH[ph].dot, tint:PH[ph].tint };
+}
+function nextPhase(o){
+  return PHASE_ORDER[(PHASE_ORDER.indexOf(phaseOf(o)) + 1) % PHASE_ORDER.length];
+}
+
+/* Stepping an order along must be undoable in one tap, and exactly: arriving
+   ticks every item and stepping off arrival unticks them again, so a mis-press
+   must not cost the tick dates on items that were ticked by hand earlier. The
+   whole previous shape is kept and put back verbatim. */
+function phaseSnapshot(o){
+  return { phase:o.phase || '', phaseAt:o.phaseAt || '', got:!!o.got,
+           items:o.items.map(i => ({ id:i.id, got:!!i.got, gotAt:i.gotAt || '' })) };
+}
+function restorePhase(o, snap){
+  o.phase = snap.phase; o.phaseAt = snap.phaseAt; o.got = snap.got;
+  const was = new Map(snap.items.map(i => [i.id, i]));
+  o.items.forEach(i => { const w = was.get(i.id); if(w){ i.got = w.got; i.gotAt = w.gotAt; } });
+}
+function setPhase(o, ph){
+  const snap = phaseSnapshot(o);
+  const wasArrived = allIn(o);
+  const today = todayISO();
+  if(ph === 'arrived'){
+    o.phase = '';
+    if(o.items.length) o.items.forEach(i => { if(!i.got){ i.got = true; i.gotAt = today; } });
+    else o.got = true;
+  } else {
+    /* only coming back OFF arrival unticks anything — an order that is merely
+       stepped along keeps whatever ticks it already had */
+    if(wasArrived){
+      if(o.items.length) o.items.forEach(i => { i.got = false; i.gotAt = ''; });
+      else o.got = false;
+    }
+    o.phase = (ph === 'ordered') ? '' : ph;
+  }
+  o.phaseAt = today;
+  save();
+  return snap;
+}
+/* the one thing both the long press and the phase strip call */
+function stepOrderTo(id, ph){
+  const o = orderById(id);
+  if(!o) return;
+  const before = phaseOf(o);
+  if(before === ph) return;
+  const snap = setPhase(o, ph);
+  popId = id;
+  keepScroll = $('main').scrollTop;
+  render();
+  showToast(PH[ph].word, () => {
+    const t = orderById(id);
+    if(t){ restorePhase(t, snap); save(); popId = id; keepScroll = $('main').scrollTop; render(); }
+    hideToast();
+  }, 'Undo', 6000);
+}
+
+/* ============ the long press ============
+   Hold a tile and it steps to the next phase. The wash of the next phase's
+   colour crossing the tile IS the feedback — there is no haptic to be had on
+   iOS — and lifting the finger before it fills cancels the whole thing. */
+const HOLD_MS = 520;
+let popId = null;            // the tile to pop once the next render has drawn it
+let holdFiredAt = 0;         // guards the click that iOS sends after the press
+function attachTileHold(el, id){
+  let timer = null, sx = 0, sy = 0;
+  const cancel = () => { clearTimeout(timer); timer = null; el.classList.remove('arming'); };
+  el.addEventListener('contextmenu', (e) => e.preventDefault());
+  el.addEventListener('pointerdown', (e) => {
+    if(e.pointerType === 'mouse' && e.button !== 0) return;
+    const o = orderById(id); if(!o) return;
+    sx = e.clientX; sy = e.clientY;
+    el.style.setProperty('--nextc', PH[nextPhase(o)].dot || colourOf(o).dot);
+    requestAnimationFrame(() => { if(timer) el.classList.add('arming'); });
+    timer = setTimeout(() => {
+      timer = null;
+      el.classList.remove('arming');
+      holdFiredAt = Date.now();
+      stepOrderTo(id, nextPhase(o));
+    }, HOLD_MS);
+  });
+  el.addEventListener('pointermove', (e) => {
+    if(timer && (Math.abs(e.clientX - sx) > 10 || Math.abs(e.clientY - sy) > 10)) cancel();
+  });
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(t => el.addEventListener(t, cancel));
+  /* the press has already redrawn the list, so the click that follows can land
+     on a brand new element — the guard has to be global, not per tile */
+  el.addEventListener('click', () => {
+    if(Date.now() - holdFiredAt < 700) return;
+    openId = id; view = 'detail'; render();
+  });
+}
+function popTile(){
+  if(!popId) return;
+  const el = document.querySelector(`[data-id="${popId}"]`);
+  popId = null;
+  if(!el) return;
+  el.classList.add('pop');
+  setTimeout(() => el.classList.remove('pop'), 400);
+}
 
 /* ============ suggested follow-ups ============
    The app already knows the dates that matter, so it can offer the two or three
@@ -1735,11 +1948,14 @@ function renderChrome(){
 function orderCard(o){
   const st = statusOf(o);
   const s = ST[st];
+  const ph = phaseOf(o);
   const pic = firstPic(o);
   const n = o.items.length;
   const got = gotCount(o);
 
   const bits = [];
+  /* once it is waiting to be collected, WHERE to go is the useful line */
+  if(ph === 'collect' && o.pickup) bits.push(`<b>${esc(o.pickup)}</b>`);
   const dt = dueShort(o);
   if(dt) bits.push(`<b>${o.estimated ? '≈ ' : ''}${esc(dt)}</b>`);
   if(o.carrier) bits.push(esc(o.carrier));
@@ -1762,9 +1978,12 @@ function orderCard(o){
   }
 
   const ot = openTodos(o);
-  const p = colourOf(o);
-  return `<button class="ordercard" data-id="${o.id}" style="--c:${s.c}; --oc:${st === 'done' ? 'var(--done)' : p.dot}; --oct:${st === 'done' ? 'var(--done-t)' : p.tint}">
-    <span class="thumb"><svg class="hi" style="width:26px;height:26px"><use href="#icon-box"/></svg>${pic ? `<img src="${esc(pic)}" alt="" loading="lazy" onerror="this.remove()" />` : ''}</span>
+  const tc = tileColour(o);
+  return `<button class="ordercard" data-id="${o.id}" style="--c:${s.c}; --oc:${tc.dot}; --oct:${tc.tint}">
+    <span class="thumbwrap">
+      <span class="thumb"><svg class="hi" style="width:26px;height:26px"><use href="#icon-box"/></svg>${pic ? `<img src="${esc(pic)}" alt="" loading="lazy" onerror="this.remove()" />` : ''}</span>
+      ${ph === 'ordered' ? '' : `<span class="phbadge"><svg class="hi"><use href="#icon-${PH[ph].icon}"/></svg></span>`}
+    </span>
     <span class="omid">
       <span class="oshop">${esc(o.shop || 'Order')}</span>
       <span class="osub">${bits.join(' · ') || esc(s.word)}</span>
@@ -1826,8 +2045,7 @@ function renderList(){
              <div class="cards">${rows.map(orderCard).join('')}</div>`;
   });
   main.innerHTML = html;
-  main.querySelectorAll('.ordercard').forEach(b =>
-    b.addEventListener('click', () => { openId = b.dataset.id; view = 'detail'; render(); }));
+  main.querySelectorAll('.ordercard').forEach(b => attachTileHold(b, b.dataset.id));
 }
 
 /* ============ one order, up close ============ */
@@ -1836,6 +2054,7 @@ function renderDetail(){
   if(!o){ view = lastListView; return renderList(); }
   const st = statusOf(o);
   const s = ST[st];
+  const ph = phaseOf(o);
   const main = $('main');
 
   const trackUrl = o.trackUrl || buildTrackUrl(o.carrier, o.tracking);
@@ -1862,8 +2081,9 @@ function renderDetail(){
     const n = o.items.length;
     statusLine = n > 1 ? `All ${n} items arrived` : 'Arrived';
   } else if(st === 'wait' && !effDue(o)){
-    statusLine = 'On its way — no date given';
+    statusLine = 'No date given';
   }
+  if(ph === 'shipped' || ph === 'collect') statusLine = PH[ph].word + ' · ' + statusLine;
   if(st !== 'done' && o.items.length > 1 && gotCount(o)) statusLine += ` · ${gotCount(o)} of ${o.items.length} already in`;
 
   const rows = o.items.length
@@ -1912,9 +2132,18 @@ function renderDetail(){
     ['Note', o.note]
   ].filter(f => f[1]);
 
-  const p = colourOf(o);
+  const phi = PHASE_ORDER.indexOf(ph);
+  const phaseStrip = `<div class="phaserow">${PHASE_ORDER.map((k, i) => `
+      <button class="phbtn${i === phi ? ' on' : (i < phi ? ' past' : '')}" data-phase="${k}" style="--pc:${PH[k].pc}">
+        <svg class="hi"><use href="#icon-${PH[k].icon}"/></svg>${esc(PH[k].tab)}
+      </button>`).join('')}</div>
+    <div class="phhint">${ph === 'arrived'
+        ? 'Everything is ticked off. Tap a step back to reopen the order.'
+        : 'Tap where it is now — or hold its card on the home screen to step it along.'}</div>`;
+
+  const p = tileColour(o);
   main.innerHTML = `
-    <div class="dhero" style="--c:${s.c}; --oc:${st === 'done' ? 'var(--done)' : p.dot}">
+    <div class="dhero" style="--c:${s.c}; --oc:${p.dot}">
       <div class="dshop">${esc(o.shop || 'Order')}</div>
       <div class="statuspill"><span class="sdot"></span>${esc(statusLine)}</div>
       ${when.length ? `<div class="dwhen">${when.join(' ')}</div>` : ''}
@@ -1922,6 +2151,9 @@ function renderDetail(){
       ${trackUrl ? `<a class="tracklink" href="${esc(trackUrl)}" target="_blank" rel="noopener"><svg class="hi"><use href="#icon-truck"/></svg>Track this parcel</a>` : ''}
       ${o.mailUrl ? `<a class="tracklink alt" href="${esc(o.mailUrl)}"><svg class="hi"><use href="#icon-mail"/></svg>Open the original mail</a>` : ''}
     </div>
+
+    <div class="sect">Where it is<span class="gline"></span></div>
+    ${phaseStrip}
 
     <div class="sect">In the box<span class="gline"></span></div>
     ${rows}
@@ -1935,6 +2167,9 @@ function renderDetail(){
       <div class="facts">${facts.map(f => `<div class="fact"><span class="k">${esc(f[0])}</span><span class="v">${esc(f[1])}</span></div>`).join('')}</div>` : ''}
 
     <button class="btn full" id="editBtn2" style="margin-bottom:14px">Edit this order</button>`;
+
+  main.querySelectorAll('[data-phase]').forEach(b =>
+    b.addEventListener('click', () => stepOrderTo(o.id, b.dataset.phase)));
 
   main.querySelectorAll('[data-item]').forEach(b => b.addEventListener('click', () => {
     const it = o.items.find(x => x.id === b.dataset.item);
@@ -1979,7 +2214,7 @@ function setPageBackground(){
   const root = document.documentElement;
   const o = view === 'detail' ? orderById(openId) : null;
   if(o){
-    root.style.setProperty('--pgTint', colourOf(o).tint);
+    root.style.setProperty('--pgTint', tileColour(o).tint);
     root.classList.add('detail-bg');
   } else {
     root.classList.remove('detail-bg');
@@ -1999,7 +2234,8 @@ function dayLabel(o, iso){
   return its.length === 1 ? its[0].name.slice(0, 34) : its.length + ' items';
 }
 function tlPill(o, windowed, label){
-  const p = colourOf(o);
+  const p = tileColour(o);
+  const ph = phaseOf(o);
   const n = o.items.length;
   const got = gotCount(o);
   const note = label ? label
@@ -2007,6 +2243,7 @@ function tlPill(o, windowed, label){
              : n > 1 ? (got ? `${got}/${n} in` : `${n} items`)
              : (o.carrier || '');
   return `<button class="tlpill${windowed ? ' window' : ''}" data-id="${o.id}" style="--oc:${p.dot}; --oct:${p.tint}">
+    ${ph === 'ordered' ? '' : `<svg class="hi tlic"><use href="#icon-${PH[ph].icon}"/></svg>`}
     <span class="tlps">${esc(o.shop || 'Order')}</span>
     ${note ? `<span class="tlpd">${esc(note)}</span>` : ''}
   </button>`;
@@ -2058,7 +2295,7 @@ function renderTimeline(){
       </div>
       <div class="tlitems">${(on.length || dueTodos.length)
         ? on.map(o => tlPill(o, !hasItemDates(o) && !!(o.dueTo && o.dueTo !== o.due), dayLabel(o, iso))).join('') +
-          dueTodos.map(({o, t}) => `<button class="tlpill window" data-id="${o.id}" style="--oc:${colourOf(o).dot}; --oct:${colourOf(o).tint}">
+          dueTodos.map(({o, t}) => `<button class="tlpill window todopill" data-id="${o.id}" style="--oc:${colourOf(o).dot}; --oct:${colourOf(o).tint}">
              <span class="tlps">${esc(t.text)}</span><span class="tlpd">${esc(o.shop || 'follow-up')}</span></button>`).join('')
         : '<div class="tlgap"></div>'}</div>
     </div>`;
@@ -2068,7 +2305,8 @@ function renderTimeline(){
   if(undated.length) html += band('No date yet', 'var(--wait)', undated);
 
   main.innerHTML = html;
-  main.querySelectorAll('[data-id]').forEach(b =>
+  main.querySelectorAll('.tlpill:not(.todopill)').forEach(b => attachTileHold(b, b.dataset.id));
+  main.querySelectorAll('.todopill').forEach(b =>
     b.addEventListener('click', () => { openId = b.dataset.id; view = 'detail'; render(); }));
 }
 
@@ -2079,8 +2317,12 @@ function render(){
   if(view === 'detail') renderDetail();
   else if(view === 'timeline') renderTimeline();
   else renderList();
-  $('main').scrollTop = 0;
+  if(keepScroll == null) $('main').scrollTop = 0;
+  else { $('main').scrollTop = keepScroll; keepScroll = null; }
+  popTile();
 }
+/* stepping a card along must not throw the list back to the top under his finger */
+let keepScroll = null;
 
 /* ============ the editor — also the "here's what I found" review ============ */
 let picInput = null;
@@ -2102,6 +2344,7 @@ function foundNoteHtml(f){
     : `I read the mail but couldn't make much of it.`;
   if(!f.items) html += ` I couldn't pick out the individual items — add them below, or just leave it as one order to tick off.`;
   if(f.mailUrl) html += ` It also picked up a link back to the mail.`;
+  if(f.phase) html += ` It reads as a <b>${f.phase === 'collect' ? 'ready-to-collect' : 'dispatch'}</b> notice, so the order is marked <b>${esc(PH[f.phase].word)}</b>.`;
   if(missed.length) html += ` <span class="miss">Not found: ${missed.join(', ')}.</span>`;
   html += ` Check it over, fix anything wrong, then Save.`;
   return html;
@@ -2282,6 +2525,12 @@ function mergeInto(target, src){
   if(src.carrier) target.carrier = src.carrier;
   if(src.tracking) target.tracking = src.tracking;
   if(src.trackUrl) target.trackUrl = src.trackUrl;
+  /* a later mail can only move an order forward — a confirmation re-read after
+     the dispatch mail must not push it back to "Ordered" */
+  if(src.phase && PHASE_ORDER.indexOf(src.phase) > PHASE_ORDER.indexOf(phaseOf(target))){
+    target.phase = src.phase;
+    target.phaseAt = todayISO();
+  }
   const have = new Map(target.items.map(i => [nameKey(i.name), i]));
   src.items.forEach(i => {
     const twin = findTwin(have, target.items, nameKey(i.name));
@@ -2311,6 +2560,7 @@ async function saveDraft(){
   o.trackUrl = $('fTrackUrl').value.trim();
   o.mailUrl = $('fMailUrl').value.trim();
   o.estimated = draftEstimated && !!o.due;
+  if(o.phase && !o.phaseAt) o.phaseAt = todayISO();
   if(!$('fItemDates').checked) o.items.forEach(i => { i.due = ''; });
   o.orderNo = $('fOrderNo').value.trim();
   o.ordered = $('fOrdered').value;
@@ -2510,6 +2760,7 @@ function showToast(msg, actionFn, actionLabel, duration){
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => { t.hidden = true; }, duration || 5000);
 }
+function hideToast(){ clearTimeout(toastTimer); $('toast').hidden = true; }
 let lastUpdateCheck = 0;
 async function checkForUpdate(manual){
   const nowMs = Date.now();
