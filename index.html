@@ -330,14 +330,18 @@
   .sheet p, .sheet li{font-size:14.5px; line-height:1.55;}
   .sheet .dim{color:var(--ink-dim);}
   label{display:block; font-size:12.5px; color:var(--ink-dim); margin:14px 0 6px; letter-spacing:.03em; font-weight:700;}
+  /* the boxes on the sheet: white on a warm kraft border, lifted a little,
+     so each field reads as a plate rather than a grey smudge on the sheet */
   input[type=text], input[type=date], input[type=number], input[type=url], textarea{
-    width:100%; padding:12px 13px; border-radius:13px; border:1px solid var(--line);
-    background:var(--bg); color:var(--ink); font-size:16px; outline:none;
+    width:100%; padding:12px 13px; border-radius:13px; border:2px solid rgba(176,106,53,.55);
+    background:#fff; color:var(--ink); font-size:16px; outline:none;
     font-family:inherit; -webkit-appearance:none; min-height:46px;
     -webkit-user-select:text; user-select:text;
+    box-shadow:0 2px 6px rgba(176,106,53,.14);
   }
   textarea{min-height:70px; resize:vertical; line-height:1.5;}
-  input:focus, textarea:focus{border-color:var(--kraft);}
+  input::placeholder, textarea::placeholder{color:rgba(32,36,44,.42);}
+  input:focus, textarea:focus{border-color:var(--kraft); box-shadow:0 0 0 3px rgba(176,106,53,.22), 0 2px 6px rgba(176,106,53,.14);}
   .two{display:flex; gap:10px;}
   .two > div{flex:1; min-width:0;}
   .btnrow{display:flex; gap:10px; margin-top:20px;}
@@ -841,6 +845,8 @@
 
 /* ============ version log — newest first; [0].v is THE app version ============ */
 const VERSIONLOG = [
+  { v:'1.11', when:'3 Sep 2026',
+    what:'The boxes on the editor sheet pop. They were pale grey slabs that barely separated from the white sheet; every field is now white on a warm kraft border with a soft shadow beneath, and the one you are typing in gets a wider kraft ring. Nothing else on the sheet changed.' },
   { v:'1.10', when:'3 Sep 2026',
     what:'The colour swatches in the editor pop. They were small flat dots sitting on the white sheet; they are now larger and more saturated, lifted on a soft shadow with a thin white inner ring, and the one you have chosen grows a little and carries a white tick, so the choice is obvious at a glance rather than a thin dark outline you had to look for.' },
   { v:'1.9', when:'3 Sep 2026',
