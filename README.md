@@ -24,11 +24,17 @@ everywhere else — from the confirmation mail all the way to the parcel in your
 
 ## What it reads
 
-Shop (from the links in the mail), order number, order date, items + pictures,
-total, promised delivery date or date range, delivery service — DHL, Deutsche Post,
-Österreichische Post, DPD, GLS, Hermes, UPS, FedEx, PostNL, TNT, Amazon Logistics —
-tracking number, and the tracking link straight out of the mail. German and English
-mails, and German or ISO date formats.
+Shop (from the links in the mail, or the sender named in a carrier's notice), order
+number, order date, items + pictures, total, promised delivery date or date range,
+delivery service — DHL, Deutsche Post, Österreichische Post, DPD, GLS, Hermes, UPS,
+FedEx, PostNL, PostNord, Bring, Budbee, Instabox, TNT, Amazon Logistics — tracking
+number, and the tracking link straight out of the mail. German, English and Swedish
+mails, and German, Swedish or ISO date formats.
+
+A carrier's **text message** works the same way — paste it in. A ready-to-collect
+notice ("finns hos ICA Supermarket Spiralen, S:t Persgatan 110. Uppge 3130. Hämtas
+senast 2026-09-17") yields the pickup place as a Maps link, the last day to collect
+as the date, and the pickup code plus "bring ID" in the note.
 
 Nothing is ever saved without showing what was found first, and every field is editable.
 
