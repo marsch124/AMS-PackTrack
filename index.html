@@ -17,16 +17,20 @@
     --card:#ffffff; --line:rgba(32,36,44,.10);
     --kraft:#b06a35; --tint:#f8efe4;
 
-    /* status colours — the colour IS the message */
-    --wait:#5f6a7a;   --wait-t:#eceff3;
-    --soon:#b06a35;   --soon-t:#f8efe4;
-    --today:#c1861a;  --today-t:#fdf2da;
-    --late:#c43c3c;   --late-t:#fbe7e6;
-    --done:#3f8f63;   --done-t:#e5f2e9;
+    /* status colours — the colour IS the message. Tints are a clear notch
+       deeper than they were, so a tile stands off the wash instead of
+       melting into it — still flat, still no neon. */
+    --wait:#5f6a7a;   --wait-t:#e3e7ee;
+    --soon:#b5602a;   --soon-t:#f3d7bb;
+    --today:#c47f0a;  --today-t:#fbe1a6;
+    --late:#c62f2f;   --late-t:#f7c5c2;
+    --done:#2f9260;   --done-t:#c4e9d3;
 
     /* phase colours — WHERE the parcel is, as opposed to WHEN it is due */
-    --ship:#2a6098;   --ship-t:#d7e6f5;
-    --coll:#6a4795;   --coll-t:#e5dbf2;
+    --ship:#1f62a6;   --ship-t:#bcd6f5;
+    --coll:#6a3fa3;   --coll-t:#d4c2f2;
+    /* the small print on a tinted tile — dimmed ink, but not as far as on white */
+    --ink-soft:rgba(32,36,44,.66);
   }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
   html,body{margin:0;height:100%;}
@@ -100,16 +104,16 @@
 
   .ordercard{
     display:flex; align-items:center; gap:13px; width:100%;
-    border:none; border-left:6px solid var(--oc, var(--kraft));
+    border:none; border-left:7px solid var(--oc, var(--kraft));
     border-radius:20px; padding:14px 14px 14px 12px;
     background:var(--oct, var(--card)); color:var(--ink); text-align:left; cursor:pointer;
-    font-family:inherit; box-shadow:0 2px 7px rgba(32,36,44,.10);
+    font-family:inherit; box-shadow:0 3px 10px rgba(32,36,44,.16);
   }
   .ordercard:active{transform:scale(.985);}
   .thumbwrap{position:relative; flex:0 0 auto;}
   .thumb{
     flex:0 0 auto; width:52px; height:52px; border-radius:14px; overflow:hidden;
-    background:#fff; border:2px solid var(--oc, var(--kraft));
+    background:#fff; border:2.5px solid var(--oc, var(--kraft));
     display:flex; align-items:center; justify-content:center; color:var(--oc, var(--kraft));
   }
   .thumb{position:relative;}
@@ -127,15 +131,15 @@
     font-size:12.5px; font-weight:800; color:var(--oc); letter-spacing:-.01em;
   }
   .ophase .hi{width:15px; height:15px; flex:0 0 auto;}
-  .ophase .pcount{color:var(--ink-dim); font-weight:700;}
+  .ophase .pcount{color:var(--ink-soft); font-weight:700;}
   .thumb img{position:absolute; inset:0; width:100%; height:100%; object-fit:contain; display:block; background:#fff;}
   .omid{flex:1; min-width:0;}
   .oshop{display:block; font-size:16.5px; font-weight:800; letter-spacing:-.01em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
-  .osub{display:block; font-size:12.5px; color:var(--ink-dim); margin-top:3px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .osub{display:block; font-size:12.5px; color:var(--ink-soft); margin-top:3px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
   .osub b{color:var(--c, var(--ink)); font-weight:800;}
   .oright{flex:0 0 auto; text-align:right; min-width:52px;}
   .onum{font-size:27px; font-weight:800; line-height:1; color:var(--c, var(--wait)); font-variant-numeric:tabular-nums; letter-spacing:-.02em;}
-  .olbl{font-size:10px; font-weight:800; color:var(--ink-dim); letter-spacing:.12em; margin-top:4px; text-transform:uppercase;}
+  .olbl{font-size:10px; font-weight:800; color:var(--ink-soft); letter-spacing:.12em; margin-top:4px; text-transform:uppercase;}
   .oword{font-size:15px; font-weight:800; color:var(--c); letter-spacing:-.01em; line-height:1.15;}
   .otick{color:var(--done);}
   /* ---------- the long press ----------
@@ -297,15 +301,15 @@
   .tlitems{flex:1; min-width:0; display:flex; flex-direction:column; gap:7px; justify-content:center;}
   .tlpill{
     display:flex; align-items:center; gap:9px; width:100%; text-align:left;
-    border:none; border-left:5px solid var(--oc); border-radius:14px;
+    border:none; border-left:6px solid var(--oc); border-radius:14px;
     padding:10px 12px; font-family:inherit; cursor:pointer;
-    background:var(--oct); color:var(--ink);
+    background:var(--oct); color:var(--ink); box-shadow:0 2px 6px rgba(32,36,44,.12);
   }
   .tlpill:active{transform:scale(.985);}
   .tlic{width:15px; height:15px; color:var(--oc); flex:0 0 auto;}
   .tlpill.window{background:transparent; box-shadow:inset 0 0 0 1.5px var(--oc);}
   .tlps{font-size:14.5px; font-weight:800; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
-  .tlpd{font-size:11.5px; color:var(--ink-dim); font-weight:700; margin-left:auto; flex:0 0 auto;}
+  .tlpd{font-size:11.5px; color:var(--ink-soft); font-weight:700; margin-left:auto; flex:0 0 auto;}
   .tlgap{flex:1; border-bottom:1px dashed transparent;}
 
   /* ---------- overlays / sheets ---------- */
@@ -326,14 +330,18 @@
   .sheet p, .sheet li{font-size:14.5px; line-height:1.55;}
   .sheet .dim{color:var(--ink-dim);}
   label{display:block; font-size:12.5px; color:var(--ink-dim); margin:14px 0 6px; letter-spacing:.03em; font-weight:700;}
+  /* the boxes on the sheet: white on a warm kraft border, lifted a little,
+     so each field reads as a plate rather than a grey smudge on the sheet */
   input[type=text], input[type=date], input[type=number], input[type=url], textarea{
-    width:100%; padding:12px 13px; border-radius:13px; border:1px solid var(--line);
-    background:var(--bg); color:var(--ink); font-size:16px; outline:none;
+    width:100%; padding:12px 13px; border-radius:13px; border:2px solid rgba(176,106,53,.55);
+    background:#fff; color:var(--ink); font-size:16px; outline:none;
     font-family:inherit; -webkit-appearance:none; min-height:46px;
     -webkit-user-select:text; user-select:text;
+    box-shadow:0 2px 6px rgba(176,106,53,.14);
   }
   textarea{min-height:70px; resize:vertical; line-height:1.5;}
-  input:focus, textarea:focus{border-color:var(--kraft);}
+  input::placeholder, textarea::placeholder{color:rgba(32,36,44,.42);}
+  input:focus, textarea:focus{border-color:var(--kraft); box-shadow:0 0 0 3px rgba(176,106,53,.22), 0 2px 6px rgba(176,106,53,.14);}
   .two{display:flex; gap:10px;}
   .two > div{flex:1; min-width:0;}
   .btnrow{display:flex; gap:10px; margin-top:20px;}
@@ -375,9 +383,18 @@
   .epic .hi{width:19px; height:19px;}
   .ex{flex:0 0 auto; border:none; background:none; color:var(--ink-dim); padding:7px; cursor:pointer;}
 
-  .accent-row{display:flex; gap:10px; margin-top:4px; flex-wrap:wrap;}
-  .cdot{width:36px; height:36px; border-radius:50%; border:3px solid transparent; cursor:pointer; padding:0;}
-  .cdot.sel{border-color:var(--ink);}
+  .accent-row{display:flex; gap:11px; margin-top:6px; flex-wrap:wrap;}
+  /* the colour swatches: saturated, lifted off the sheet, the chosen one ticked */
+  .cdot{
+    width:42px; height:42px; border-radius:50%; border:3px solid transparent; cursor:pointer; padding:0;
+    display:flex; align-items:center; justify-content:center;
+    filter:saturate(1.35) brightness(1.04);
+    box-shadow:0 3px 8px rgba(32,36,44,.26), inset 0 0 0 2px rgba(255,255,255,.55);
+    transition:transform .12s ease-out;
+  }
+  .cdot:active{transform:scale(.92);}
+  .cdot.sel{border-color:var(--ink); transform:scale(1.08); box-shadow:0 4px 10px rgba(32,36,44,.30), inset 0 0 0 2px rgba(255,255,255,.75);}
+  .cdot.sel::after{content:''; width:13px; height:8px; border-left:3.5px solid #fff; border-bottom:3.5px solid #fff; transform:rotate(-45deg) translate(1px,-2px);}
 
   .switch{display:flex; align-items:center; gap:10px; font-size:13.5px; font-weight:700; margin:2px 0 12px; cursor:pointer;}
   .switch input{width:20px; height:20px; accent-color:var(--kraft); flex:0 0 auto;}
@@ -691,7 +708,7 @@
         <p>There's an Apple Shortcut recipe under <b>The one-tap Shortcut</b> below. Once it's set up, the mail's <b>share sheet</b> has a “Send to PackTrack” entry that opens the app with the mail already in it. Faster, but iOS only hands a Shortcut plain text — so no pictures, and a very long mail can get clipped. Use it for the quick ones and paste for the ones you want pictures on.</p>
 
         <h3>What it looks for</h3>
-        <p>Shop, order number, order date, <b>every item in the order</b> with its own picture, the total, the <b>promised delivery date</b> — a single day or a range like “zwischen dem 3. und 5. September” — the <b>delivery service</b> (DHL, Deutsche Post, Austrian Post, DPD, GLS, Hermes, UPS, FedEx, PostNL, TNT, Amazon and others), the tracking number, the <b>tracking link</b> straight out of the mail so tracking is one tap, and the <b>pickup place</b> if it's not coming to your door. German and English mails both work.</p>
+        <p>Shop, order number, order date, <b>every item in the order</b> with its own picture, the total, the <b>promised delivery date</b> — a single day or a range like “zwischen dem 3. und 5. September” — the <b>delivery service</b> (DHL, Deutsche Post, Austrian Post, DPD, GLS, Hermes, UPS, FedEx, PostNL, PostNord, Budbee, Instabox, TNT, Amazon and others), the tracking number, the <b>tracking link</b> straight out of the mail so tracking is one tap, and the <b>pickup place</b> if it's not coming to your door. German, English and Swedish mails all work — and so does a carrier's <b>text message</b>, pasted in the same way.</p>
         <p>It always shows you what it found <b>before</b> saving, and says plainly what it couldn't find. Every single field is editable, so a miss is never a dead end.</p>
 
         <h3>The dispatch mail too</h3>
@@ -712,7 +729,8 @@
         <p>Holding the order's own card still moves the whole order at once, and brings every outstanding item along with it. Undo puts every single item back exactly as it was.</p>
 
         <h3>The app reads the dispatch mail for it</h3>
-        <p>When you paste in a mail that says the parcel has been sent — “Ihre Sendung ist unterwegs”, “versandt”, “has shipped”, “on its way” — the order is marked <b>On its way</b> by itself, and one that says it is waiting at a pickup point is marked <b>Ready to collect</b>. The review sheet tells you it did this before anything is saved.</p>
+        <p>When you paste in a mail that says the parcel has been sent — “Ihre Sendung ist unterwegs”, “versandt”, “has shipped”, “on its way”, “har skickats” — the order is marked <b>On its way</b> by itself, and one that says it is waiting at a pickup point — “zur Abholung bereit”, “ready to collect”, “finns hos” — is marked <b>Ready to collect</b>. The review sheet tells you it did this before anything is saved.</p>
+        <p>A ready-to-collect notice usually carries a <b>last day to collect</b> (“Hämtas senast 17 september”, “bis spätestens 12.09.”) rather than a delivery date, so the app puts that in the date box and the countdown runs to it. A <b>pickup code</b> to give at the counter (“Uppge 3130”, “Abholcode”) and a reminder to <b>bring ID</b> go into the note, so they are on the order screen when you are standing there.</p>
         <p>A mail that only <i>promises</i> to tell you later — “wir informieren Sie, sobald Ihre Sendung unterwegs ist” — is not treated as a dispatch, which is why the order confirmation itself does not trip it. And a mail can only move an order <b>forward</b>: re-reading the old confirmation after the dispatch mail will not push it back to Ordered.</p>
 
         <h3>The home screen</h3>
@@ -724,7 +742,7 @@
         <p>When a shop promises a <b>window</b> rather than a day — “between the 5th and the 7th” — the order is drawn on every day it might turn up on, outlined rather than filled, and labelled with the window so you know why it repeats.</p>
 
         <h3>The pickup place</h3>
-        <p>If the mail says the parcel is going somewhere other than your door — a post office, a Paketshop, a Packstation, a collection point — PackTrack picks that line out and puts it on the order. You can also type it in yourself, and the app remembers the places you've used so the next one is a tap away.</p>
+        <p>If the mail says the parcel is going somewhere other than your door — a post office, a Paketshop, a Packstation, a collection point, a Swedish <i>ombud</i> — PackTrack picks that line out and puts it on the order. A text message that says “finns hos ICA Supermarket Spiralen, S:t Persgatan 110” gives up just the shop and the street. You can also type it in yourself, and the app remembers the places you've used so the next one is a tap away.</p>
         <p>The pickup place is a <b>link</b>: tap it on the order screen and it opens in <b>Maps</b>, ready to navigate to.</p>
 
         <h3>Each item its own date</h3>
@@ -739,6 +757,7 @@
         <p>The app knows the dates, so under <b>Follow-ups</b> it offers the two or three to-dos that actually follow from them — each with a date already worked out. Tap one to add it:</p>
         <ul>
           <li><b>Chase the shop</b> — three days after the promised date, or today if it is already overdue.</li>
+          <li><b>Collect it</b> — when the order is waiting at a pickup point, the day before the last day to collect.</li>
           <li><b>Return window closes</b> — 14 days after the last item arrived, while you can still change your mind.</li>
           <li><b>Register the warranty</b> — a few working days after everything arrived, while the receipt is still to hand.</li>
         </ul>
@@ -826,8 +845,16 @@
 
 /* ============ version log — newest first; [0].v is THE app version ============ */
 const VERSIONLOG = [
-  { v:'1.8', when:'4 Sep 2026',
-    what:'One version number instead of two. The hidden store this app keeps on your phone used to carry a number of its own \u2014 version 1.7 of the app kept its files in a box labelled 8 \u2014 so the two never matched and it was confusing whenever it came up. The box is now named after the app version itself. Nothing changes in what you see or do; there is simply only one number now, and it is the one in the corner.' },
+  { v:'1.12', when:'4 Sep 2026',
+    what:'One version number instead of two. The hidden store this app keeps on your phone used to carry a number of its own \u2014 version 1.11 of the app kept its files in a box labelled 12 \u2014 so the two never matched and it was confusing whenever it came up. The box is now named after the app version itself. Nothing changes in what you see or do; there is simply only one number now, and it is the one in the corner.' },
+  { v:'1.11', when:'3 Sep 2026',
+    what:'The boxes on the editor sheet pop. They were pale grey slabs that barely separated from the white sheet; every field is now white on a warm kraft border with a soft shadow beneath, and the one you are typing in gets a wider kraft ring. Nothing else on the sheet changed.' },
+  { v:'1.10', when:'3 Sep 2026',
+    what:'The colour swatches in the editor pop. They were small flat dots sitting on the white sheet; they are now larger and more saturated, lifted on a soft shadow with a thin white inner ring, and the one you have chosen grows a little and carries a white tick, so the choice is obvious at a glance rather than a thin dark outline you had to look for.' },
+  { v:'1.9', when:'3 Sep 2026',
+    what:'The tiles pop. Every colour a tile can wear — the shop’s own, the blue of <b>On its way</b>, the violet of <b>Ready to collect</b>, the green of <b>Arrived</b>, and the amber and red of today and overdue — is a clear notch deeper than it was, so a card stands off the background instead of melting into it. The coloured edge is a shade thicker, the picture frame a shade heavier, and each tile sits on a slightly stronger shadow. The same goes for the pills on the timeline. It is still flat colour, still warm, still no neon — just more of it. The small print on a tile is a touch darker to keep it easy to read on the deeper tint.' },
+  { v:'1.8', when:'3 Sep 2026',
+    what:'The app now reads <b>Swedish</b>, and it reads a carrier’s <b>text message</b> as readily as a mail.\n\nThe one that prompted it was a PostNord text — “Ditt REK från SAAB AB finns hos ICA Supermarket Spiralen, S:t Persgatan 110. Uppge 3130. Hämtas personligen senast 2026-09-17, ta med fysiskt leg.” — which the app could make nothing of. Pasted in now, it comes out as an order from SAAB AB, carried by PostNord, marked <b>Ready to collect</b> at <b>ICA Supermarket Spiralen, S:t Persgatan 110</b> (a tap opens it in Maps), containing one registered letter, with the pickup code 3130 and “bring photo ID” in the note.\n\nA ready-to-collect notice rarely says when the parcel will arrive — it says when it will be sent back. So the <b>last day to collect</b> (“Hämtas senast”, “bis spätestens”, “collect by”) now goes into the date box and the countdown runs to it, and the review sheet says so. The <b>pickup code</b> — “Uppge 3130”, “Abholcode 4711”, “PIN” — and a reminder to bring ID land in the note, where they are on the order screen when you are standing at the counter; on an order you already have, the note is added to rather than replaced.\n\nSwedish now works everywhere the app reads: dispatch and collect phrases (“har skickats”, “är på väg”, “finns hos”, “kan hämtas”), the <b>pickup place</b> lifted out of the sentence itself (“finns hos …”) rather than the whole line, delivery-date labels (“Beräknad leverans”), months and weekdays (“måndag 8 september”), “idag” and “imorgon”, order numbers, tracking labels (“Kolli-id”, “Spårningsnummer”) and the RR123456789SE shape of a registered letter, totals in kronor (“1 299 kr”), and “3–5 arbetsdagar” as a lead time. <b>PostNord</b> gets a tracking link of its own, and Bring, Budbee, Instabox, Airmee and Early Bird are recognised. When a notice names the sender — “Ditt paket från Zalando”, “Ihre Sendung von Thomann” — that becomes the shop.' },
   { v:'1.7', when:'3 Sep 2026',
     what:'The phases now go all the way down to the individual item, because shops split deliveries and one order is very often three parcels arriving on three different days.\n\nOn the order screen, <b>tap</b> an item to tick it off as before and <b>hold</b> it to step that one item along on its own — Ordered, On its way, Ready to collect, Arrived — with the same colour sweep under your finger and the same Undo afterwards. The row then takes that state’s colour, gets its own badge and says the state in words, so one order can plainly show one thing on its way, one waiting at the Paketshop and one already in the hall.\n\nOnce any item carries a state of its own the items drive the order, exactly as they already do for dates. The card on the home screen shows the state of the parcel that is <b>furthest along</b> — that is the one turning up next, and the one there might be something to do about — and writes the count next to it, “On its way · 1 of 3”, so the word is never allowed to overstate. Holding the order’s own card still moves everything at once and brings every outstanding item with it, and Undo puts every item back exactly as it was, one by one.\n\nTwo things you asked for on the card itself. The little state badge on the picture is <b>half again as big</b>, and the state is now also <b>written out in words on its own line under the date</b> — a lorry and “On its way”, a tick and “Arrived” — so it reads without having to work out what the colour means. The icons in the Where-it-is strip grew a little too.\n\nAnd because a dispatch mail arriving for an order whose items already carry their own states could otherwise have had nothing visible to change, such a mail now also carries the parcels that are <b>behind</b> up to where it says they are — never touching one that is already further on.' },
   { v:'1.6', when:'3 Sep 2026',
@@ -993,8 +1020,8 @@ function addWorkdays(fromISO, k){
    Only counted when a delivery word sits just before it, so a "2-4" inside a
    product name can't be mistaken for a lead time. A mail may state several
    ("…, mit Gravur 2-4 Werktage") — take the widest span, which is the honest one. */
-const LEAD_NEAR = /(Lieferzeit|Lieferfrist|Lieferung|Liefertermin|Versand|Bearbeitungszeit|Zustellung|verschickt|verschicken|ship|dispatch|delivery|deliver|arriv)/i;
-const LEAD_UNITS = '(Werktage?n?|Arbeitstage?n?|business\\s+days?|working\\s+days?|Tage?n?|days?)';
+const LEAD_NEAR = /(Lieferzeit|Lieferfrist|Lieferung|Liefertermin|Versand|Bearbeitungszeit|Zustellung|verschickt|verschicken|ship|dispatch|delivery|deliver|arriv|leverans|levereras|skickas|anl[äa]nder)/i;
+const LEAD_UNITS = '(Werktage?n?|Arbeitstage?n?|business\\s+days?|working\\s+days?|arbetsdagar?|vardagar?|Tage?n?|days?|dagar?)';
 const LEAD_RE = new RegExp(
   '(\\d{1,2})\\s*(?:[–—-]|bis|to)\\s*(\\d{1,2})\\s*' + LEAD_UNITS +
   '|(\\d{1,2})\\s*' + LEAD_UNITS, 'gi');
@@ -1006,7 +1033,7 @@ function findLeadTime(txt){
   while((m = LEAD_RE.exec(txt)) !== null){
     if(!LEAD_NEAR.test(txt.slice(Math.max(0, m.index - 45), m.index))) continue;
     const unit = String(m[3] || m[5] || '').toLowerCase();
-    const working = /werktag|arbeitstag|business|working/.test(unit);
+    const working = /werktag|arbeitstag|business|working|arbetsdag|vardag/.test(unit);
     const lo = m[1] ? +m[1] : +m[4];
     const hi = m[2] ? +m[2] : +m[4];
     if(!lo || lo > 60 || hi > 90 || hi < lo) continue;
@@ -1050,6 +1077,13 @@ const CARRIERS = [
     url:n => 'https://www.fedex.com/fedextrack/?trknbr=' + n },
   { id:'PostNL',        re:/\bPostNL\b/i,
     url:n => 'https://postnl.post/detail?barcode=' + n },
+  { id:'PostNord',      re:/\bPostNord\b|\bpostnord\.[a-z]{2,3}\b/i,
+    url:n => 'https://tracking.postnord.com/se/?id=' + n },
+  { id:'Bring',         re:/\bBring\s*(?:Parcels|Express|Home\s*Delivery|Pakke|Paket)|\bbring\.(?:com|se|no|dk)\b|\bBring\b(?=[^.\n]*\b(?:paket|pakke|kolli|sp[åa]r|s[äa]ndning|leverans|levering)\b)/i, url:() => '' },
+  { id:'Budbee',        re:/\bBudbee\b/i, url:() => '' },
+  { id:'Instabox',      re:/\bInstabox\b/i, url:() => '' },
+  { id:'Airmee',        re:/\bAirmee\b/i, url:() => '' },
+  { id:'Early Bird',    re:/\bEarly\s*Bird\b/i, url:() => '' },
   { id:'TNT',           re:/\bTNT\b/,
     url:n => 'https://www.tnt.com/express/de_at/site/shipping-tools/tracking.html?searchType=con&cons=' + n },
   { id:'GO!',           re:/\bGO!\s*Express|General\s*Overnight/i, url:() => '' },
@@ -1068,16 +1102,16 @@ function buildTrackUrl(carrier, number){
   try{ return c.url(encodeURIComponent(String(number).replace(/\s+/g,''))) || ''; }catch(e){ return ''; }
 }
 
-/* ============ months / weekdays, German and English ============ */
+/* ============ months / weekdays — German, English and Swedish ============ */
 const MONTHS = {
-  jan:1, januar:1, january:1, jän:1, jaen:1, jänner:1, jaenner:1,
-  feb:2, februar:2, february:2,
-  mar:3, mär:3, maer:3, marz:3, märz:3, maerz:3, mrz:3, march:3,
+  jan:1, januar:1, january:1, januari:1, jän:1, jaen:1, jänner:1, jaenner:1,
+  feb:2, februar:2, february:2, februari:2,
+  mar:3, mär:3, maer:3, marz:3, märz:3, maerz:3, mrz:3, march:3, mars:3,
   apr:4, april:4,
-  mai:5, may:5,
+  mai:5, may:5, maj:5,
   jun:6, juni:6, june:6,
   jul:7, juli:7, july:7,
-  aug:8, august:8,
+  aug:8, august:8, augusti:8,
   sep:9, sept:9, september:9,
   okt:10, oct:10, oktober:10, october:10,
   nov:11, november:11,
@@ -1093,9 +1127,9 @@ function monthNo(word){
 }
 /* long names only — "so" and "do" are far too common in German prose */
 const WEEKDAYS = {
-  sonntag:0, sunday:0, montag:1, monday:1, dienstag:2, tuesday:2,
-  mittwoch:3, wednesday:3, donnerstag:4, thursday:4,
-  freitag:5, friday:5, samstag:6, sonnabend:6, saturday:6
+  sonntag:0, sunday:0, söndag:0, montag:1, monday:1, måndag:1, dienstag:2, tuesday:2, tisdag:2,
+  mittwoch:3, wednesday:3, onsdag:3, donnerstag:4, thursday:4, torsdag:4,
+  freitag:5, friday:5, fredag:5, samstag:6, sonnabend:6, saturday:6, lördag:6
 };
 
 /* Build an ISO date, inferring a missing year so it lands near today. */
@@ -1121,10 +1155,10 @@ function mkDate(y, m, d){
    "zwischen dem 3. und 5. September" match "dem 3" and "und 5" first, eating both
    digits before the actual date could be read. Longest spellings come first. */
 const MONTH_WORDS =
-  'januar|jänner|jaenner|january|jan|februar|february|feb|märz|maerz|marz|march|mar|mrz' +
-  '|april|apr|mai|may|juni|june|jun|juli|july|jul|august|aug|september|sept|sep' +
+  'januari|januar|jänner|jaenner|january|jan|februari|februar|february|feb|märz|maerz|mars|marz|march|mar|mrz' +
+  '|april|apr|mai|may|maj|juni|june|jun|juli|july|jul|augusti|august|aug|september|sept|sep' +
   '|oktober|october|okt|oct|november|nov|dezember|december|dez|dec';
-const MW = '(?:' + MONTH_WORDS + ')(?![a-zäöüß])';
+const MW = '(?:' + MONTH_WORDS + ')(?![a-zäöüßåæø])';
 
 /* One pass over a piece of text, collecting every date it can recognise, in order. */
 const DATE_RE = new RegExp([
@@ -1136,7 +1170,7 @@ const DATE_RE = new RegExp([
 
 /* "zwischen dem 3. und 5. September" — one month, two days. */
 const RANGE_RE = new RegExp(
-  '(\\d{1,2})\\.?\\s*(?:und|bis|to|and|[–—-])\\s*(?:[A-Za-zÄÖÜäöüß]{2,10},?\\s*)?' +
+  '(\\d{1,2})\\.?\\s*(?:und|bis|to|and|och|till|[–—-])\\s*(?:[A-Za-zÄÖÜäöüßÅåÆæØø]{2,10},?\\s*)?' +
   '(\\d{1,2})\\.?\\s*(' + MW + ')\\.?(?:\\s+(\\d{4}))?', 'i');
 function scanRange(text){
   const m = String(text || '').match(RANGE_RE);
@@ -1166,12 +1200,12 @@ function scanDates(text){
   return out;
 }
 
-/* "morgen", "tomorrow", "Montag" … when no real date is written out */
+/* "morgen", "tomorrow", "imorgon", "Montag" … when no real date is written out */
 function relativeDate(tail){
   const t = ' ' + tail.toLowerCase() + ' ';
-  if(/\b(heute|today)\b/.test(t)) return todayISO();
-  if(/\b(morgen|tomorrow)\b/.test(t) && !/\bübermorgen\b/.test(t)) return isoOf(new Date(Date.now() + DAY));
-  if(/\bübermorgen\b/.test(t)) return isoOf(new Date(Date.now() + 2*DAY));
+  if(/\b(heute|today|idag|i dag)\b/.test(t)) return todayISO();
+  if(/\b(morgen|tomorrow|imorgon|i morgon)\b/.test(t) && !/\b(übermorgen|i övermorgon)\b/.test(t)) return isoOf(new Date(Date.now() + DAY));
+  if(/\b(übermorgen|i övermorgon)\b/.test(t)) return isoOf(new Date(Date.now() + 2*DAY));
   for(const w in WEEKDAYS){
     if(new RegExp('\\b' + w + '\\b').test(t)){
       const want = WEEKDAYS[w];
@@ -1244,7 +1278,7 @@ const SHOP_PRETTY = {
 };
 /* infrastructure, senders and CDNs — never the shop */
 const SHOP_NOISE = /^(amazonses|amazonaws|media-amazon|ssl-images-amazon|images-amazon|mailchimp|list-manage|sendgrid|sendgrid\.net|mandrillapp|klaviyo|braze|exacttarget|sailthru|salesforce|hubspot|doubleclick|googleapis|gstatic|google|googletagmanager|facebook|twitter|x|instagram|youtube|linkedin|pinterest|tiktok|whatsapp|apple\.co|cloudfront|akamaized|akamai|fastly|cdn|w3|schema|paypal|klarna|visa|mastercard|trustpilot|trustedshops|shopify|shopifycdn|myshopify)\./;
-const CARRIER_DOMAIN = /^(dhl|deutschepost|post|dpd|gls-group|myhermes|hermesworld|ups|fedex|postnl|tnt|dpdgroup)\./;
+const CARRIER_DOMAIN = /^(dhl|deutschepost|post|dpd|gls-group|myhermes|hermesworld|ups|fedex|postnl|tnt|dpdgroup|postnord|bring|budbee|instabox|airmee|earlybird)\./;
 
 function shopFromDom(root){
   if(!root) return '';
@@ -1270,10 +1304,19 @@ function shopFromText(txt){
   for(const k in SHOP_PRETTY){
     if(new RegExp('\\b' + k.replace(/[-]/g,'[- ]?') + '\\b', 'i').test(txt)) return SHOP_PRETTY[k];
   }
-  const from = txt.match(/^(?:From|Von)\s*:\s*([^<\n]{2,40})/mi);
+  const from = txt.match(/^(?:From|Von|Från)\s*:\s*([^<\n]{2,40})/mi);
   if(from) return from[1].replace(/["']/g,'').trim().slice(0, 30);
+  /* "Ditt REK från SAAB AB finns hos…", "Ihr Paket von Thomann ist…" — the
+     sender of a carrier's notice is the nearest thing to a shop it has */
+  const snd = txt.match(SENDER_RE);
+  const sender = snd ? (snd[1] || snd[2] || snd[3] || '').trim() : '';
+  if(sender && !carrierDef(sender) && !/^(uns|us|oss|dir|Ihnen|you|dig)$/i.test(sender)) return sender.slice(0, 30);
   return '';
 }
+const SENDER_RE = new RegExp(
+  '\\b(?:REK|paket(?:et)?|f[öo]rs[äa]ndelse(?:n)?|brev(?:et)?|leverans(?:en)?|kolli(?:t)?|order(?:n)?|best[äa]llning(?:en)?)(?:\\s+[A-Z0-9#-]{3,20})?\\s+fr[åa]n\\s+([^\\n,.]{2,40}?)(?=\\s+(?:finns|ligger|har|[äa]r|kan|v[äa]ntar|kommer|levereras|skickades|skickas|hämtas)\\b|[.,\\n]|$)' +
+  '|\\b(?:Sendung|Paket|Lieferung|Bestellung|Einschreiben)\\s+von\\s+([^\\n,.]{2,40}?)(?=\\s+(?:ist|liegt|wurde|kann|wird|wartet|k[öo]nnen)\\b|[.,\\n]|$)' +
+  '|\\b(?:parcel|package|shipment|order|delivery|letter)\\s+from\\s+([^\\n,.]{2,40}?)(?=\\s+(?:is|has|can|will|was|awaits|arrived)\\b|[.,\\n]|$)', 'i');
 
 /* ---- pictures ---- */
 const IMG_NOISE = /(pixel|spacer|transparent|1x1|blank|beacon|open\?|\/o\.gif|clear\.gif|logo|wordmark|badge|sprite|icon|footer|header|banner|social|facebook|twitter|instagram|appstore|app-store|googleplay|play-badge|unsubscribe|trustpilot|paypal|klarna|visa|mastercard|star|rating)/i;
@@ -1439,7 +1482,7 @@ function itemsFromText(txt){
     const L = lines[i];
     if(L.length < 10 || L.length > 180) continue;
     if(TEXT_NOISE.test(L)) continue;
-    if(!/[A-Za-zÄÖÜäöüß]{4}/.test(L)) continue;
+    if(!/[A-Za-zÄÖÜäöüßÅå]{4}/.test(L)) continue;
     if(/^[\d\s.,:€$-]+$/.test(L)) continue;
     const near = [L, lines[i+1] || '', lines[i+2] || ''].join(' ');
     if(!PRICE_RE.test(near)) continue;
@@ -1468,8 +1511,22 @@ function findMailLink(root, txt){
 }
 
 /* ---- where the parcel actually ends up ---- */
-const PICKUP_KW = /(Abholstation|Abholort|Abholung|Abholbereit|Selbstabholung|Postfiliale|Post-?Filiale|Postpartner|Post\.Partner|Packstation|Paketshop|Paket-?Shop|PaketBox|Abgabestelle|Zustellbasis|Pickup\s*(?:point|station|location)?|Collection\s*point|Parcel\s*(?:shop|locker))/i;
+const PICKUP_KW = /(Abholstation|Abholort|Abholung|Abholbereit|Selbstabholung|Postfiliale|Post-?Filiale|Postpartner|Post\.Partner|Packstation|Paketshop|Paket-?Shop|PaketBox|Abgabestelle|Zustellbasis|Pickup\s*(?:point|station|location)?|Collection\s*point|Parcel\s*(?:shop|locker)|\bombud(?:et)?\b|utl[äa]mningsst[äa]lle|uth[äa]mtningsst[äa]lle|servicest[äa]lle|paketbox|paketsk[åa]p|service\s*point)/i;
+/* A Swedish notice names the place in the sentence itself — "finns hos ICA
+   Supermarket Spiralen, S:t Persgatan 110." — so take exactly that, not the
+   whole line, which on a text message is the entire message. */
+const PICKUP_AT_RE = new RegExp(
+  '(?:finns|ligger|v[äa]ntar(?:\\s+p[åa]\\s+dig)?|kan\\s+h[äa]mtas|h[äa]mtas?|h[äa]mta(?:s)?\\s+ut|levererats?|levererad|utl[äa]mnas)' +
+  '\\s+(?:nu\\s+)?(?:att\\s+h[äa]mtas?\\s+(?:ut\\s+)?)?(?:hos|p[åa]|till)\\s+(?:ditt\\s+|v[åa]rt\\s+|n[äa]rmaste\\s+)?' +
+  '(?:ombud(?:et)?|utl[äa]mningsst[äa]lle(?:t)?|uth[äa]mtningsst[äa]lle(?:t)?|servicest[äa]lle(?:t)?|paketbox(?:en)?)?\\s*:?\\s*' +
+  '([^\\n]{4,90}?)' +
+  '(?=\\.(?:\\s|$)|\\s*[.!,]?\\s+(?:Uppge|Ange|H[äa]mtas?|Kod|Senast|Du\\b|Ta\\s+med|[ÖO]ppettider|Visa|Mvh|H[äa]lsningar)|,?\\s+senast\\b|\\n|$)', 'i');
 function findPickup(txt){
+  const at = String(txt || '').match(PICKUP_AT_RE);
+  if(at && at[1]){
+    const place = at[1].replace(/\s+/g, ' ').replace(/[\s,.!]+$/, '').trim();
+    if(place.length >= 4 && /[A-Za-zÄÖÜäöüßÅå]{2}/.test(place)) return place.slice(0, 100);
+  }
   const lines = String(txt || '').split('\n');
   for(const line of lines){
     if(!PICKUP_KW.test(line)) continue;
@@ -1485,29 +1542,34 @@ const DUE_LABEL = new RegExp(
   '|geplante[rs]?\\s*(?:lieferung|zustellung)|liefertermin|lieferdatum|lieferzeitraum' +
   '|zustelldatum|zustellung(?:\\s*erfolgt)?|lieferung(?:\\s*(?:am|bis|zwischen|erfolgt))?|ankunft|wird\\s*geliefert|ankunftsdatum' +
   '|estimated\\s*delivery|expected\\s*(?:delivery|arrival)|delivery\\s*(?:date|estimate|by)|scheduled\\s*delivery' +
-  '|guaranteed\\s*delivery|arriv\\w+|will\\s*arrive)\\s*[:\\-–]?\\s*', 'i');
+  '|guaranteed\\s*delivery|arriv\\w+|will\\s*arrive' +
+  '|ber[äa]knad\\s*(?:leverans|ankomst)\\w*|f[öo]rv[äa]ntad\\s*(?:leverans|ankomst)\\w*|prelimin[äa]r\\s*leverans\\w*' +
+  '|leveransdatum|leveransdag|leveranstid|leverans(?:\\s*(?:sker|senast|mellan|den|till\\s+dig))?' +
+  '|levereras(?:\\s*(?:den|senast|mellan|till\\s+dig))?|anl[äa]nder(?:\\s*(?:den|senast|mellan))?)\\s*[:\\-–]?\\s*', 'i');
 
 const ORDERNO_RES = [
   /\b(\d{3}-\d{7}-\d{7})\b/,
-  /(?:Bestellnummer|Bestell-?\s?Nr\.?|Bestellnr\.?|Auftragsnummer|Auftrags-?\s?Nr\.?)\s*[:#]?\s*([A-Z0-9][A-Z0-9\/-]{4,29})/i,
+  /(?:Bestellnummer|Bestell-?\s?Nr\.?|Bestellnr\.?|Auftragsnummer|Auftrags-?\s?Nr\.?|Ordernummer|Order-?\s?nr\.?|Ordernr\.?|Best[äa]llningsnummer|Best[äa]llnings-?\s?nr\.?)\s*[:#]?\s*([A-Z0-9][A-Z0-9\/-]{4,29})/i,
   /(?:Order|Bestellung)\s*(?:number|no\.?|#|ID|Nr\.?)\s*[:#]?\s*([A-Z0-9][A-Z0-9\/-]{4,29})/i,
   /(?:Rechnungsnummer|Invoice\s*(?:number|no\.?))\s*[:#]?\s*([A-Z0-9][A-Z0-9\/-]{4,29})/i,
   // "Bestellung AU105709 bestätigt" — no label word at all, just the code.
   // Requiring a digit inside stops it matching "Bestellung bestätigt".
   /(?:Bestellung|Bestellnr|Order|Auftrag)\s*#?\s*([A-Z]{0,5}\d[A-Z0-9-]{3,24})\b/i
 ];
-const AMT = '(?:EUR|€|CHF|USD|\\$|£)\\s?\\d(?:[\\d.,]{0,12}\\d)?|\\d(?:[\\d.,]{0,12}\\d)?\\s?(?:EUR|€|CHF)';
+const AMT = '(?:EUR|€|CHF|USD|\\$|£|SEK|NOK|DKK)\\s?\\d(?:[\\d.,]{0,12}\\d)?|\\d(?:[\\d.,]{0,12}\\d)?\\s?(?:EUR|€|CHF|SEK|NOK|DKK|kr\\b|:-)' +
+            '|\\d{1,3}(?:[ .]\\d{3})*(?:[.,]\\d{2})?\\s?(?:SEK|NOK|DKK|kr\\b|:-)';
 const TOTAL_RES = [
-  new RegExp('\\b(?:Gesamtsumme|Gesamtbetrag|Rechnungsbetrag|Bestellsumme|Endbetrag|Gesamtpreis|Summe\\s*gesamt|Order\\s*Total|Grand\\s*Total|Total\\s*(?:amount|paid|charged))\\s*[:.]?\\s*(' + AMT + ')', 'i'),
-  new RegExp('\\b(?:Gesamt|Summe|Total)\\s*[:.]?\\s*(' + AMT + ')', 'i')
+  new RegExp('\\b(?:Gesamtsumme|Gesamtbetrag|Rechnungsbetrag|Bestellsumme|Endbetrag|Gesamtpreis|Summe\\s*gesamt|Order\\s*Total|Grand\\s*Total|Total\\s*(?:amount|paid|charged)|Totalsumma|Ordersumma|Att\\s*betala|Summa\\s*att\\s*betala|Totalt(?:\\s*att\\s*betala)?)\\s*[:.]?\\s*(' + AMT + ')', 'i'),
+  new RegExp('\\b(?:Gesamt|Summe|Total|Summa)\\s*[:.]?\\s*(' + AMT + ')', 'i')
 ];
-const TRACK_RE = /(?:Sendungsverfolgungsnummer|Sendungsnummer|Sendungs-?\s?ID|Sendungs-?\s?Nr\.?|Trackingnummer|Tracking-?\s?(?:Nummer|number|code|ID|No\.?)|Paketnummer|Paket-?\s?Nr\.?|Waybill|AWB|Frachtbrief(?:nummer)?|Tracking)\s*[:#]?\s*([A-Z0-9][A-Z0-9\s-]{6,34}[A-Z0-9])/i;
+const TRACK_RE = /(?:Sendungsverfolgungsnummer|Sendungsnummer|Sendungs-?\s?ID|Sendungs-?\s?Nr\.?|Trackingnummer|Tracking-?\s?(?:Nummer|number|code|ID|No\.?)|Paketnummer|Paket-?\s?Nr\.?|Waybill|AWB|Frachtbrief(?:nummer)?|Tracking|Kolli-?\s?(?:id|nummer|nr\.?)|S[äa]ndnings-?\s?(?:id|nummer|nr\.?)|F[öo]rs[äa]ndelse-?\s?(?:id|nummer|nr\.?)|Sp[åa]rnings-?\s?(?:id|nummer|nr\.?)|Paket-?\s?id)\s*[:#]?\s*([A-Z0-9][A-Z0-9\s-]{6,34}[A-Z0-9])/i;
 const TRACK_SHAPES = [
   /\b(1Z[0-9A-Z]{16})\b/,                 // UPS
   /\b(00340\d{15})\b/, /\b(00344\d{15})\b/, // DHL
+  /\b([A-Z]{2}\d{9}[A-Z]{2})\b/,           // universal postal — RR123456789SE, a PostNord REK
   /\b(\d{12,22})\b/                       // Post / DPD / generic
 ];
-const TRACK_HOSTS = /(dhl\.|deutschepost\.|post\.at|dpd\.|gls-group|myhermes|hermesworld|ups\.com|fedex\.com|postnl|tnt\.com|progress-tracker|sendungsverfolgung|paketverfolgung|parceltracking|track-?trace)/i;
+const TRACK_HOSTS = /(dhl\.|deutschepost\.|post\.at|dpd\.|gls-group|myhermes|hermesworld|ups\.com|fedex\.com|postnl|postnord|bring\.|budbee|instabox|tnt\.com|progress-tracker|sendungsverfolgung|paketverfolgung|parceltracking|track-?trace|sp[åa]rning)/i;
 
 function firstMatch(res, txt){
   for(const re of res){ const m = txt.match(re); if(m && m[1]) return m[1].trim(); }
@@ -1516,8 +1578,8 @@ function firstMatch(res, txt){
 /* ============ what the mail says about where it is ============
    A dispatch mail is the commonest reason to touch an order at all, so the app
    should recognise one rather than make him say it twice. */
-const SHIPPED_RE = /(ist unterwegs|sind unterwegs|unterwegs zu|versandt|verschickt|versendet|abgeschickt|Versandbest[äa]tigung|Versandmitteilung|hat (?:unser|das) Lager verlassen|Sendungsverfolgung ist|has (?:been )?shipped|have (?:been )?shipped|is on (?:its|the) way|are on (?:their|the) way|on its way|dispatched|shipping confirmation|shipment confirmation|out for delivery|har skickats|[äa]r p[åa] v[äa]g)/i;
-const COLLECT_RE = /(zur Abholung bereit|abholbereit|bereit zur Abholung|liegt (?:f[üu]r Sie )?(?:zur Abholung )?bereit|kann(?:st du|en Sie)? abgeholt werden|zum Abholen bereit|ready (?:for|to) (?:collect|collection|pick ?-?up)|available for collection|awaiting collection|redo (?:att h[äa]mtas|f[öo]r upph[äa]mtning)|kan h[äa]mtas)/i;
+const SHIPPED_RE = /(ist unterwegs|sind unterwegs|unterwegs zu|versandt|verschickt|versendet|abgeschickt|Versandbest[äa]tigung|Versandmitteilung|hat (?:unser|das) Lager verlassen|Sendungsverfolgung ist|has (?:been )?shipped|have (?:been )?shipped|is on (?:its|the) way|are on (?:their|the) way|on its way|dispatched|shipping confirmation|shipment confirmation|out for delivery|har skickats?|[äa]r (?:nu )?skickad|har l[äa]mnat (?:v[åa]rt )?lager|[äa]r (?:nu )?p[åa] v[äa]g|leveransbekr[äa]ftelse|ute f[öo]r leverans|levereras idag)/i;
+const COLLECT_RE = /(zur Abholung bereit|abholbereit|bereit zur Abholung|liegt (?:f[üu]r Sie )?(?:zur Abholung )?bereit|kann(?:st du|en Sie)? abgeholt werden|zum Abholen bereit|ready (?:for|to) (?:collect|collection|pick ?-?up)|available for collection|awaiting collection|redo (?:att h[äa]mtas?|f[öo]r (?:upp)?h[äa]mtning)|klar (?:att h[äa]mtas?|f[öo]r (?:upp)?h[äa]mtning)|(?:kan|f[åa]r) (?:nu )?h[äa]mtas?(?: ut)?|finns(?: nu)? (?:att h[äa]mtas?|hos|f[öo]r uth[äa]mtning|p[åa] (?:ditt |v[åa]rt )?(?:ombud|utl[äa]mningsst[äa]lle))|h[äa]mtas?(?: ut)?(?: personligen)? senast|ligger(?: nu)? (?:hos|p[åa] (?:ditt )?ombud)|v[äa]ntar p[åa] dig hos|levererats? till (?:ditt )?ombud)/i;
 /* "we'll let you know as soon as it's on its way" is a promise, not a dispatch */
 const PROMISE_RE = /\b(sobald|sowie|wenn|falls|once|when|as soon as|informieren|benachrichtigen|melden uns|notify|let you know|n[äa]r)\b/i;
 function mailPhase(txt){
@@ -1528,6 +1590,29 @@ function mailPhase(txt){
   };
   if(said(COLLECT_RE)) return 'collect';
   return said(SHIPPED_RE) ? 'shipped' : '';
+}
+
+/* ============ the small print on a ready-to-collect notice ============
+   "Hämtas senast 2026-09-17" — the last day to collect it — is the one date
+   such a notice carries, so it stands in for the delivery date. The code to
+   say at the counter and "bring ID" go into the note, where he will see them. */
+const COLLECT_BY_RE = new RegExp(
+  '(?:h[äa]mtas?(?:\\s+ut)?(?:\\s+personligen)?\\s+senast|senast(?:\\s+den)?|f[öo]re\\s+den' +
+  '|abholen\\s+bis(?:\\s+zum|\\s+sp[äa]testens)?|abzuholen\\s+bis(?:\\s+zum)?|Abholfrist|Abholung\\s+bis(?:\\s+zum)?' +
+  '|bis\\s+sp[äa]testens(?:\\s+zum)?|sp[äa]testens\\s+(?:am|bis(?:\\s+zum)?)' +
+  '|(?:collect(?:ed)?|pick(?:ed)?\\s+up|collection)\\s+(?:by|before|until|deadline)|before\\s+it\\s+is\\s+(?:returned|sent\\s+back)' +
+  '|(?:will\\s+be\\s+)?(?:held|kept|stored)(?:\\s+for\\s+you)?\\s+until)\\s*[:\\-–]?\\s*', 'i');
+const CODE_LABEL = /\b(?:Uppge|Ange|H[äa]mtningskod|Uth[äa]mtningskod|Utl[äa]mningskod|Kollikod|Abhol-?[Cc]ode|Abholnummer|Abholungscode|PIN(?:-?[Cc]ode)?|Pick-?up\s*(?:code|PIN)|Collection\s*(?:code|PIN)|Access\s*code)\s*[:#]?\s*(?:kod(?:en)?\s*[:#]?\s*)?/i;
+function findPickupCode(txt){
+  const tail = labelTail(txt, CODE_LABEL, 20);
+  const m = tail.match(/^([A-Z0-9]{3,12})\b/);      // digits or capitals — a word is not a code
+  return m ? m[1] : '';
+}
+const ID_RE = /(fysiskt?\s+leg\b|legitimation|giltig\s+id-?handling|ta\s+med\s+(?:giltig\s+)?(?:id|leg)\b|Lichtbildausweis|amtlichen?\s+Ausweis|Ausweis\s+mit(?:zu)?bringen|(?:photo|valid)\s+ID\b|proof\s+of\s+identity)/i;
+/* "REK" is PostNord's registered letter — the one thing in the box */
+function parcelKind(txt){
+  if(/\bREK\b/.test(txt) || /rekommenderat\s+brev|\bEinschreiben\b|registered\s+(?:letter|mail|post)\b/i.test(txt)) return 'Registered letter (REK)';
+  return '';
 }
 
 function labelTail(txt, re, len){
@@ -1613,6 +1698,25 @@ function readMail(root, rawText){
   o.phase = mailPhase(txt);
   found.phase = o.phase;
 
+  /* ---- the last day to collect it, on a ready-to-collect notice ---- */
+  found.collectBy = '';
+  if(o.phase === 'collect'){
+    const cTail = labelTail(txt, COLLECT_BY_RE, 40);
+    const cd = cTail ? (scanDates(cTail)[0] || relativeDate(cTail)) : '';
+    if(cd){
+      found.collectBy = cd;
+      if(!o.due){ o.due = cd; found.due = true; }
+    }
+  }
+
+  /* ---- what to say and bring at the counter ---- */
+  const code = findPickupCode(txt);
+  found.code = !!code;
+  const counter = [];
+  if(code) counter.push('Pickup code ' + code);
+  if(o.phase === 'collect' && ID_RE.test(txt)) counter.push('bring photo ID');
+  o.note = counter.join(' · ');
+
   /* ---- a stated delivery time, when no actual date was given ---- */
   found.lead = findLeadTime(txt);
   found.leadFrom = o.ordered || todayISO();
@@ -1629,6 +1733,10 @@ function readMail(root, rawText){
   o.items = itemsFromDom(root);
   if(!o.items.length) o.items = itemsFromBlocks(root);
   if(!o.items.length) o.items = itemsFromText(txt);
+  if(!o.items.length){
+    const kind = parcelKind(txt);
+    if(kind) o.items = [{ id:uid(), name:kind, qty:'', img:'', due:'', got:false, gotAt:'' }];
+  }
 
   /* Last resort: we have items but not one picture, and the mail plainly has
      some. Pair them in the order they appear — far better than losing them. */
@@ -1693,14 +1801,14 @@ async function cacheOrderImages(order){
    Each shop keeps the same colour every time, so Amazon is always Amazon —
    picked from the shop's name, and changeable by hand in the editor. */
 const PALETTE = {
-  coral: { dot:'#df5f48', tint:'#fde7e1' },
-  sun:   { dot:'#c98d0c', tint:'#fdf1d2' },
-  mint:  { dot:'#2b9270', tint:'#dff3ea' },
-  sky:   { dot:'#357dc4', tint:'#e2edfb' },
-  lilac: { dot:'#7f61c4', tint:'#ede7fb' },
-  rose:  { dot:'#c94d87', tint:'#fbe3ee' },
-  teal:  { dot:'#1a8d9c', tint:'#ddf1f4' },
-  kraft: { dot:'#b06a35', tint:'#f8efe4' }
+  coral: { dot:'#e0492c', tint:'#fbc9bc' },
+  sun:   { dot:'#d38f06', tint:'#fce09a' },
+  mint:  { dot:'#1f9a6e', tint:'#bfead5' },
+  sky:   { dot:'#2f7fd0', tint:'#c3dbf8' },
+  lilac: { dot:'#7d55d0', tint:'#d9ccf8' },
+  rose:  { dot:'#d33f83', tint:'#f9c6db' },
+  teal:  { dot:'#0f92a3', tint:'#b8e6ec' },
+  kraft: { dot:'#b8652a', tint:'#f3d7bb' }
 };
 const PAL_KEYS = Object.keys(PALETTE);
 function hashStr(s){ let h = 0; for(let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return h; }
@@ -1976,7 +2084,13 @@ function suggestFollowUps(o){
   const ld = lastDue(o);
   const out = [];
 
-  if(!arrived && ld){
+  if(!arrived && ld && phaseOf(o) === 'collect'){
+    /* waiting at a pickup point, the date is the LAST day — the to-do is to go, not to chase */
+    const soon = daysTo(ld) <= 1;
+    out.push({ text:'Collect it' + (o.pickup ? ' from ' + o.pickup.split(',')[0].trim() : ''),
+               due: soon ? todayISO() : addDays(ld, -1),
+               why: soon ? 'it goes back after ' + prettyDate(ld) : 'the day before it goes back' });
+  } else if(!arrived && ld){
     const late = daysTo(ld) < 0;
     out.push({ text:'Chase ' + (o.shop || 'the shop'),
                due: late ? todayISO() : addDays(ld, 3),
@@ -2460,12 +2574,13 @@ let picInput = null;
 function foundNoteHtml(f){
   if(!f) return '';
   const labels = [
-    ['shop','the shop'], ['due','the delivery date'], ['carrier','the delivery service'],
-    ['trackUrl','a tracking link'], ['tracking','the tracking number'], ['pickup','a pickup place'],
+    ['shop', f.phase === 'collect' && f.shop ? 'the sender' : 'the shop'],
+    ['due', f.collectBy ? 'the last day to collect it' : 'the delivery date'], ['carrier','the delivery service'],
+    ['trackUrl','a tracking link'], ['tracking','the tracking number'], ['pickup','a pickup place'], ['code','the pickup code'],
     ['orderNo','the order number'], ['total','the total'], ['ordered','the order date']
   ];
   const got = labels.filter(l => f[l[0]]).map(l => l[1]);
-  const missed = labels.filter(l => !f[l[0]]).map(l => l[1]);
+  const missed = labels.filter(l => !f[l[0]] && (l[0] !== 'code' || f.phase === 'collect')).map(l => l[1]);
   const parts = [];
   if(f.items) parts.push(`<b>${f.items} item${f.items === 1 ? '' : 's'}</b>${f.pics ? ` (${f.pics} with a picture)` : ' — no pictures came across'}`);
   if(got.length) parts.push(got.join(', '));
@@ -2475,6 +2590,8 @@ function foundNoteHtml(f){
   if(!f.items) html += ` I couldn't pick out the individual items — add them below, or just leave it as one order to tick off.`;
   if(f.mailUrl) html += ` It also picked up a link back to the mail.`;
   if(f.phase) html += ` It reads as a <b>${f.phase === 'collect' ? 'ready-to-collect' : 'dispatch'}</b> notice, so the order is marked <b>${esc(PH[f.phase].word)}</b>.`;
+  if(f.collectBy) html += ` The date is the <b>last day to collect it</b>, so the countdown runs to that.`;
+  if(f.code) html += ` The pickup code is in the note.`;
   if(missed.length) html += ` <span class="miss">Not found: ${missed.join(', ')}.</span>`;
   html += ` Check it over, fix anything wrong, then Save.`;
   return html;
@@ -2648,7 +2765,9 @@ function findTwin(map, list, key){
   return null;
 }
 function mergeInto(target, src){
-  ['shop','orderNo','ordered','total','note'].forEach(k => { if(!target[k] && src[k]) target[k] = src[k]; });
+  ['shop','orderNo','ordered','total'].forEach(k => { if(!target[k] && src[k]) target[k] = src[k]; });
+  /* the pickup code arrives on the LAST notice, when a note is often already there */
+  if(src.note && !(target.note || '').includes(src.note)) target.note = target.note ? target.note + ' · ' + src.note : src.note;
   if(src.pickup) target.pickup = src.pickup;
   if(src.mailUrl) target.mailUrl = src.mailUrl;
   if(src.due){ target.due = src.due; target.dueTo = src.dueTo; }
