@@ -29,6 +29,11 @@
     /* phase colours — WHERE the parcel is, as opposed to WHEN it is due */
     --ship:#1f62a6;   --ship-t:#bcd6f5;
     --coll:#6a3fa3;   --coll-t:#d4c2f2;
+
+    /* going the other way — a return. Rose belongs to nothing else on the
+       status side, so a return can never be misread as a delivery. */
+    --ret:#b83f79;    --ret-t:#f7d7e8;
+    --rets:#6f6480;   --rets-t:#e2dfe9;
     /* the small print on a tinted tile — dimmed ink, but not as far as on white */
     --ink-soft:rgba(32,36,44,.66);
   }
@@ -126,12 +131,8 @@
   }
   .phbadge .hi{width:17px; height:17px;}
   /* the phase said in words as well, on its own line under the date */
-  .ophase{
-    display:inline-flex; align-items:center; gap:5px; margin-top:5px;
-    font-size:12.5px; font-weight:800; color:var(--oc); letter-spacing:-.01em;
-  }
+  .ophase{color:var(--oc);}
   .ophase .hi{width:15px; height:15px; flex:0 0 auto;}
-  .ophase .pcount{color:var(--ink-soft); font-weight:700;}
   .thumb img{position:absolute; inset:0; width:100%; height:100%; object-fit:contain; display:block; background:#fff;}
   .omid{flex:1; min-width:0;}
   .oshop{display:block; font-size:16.5px; font-weight:800; letter-spacing:-.01em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
@@ -254,6 +255,45 @@
   }
   .tibadge .hi{width:13px; height:13px;}
   .tsub .pword{color:var(--ic); font-weight:800;}
+  /* a row on its way back: the same shape as a phased row, its own colours */
+  .tickrow.returning{background:var(--ict); border-color:var(--ic); border-left:5px solid var(--ic);}
+  .tickrow.returning .tbox{border-color:var(--ic); background:var(--ic); color:#fff;}
+  .tickrow.returning .tname{color:var(--ink);}
+  .tsub .rlate{color:var(--late); font-weight:800;}
+  /* one line with ONE place to truncate — the pieces each wrapped on their own */
+  .retline, .ophase{
+    display:flex; align-items:center; gap:4px; margin-top:5px; max-width:100%;
+    font-size:12.5px; font-weight:800; letter-spacing:-.015em; white-space:nowrap;
+  }
+  .retline{color:var(--ret);}
+  .retline .hi{width:15px; height:15px; flex:0 0 auto;}
+  .retline.late{color:var(--late);}
+  .retline b, .ophase b{flex:0 0 auto; font-weight:800;}
+  .retline .rdim, .ophase .pcount{
+    color:var(--ink-soft); font-weight:700; min-width:0; overflow:hidden; text-overflow:ellipsis;
+  }
+  .chip.ret{border-color:rgba(184,63,121,.45); color:var(--ret);}
+  .chip.ret.sel{background:var(--ret); border-color:var(--ret); color:#fff;}
+
+  /* ---------- the return sheet ---------- */
+  .reasons{display:flex; flex-wrap:wrap; gap:7px; margin-top:2px;}
+  .rchip{
+    border:2px solid rgba(184,63,121,.35); background:#fff; color:var(--ret);
+    border-radius:999px; padding:9px 13px; font-family:inherit;
+    font-size:13.5px; font-weight:700; cursor:pointer;
+  }
+  .rchip.sel{background:var(--ret); border-color:var(--ret); color:#fff;}
+  .pickitem{
+    display:flex; align-items:center; gap:10px; width:100%; text-align:left;
+    border:2px solid var(--line); background:#fff; border-radius:14px;
+    padding:11px 12px; margin-bottom:8px; font-family:inherit; font-size:14.5px;
+    font-weight:700; color:var(--ink); cursor:pointer;
+  }
+  .pickitem.sel{border-color:var(--ret); background:var(--ret-t);}
+  .pickitem .hi{width:19px; height:19px; color:var(--ret); flex:0 0 auto;}
+  .pickitem .pn{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .retsteps{display:flex; gap:7px; margin:2px 0 0;}
+  .retwhy{font-size:12.5px; color:var(--ink-dim); font-weight:600; margin:8px 2px 0; line-height:1.45;}
   .tbox{
     flex:0 0 auto; width:30px; height:30px; border-radius:50%;
     border:2.5px solid var(--ink-dim); display:flex; align-items:center; justify-content:center; color:transparent;
@@ -572,6 +612,10 @@
     <path d="M12.1 4.2c3.2 0 5.6 2.5 5.5 5.7-.1 3.4-2.4 6.6-5.5 9.9-3.2-3.3-5.5-6.5-5.6-9.8-.1-3.3 2.3-5.8 5.6-5.8Z"/>
     <path d="M12 7.9c1.2 0 2.1.9 2.1 2.1 0 1.2-1 2.1-2.2 2.1-1.2 0-2.1-1-2-2.2 0-1.2.9-2 2.1-2Z"/>
   </symbol>
+  <symbol id="icon-return" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M8.9 5.5C6.9 7.2 5 8.9 3.3 10.8c1.8 1.8 3.6 3.5 5.5 5.1"/>
+    <path d="M3.6 10.8c3.9-.3 7.9-.3 11.8-.1 3 .2 4.9 2 4.8 4.5-.1 2.5-2 4.1-4.9 4.2-1.9.1-3.8.1-5.7-.1"/>
+  </symbol>
   <symbol id="icon-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
     <path d="M4.7 7.1c.7.7 1.3 1.4 1.9 2.2 1-1.5 2.1-2.9 3.3-4.2"/>
     <path d="M12.6 7.6c2.4-.2 4.8-.2 7.2 0"/>
@@ -613,6 +657,50 @@
 </div>
 
 <!-- ============ order editor — also the "here's what I found" review ============ -->
+<!-- ============ sending something back ============ -->
+<div class="overlay" id="ovRet">
+  <div class="sheet">
+    <button class="iconbtn closex" id="retClose" aria-label="Close"><svg class="hi"><use href="#icon-close"/></svg></button>
+    <h2><svg class="hi" style="color:var(--ret)"><use href="#icon-return"/></svg><span id="retTitle">Send it back</span></h2>
+
+    <div id="retPickWrap" hidden>
+      <label>Which one is going back?</label>
+      <div id="retPick"></div>
+    </div>
+
+    <label>What is wrong with it?</label>
+    <div class="reasons" id="retReasons"></div>
+    <input type="text" id="fRetReason" placeholder="…or say it in your own words" autocapitalize="sentences" style="margin-top:9px" />
+
+    <div class="two">
+      <div>
+        <label for="fRetBy">Return by</label>
+        <input type="date" id="fRetBy" />
+      </div>
+      <div>
+        <label for="fRetAmount">Money back</label>
+        <input type="text" id="fRetAmount" placeholder="129,00 €" inputmode="decimal" />
+      </div>
+    </div>
+    <div class="retwhy" id="retByWhy" hidden></div>
+
+    <label for="fRetNo">Return number</label>
+    <input type="text" id="fRetNo" placeholder="RET-88213" autocapitalize="characters" />
+
+    <label for="fRetUrl">Return page or label</label>
+    <input type="url" id="fRetUrl" placeholder="https://…" inputmode="url" />
+
+    <label>Where it has got to</label>
+    <div class="retsteps" id="retSteps"></div>
+
+    <div class="btnrow">
+      <button class="btn danger" id="retDrop" hidden>Not going back</button>
+      <button class="btn" id="retCancel">Cancel</button>
+      <button class="btn kraft" id="retSave">Save</button>
+    </div>
+  </div>
+</div>
+
 <div class="overlay" id="ovEdit">
   <div class="sheet">
     <button class="iconbtn closex" id="editClose" aria-label="Close"><svg class="hi"><use href="#icon-close"/></svg></button>
@@ -733,6 +821,14 @@
         <p>A ready-to-collect notice usually carries a <b>last day to collect</b> (“Hämtas senast 17 september”, “bis spätestens 12.09.”) rather than a delivery date, so the app puts that in the date box and the countdown runs to it. A <b>pickup code</b> to give at the counter (“Uppge 3130”, “Abholcode”) and a reminder to <b>bring ID</b> go into the note, so they are on the order screen when you are standing there.</p>
         <p>A mail that only <i>promises</i> to tell you later — “wir informieren Sie, sobald Ihre Sendung unterwegs ist” — is not treated as a dispatch, which is why the order confirmation itself does not trip it. And a mail can only move an order <b>forward</b>: re-reading the old confirmation after the dispatch mail will not push it back to Ordered.</p>
 
+        <h3>Sending something back</h3>
+        <p>Sometimes the parcel is damaged, sometimes the thing inside is faulty, sometimes it simply never turned up. Open the order and tap <b>Send something back</b> under the items. Pick which one is going back — a return belongs to the <b>item</b>, not the whole order, because usually only one thing out of three is the problem.</p>
+        <p>Say what is wrong with it (there are quick answers — damaged, faulty, wrong item, doesn't fit, never arrived, changed my mind — or type your own), and the app fills in the rest it can work out: the <b>return-by date</b> is offered as <b>14 days from the day the item landed</b>, which is the window most shops give, and you tap <b>Use it</b> to take it. You can also record the <b>return number</b>, a link to the <b>return page or label</b>, and <b>how much money</b> you are owed.</p>
+        <p>A return has its own little journey, the same way a delivery does, in rose so it can never be mistaken for one: <b>Sending back → Sent back → Refunded</b>. <b>Hold</b> the item to step it along, exactly like holding a card, and <b>tap</b> it to open the return again and change anything. Once something is going back, holding it walks the return rather than the delivery — that journey is over.</p>
+        <p>Everything you are sending back is gathered under the rose <b>Returns</b> chip at the top of the home screen, which only appears when there is something in it. The order's card writes the return under the date instead of the delivery state, because that is the live news, and it turns <b>red</b> once the return-by date has gone past. The date also lands on the <b>timeline</b> on the day it falls due, so it sits alongside the parcels.</p>
+        <p>If it turns out you are keeping it after all, open the return and tap <b>Not going back</b>.</p>
+        <p>One quiet piece of book-keeping: an item that never arrived and has been refunded counts as settled, so the order can finally close instead of waiting forever for a parcel that is not coming.</p>
+
         <h3>The home screen</h3>
         <p>One card per order, grouped into <b>Late</b>, <b>Today</b>, <b>Coming</b> and <b>Arrived</b>. The big number is <b>days to go</b>, and its colour is the message: red is overdue, amber is due today, green is all in. The card's own colour says <b>where</b> the parcel is (see above). The chips along the top filter the list.</p>
 
@@ -845,6 +941,8 @@
 
 /* ============ version log — newest first; [0].v is THE app version ============ */
 const VERSIONLOG = [
+  { v:'1.14', when:'4 Sep 2026',
+    what:'Sending things back. Sometimes the parcel arrives damaged, sometimes the thing inside does not work, and sometimes it never turns up at all — and until now the app had nothing to say about any of it.\n\nOpen an order and there is a new <b>Send something back</b> button under the items. A return belongs to the <b>item</b> rather than the whole order, because it is almost always one thing out of three that is the problem. Say what is wrong with it — damaged, faulty, wrong item, doesn’t fit, not as described, never arrived, changed your mind, or your own words — and record the <b>return number</b>, a link to the <b>return page or label</b>, and <b>how much money</b> you are owed.\n\nThe deadline offers itself. The app already knows the day the item landed, so it works out the <b>14 days</b> most shops give you and shows the arithmetic with a <b>Use it</b> button; nothing is filled in unless you tap it.\n\nA return then has its own journey, exactly like a delivery but in rose so the two can never be confused: <b>Sending back → Sent back → Refunded</b>. <b>Hold</b> the item to step it along, the same gesture and the same colour sweep and the same Undo. <b>Tap</b> it to open the return again — ticking a thing off as arrived when it is on its way back to the shop would mean nothing, so the tap does something useful instead.\n\nEverything on its way back is gathered under a rose <b>Returns</b> chip at the top of the home screen, which appears only when there is something in it. The order’s card writes the return under the date in place of the delivery state, since that is the live news, and the whole line turns <b>red</b> once the return-by date has gone past. The date lands on the <b>timeline</b> on the day it falls due, alongside the parcels. Changed your mind about changing your mind? Open it and tap <b>Not going back</b>.\n\nOne quiet piece of book-keeping came with it: an item that never arrived and has since been refunded now counts as settled, so an order with a lost parcel in it can finally close instead of waiting for ever. And the older “Return window closes” suggestion steps aside on any order that has a real return on it, rather than saying the same thing twice.' },
   { v:'1.13', when:'4 Sep 2026',
     what:'Better neighbours. All of your AMS apps live at the same web address, and each one used to clear out every stored copy it found there that was not its own \u2014 so opening this app in Safari quietly made the last app you had looked at fetch itself again the next time. It now tidies up only its own older copies and leaves the others alone. Your own data was never involved and is untouched.' },
   { v:'1.12', when:'4 Sep 2026',
@@ -874,6 +972,18 @@ const VERSIONLOG = [
   { v:'1.0', when:'1 Sep 2026',
     what:'First release. Hand a confirmation mail to the app and it reads it for you: the shop, the order number and order date, every item in the order with its own product picture, the total, the promised delivery date — a single day or a range like “zwischen dem 3. und 5. September” — the delivery service (DHL, Deutsche Post, Österreichische Post, DPD, GLS, Hermes, UPS, FedEx, PostNL, TNT, Amazon Logistics and more), the tracking number, the tracking link straight out of the mail, and the pickup place if the parcel is going to a post office, a Paketshop or a Packstation. German and English mails both work.\n\nThere are two ways to hand a mail over. Copy it in Mail and paste it into the app — this is the route that carries the product pictures across, because a rich paste keeps the images while plain text throws them away. Or set up the one-tap Apple Shortcut described in Settings and send the mail straight from its share sheet, which is faster but text-only. Either way the app shows you exactly what it found before anything is saved, says plainly what it could not find, and lets you correct every single field, so a miss is never a dead end.\n\nSend the dispatch mail the same way when it comes. If the order number matches an order you already have, PackTrack offers to fold it in rather than create a second one — filling in the carrier, the tracking number and the sharpened delivery date, and adding any pictures the first mail did not carry.\n\nThe home screen is one card per order, grouped into Late, Today, Almost here, Coming and Arrived. Every shop gets its own clear flat colour that it keeps for good, and the status colour on the number carries the message: red overdue, amber today, green all in. The button at the top right flips the whole thing into a timeline — a day-by-day strip of the days ahead showing which parcel lands when, with overdue ones banded at the top, orders with a delivery window drawn across every day they might turn up on, and anything without a date collected at the bottom.\n\nTap an order to tick items off one at a time as they actually arrive, because Amazon splits deliveries and one mail is usually several items. When the last item is ticked the order turns green and moves to Arrived. Each order also carries your own follow-ups — return the small one, register the warranty, check the invoice — with their own ticks and a home-screen chip counting every open one. If a pickup place is known, tapping it opens it in Maps.\n\nBackups, daily snapshots that prove themselves by reading back what they wrote, and self-updating are all built in. Everything is stored on this one device. Works fully offline as a home-screen app.' },
 ];
+
+/* ============ returns ============
+   Three states, because that is genuinely how a return goes: you decide to send
+   it, you post it, and then — the part that actually costs money if forgotten —
+   the shop pays you back. Rose throughout: it is not a delivery. */
+const RET_ORDER = ['', 'todo', 'sent', 'done'];
+const RT = {
+  todo: { word:'Sending back', tab:'To send',  dot:'var(--ret)',  tint:'var(--ret-t)' },
+  sent: { word:'Sent back',    tab:'Sent',     dot:'var(--rets)', tint:'var(--rets-t)' },
+  done: { word:'Refunded',     tab:'Refunded', dot:'var(--done)', tint:'var(--done-t)' }
+};
+const RET_REASONS = ['Damaged', 'Faulty', 'Wrong item', "Doesn't fit", 'Not as described', 'Never arrived', 'Changed my mind'];
 
 /* ============ storage ============ */
 const KEY = 'amspt.v1';
@@ -905,6 +1015,14 @@ function load(){
   }catch(e){}
   return { version:1, orders:[] };
 }
+/* A return is a parcel going the other way, so it gets its own little journey
+   rather than a single "returned" flag: decided, posted, settled. */
+function normRet(r){
+  if(!r || !RET_ORDER.includes(r.phase) || r.phase === '') return null;
+  return { phase:r.phase, reason:r.reason || '', by:r.by || '', no:r.no || '',
+           url:r.url || '', amount:r.amount || '',
+           openedAt:r.openedAt || '', sentAt:r.sentAt || '', doneAt:r.doneAt || '' };
+}
 function normalise(s){
   s.orders = s.orders.filter(o => o && o.id).map(o => ({
     id: o.id,
@@ -929,7 +1047,8 @@ function normalise(s){
     items: Array.isArray(o.items) ? o.items.filter(i => i && (i.name || i.img)).map(i => ({
       id: i.id || uid(), name: i.name || '', qty: i.qty || '', img: i.img || '',
       due: i.due || '', got: !!i.got, gotAt: i.gotAt || '',
-      phase: (i.phase === 'shipped' || i.phase === 'collect') ? i.phase : ''
+      phase: (i.phase === 'shipped' || i.phase === 'collect') ? i.phase : '',
+      ret: normRet(i.ret)
     })) : [],
     todos: Array.isArray(o.todos) ? o.todos.filter(t => t && t.text).map(t => ({
       id: t.id || uid(), text: t.text, due: t.due || '', done: !!t.done, doneAt: t.doneAt || ''
@@ -950,6 +1069,10 @@ function daysTo(iso){ const d = parseISO(iso); if(!d) return null; return Math.r
 function prettyDate(iso){
   const d = parseISO(iso); if(!d) return '';
   return d.toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'short' });
+}
+function dayMonth(iso){
+  const d = parseISO(iso); if(!d) return '';
+  return d.toLocaleDateString('en-GB', { day:'numeric', month:'short' });
 }
 function longDate(iso){
   const d = parseISO(iso); if(!d) return '';
@@ -1828,7 +1951,10 @@ const ST = {
   wait:  { c:'var(--wait)',  t:'var(--card)',    word:'Coming' },
   done:  { c:'var(--done)',  t:'var(--done-t)',  word:'All arrived' }
 };
-function allIn(o){ return o.items.length ? o.items.every(i => i.got) : !!o.got; }
+/* An item that never turned up and has been refunded is settled too, or an
+   order with a lost parcel in it could never close. */
+function settled(i){ return i.got || (i.ret && i.ret.phase === 'done'); }
+function allIn(o){ return o.items.length ? o.items.every(settled) : !!o.got; }
 /* Items can each have their own delivery date (Amazon splits deliveries and
    plenty of shops promise per line). When any do, they drive the order: the
    countdown follows the next one still outstanding, lateness the last one. */
@@ -1922,6 +2048,31 @@ function phaseSplit(o){
   const at = o.items.filter(i => itemPhase(i) === ph).length;
   return at < n ? { at, n } : null;
 }
+function retOf(i){ return (i.ret && RT[i.ret.phase]) ? i.ret : null; }
+function isReturning(i){ const r = retOf(i); return !!r && r.phase !== 'done'; }
+/* the deadline is the part that bites, so it is the part that shouts */
+function retLate(i){ const r = retOf(i); return !!r && r.phase === 'todo' && !!r.by && daysTo(r.by) < 0; }
+function openReturns(o){ return o.items.filter(isReturning).length; }
+function anyReturn(o){ return o.items.some(i => retOf(i)); }
+/* the return the order should talk about: the most urgent one still open */
+function leadReturn(o){
+  const open = o.items.filter(isReturning);
+  if(!open.length) return null;
+  const late = open.filter(retLate);
+  const pool = late.length ? late : open;
+  const dated = pool.filter(i => i.ret.by).sort((a, b) => a.ret.by.localeCompare(b.ret.by));
+  return dated[0] || pool[0];
+}
+function retSteps(i){
+  const r = retOf(i);
+  if(!r) return '';
+  const bits = [RT[r.phase].word];
+  if(r.reason) bits.push(r.reason);
+  if(r.phase === 'todo' && r.by) bits.push((retLate(i) ? 'was due ' : 'by ') + prettyDate(r.by));
+  if(r.phase === 'done' && r.amount) bits.push(r.amount);
+  return bits;
+}
+
 /* A tile wears its shop's own colour until something is known about where it
    is; from then on it wears the phase, because that is the newer news. */
 function tileColour(o){
@@ -2098,7 +2249,9 @@ function suggestFollowUps(o){
                due: late ? todayISO() : addDays(ld, 3),
                why: late ? 'it is already overdue' : 'three days after the promised date' });
   }
-  if(arrival){
+  /* once something really is going back, the app is tracking the deadline
+     properly and this softer nudge would only say the same thing twice */
+  if(arrival && !anyReturn(o)){
     out.push({ text:'Return window closes', due:addDays(arrival, 14),
                why:'14 days from delivery to change your mind' });
   }
@@ -2148,14 +2301,16 @@ function renderChrome(){
   const lateN = state.orders.filter(o => statusOf(o) === 'late').length;
   const todoN = state.orders.reduce((n, o) => n + openTodos(o), 0);
   const doneN = state.orders.filter(o => allIn(o)).length;
+  const retN = state.orders.reduce((n, o) => n + openReturns(o), 0);
   const defs = [
     { k:'open', label:'Waiting', n:openN },
     { k:'todo', label:'Follow-ups', n:todoN },
+    { k:'ret',  label:'Returns', n:retN },
     { k:'done', label:'Arrived', n:doneN },
     { k:'all',  label:'Everything', n:state.orders.length }
   ];
-  chips.innerHTML = defs.map(d =>
-    `<button class="chip${filter === d.k ? ' sel' : ''}${d.k === 'open' && lateN ? ' alarm' : ''}" data-k="${d.k}">${d.label}${d.n ? `<span class="n">${d.n}</span>` : ''}</button>`
+  chips.innerHTML = defs.filter(d => d.k !== 'ret' || d.n || filter === 'ret').map(d =>
+    `<button class="chip${filter === d.k ? ' sel' : ''}${d.k === 'ret' ? ' ret' : ''}${d.k === 'open' && lateN ? ' alarm' : ''}" data-k="${d.k}">${d.label}${d.n ? `<span class="n">${d.n}</span>` : ''}</button>`
   ).join('');
   chips.querySelectorAll('.chip').forEach(b =>
     b.addEventListener('click', () => { filter = b.dataset.k; render(); }));
@@ -2196,6 +2351,8 @@ function orderCard(o){
 
   const ot = openTodos(o);
   const split = phaseSplit(o);
+  const lead = leadReturn(o);
+  const retN = openReturns(o);
   const tc = tileColour(o);
   return `<button class="ordercard" data-id="${o.id}" style="--c:${s.c}; --oc:${tc.dot}; --oct:${tc.tint}">
     <span class="thumbwrap">
@@ -2205,8 +2362,21 @@ function orderCard(o){
     <span class="omid">
       <span class="oshop">${esc(o.shop || 'Order')}</span>
       <span class="osub">${bits.join(' · ') || esc(s.word)}</span>
-      ${ph === 'ordered' ? '' : `<span class="ophase">
-        <svg class="hi"><use href="#icon-${PH[ph].icon}"/></svg>${esc(ph === 'arrived' ? 'Arrived' : PH[ph].word)}${
+      ${lead ? `<span class="retline${retLate(lead) ? ' late' : ''}">
+        <svg class="hi"><use href="#icon-return"/></svg><b>${esc(RT[lead.ret.phase].word)}</b>${(() => {
+          /* the card is narrow, so say the ONE thing that matters: how late it
+             is, else when it is due, else how many are going back */
+          let tail = '';
+          if(lead.ret.by && lead.ret.phase === 'todo'){
+            const d = daysTo(lead.ret.by);
+            tail = d < 0 ? `${-d} day${d === -1 ? '' : 's'} late`
+                 : d === 0 ? 'today'
+                 : 'by ' + dayMonth(lead.ret.by);
+          } else if(retN > 1) tail = retN + ' items';
+          return tail ? `<span class="rdim">· ${esc(tail)}</span>` : '';
+        })()}</span>`
+      : ph === 'ordered' ? '' : `<span class="ophase">
+        <svg class="hi"><use href="#icon-${PH[ph].icon}"/></svg><b>${esc(ph === 'arrived' ? 'Arrived' : PH[ph].word)}</b>${
           split ? `<span class="pcount">· ${split.at} of ${split.n}</span>` : ''}</span>`}
       ${ot ? `<span class="todobadge"><svg class="hi" style="width:13px;height:13px"><use href="#icon-list"/></svg>${ot} follow-up${ot === 1 ? '' : 's'}</span>` : ''}
     </span>
@@ -2229,12 +2399,13 @@ function renderList(){
   let pool;
   if(filter === 'open') pool = state.orders.filter(o => !allIn(o));
   else if(filter === 'todo') pool = state.orders.filter(o => openTodos(o) > 0);
+  else if(filter === 'ret') pool = state.orders.filter(o => openReturns(o) > 0);
   else if(filter === 'done') pool = state.orders.filter(o => allIn(o));
   else pool = state.orders.slice();
 
   if(!pool.length){
     const msg = { open:'Nothing is on its way right now.', todo:'No open follow-ups — all clear.',
-                  done:'Nothing has arrived yet.', all:'No orders yet.' }[filter];
+                  ret:'Nothing is going back.', done:'Nothing has arrived yet.', all:'No orders yet.' }[filter];
     main.innerHTML = `<div class="empty"><p>${esc(msg)}</p></div>`;
     return;
   }
@@ -2312,20 +2483,26 @@ function renderDetail(){
 
   const rows = o.items.length
     ? o.items.map(i => {
+        const r = retOf(i);
+        /* once something is going back, THAT is its journey — the delivery
+           phase it used to be in is history and would only confuse */
         const ip = itemPhase(i);
-        const mid = ip === 'ordered' || ip === 'arrived' ? null : PH[ip];
-        const sub = [
-          (i.qty && i.qty !== '1') ? '×' + esc(i.qty) : '',
-          (i.due && !i.got) ? esc(prettyDate(i.due)) : '',
-          i.got && i.gotAt ? 'ticked ' + prettyDate(i.gotAt) : '',
-          mid ? `<span class="pword">${esc(mid.word)}</span>` : ''
-        ].filter(Boolean);
+        const mid = r ? RT[r.phase] : (ip === 'ordered' || ip === 'arrived' ? null : PH[ip]);
+        const sub = r
+          ? retSteps(i).map((t, k) => k === 0 ? `<span class="pword">${esc(t)}</span>`
+              : (retLate(i) && /^(was due|by) /.test(t) ? `<span class="rlate">${esc(t)}</span>` : esc(t)))
+          : [
+            (i.qty && i.qty !== '1') ? '×' + esc(i.qty) : '',
+            (i.due && !i.got) ? esc(prettyDate(i.due)) : '',
+            i.got && i.gotAt ? 'ticked ' + prettyDate(i.gotAt) : '',
+            mid ? `<span class="pword">${esc(mid.word)}</span>` : ''
+          ].filter(Boolean);
         return `
-        <button class="tickrow${i.got ? ' on' : ''}${mid ? ' phased' : ''}" data-item="${i.id}"${
+        <button class="tickrow${!r && i.got ? ' on' : ''}${r ? ' returning' : (mid ? ' phased' : '')}" data-item="${i.id}"${
           mid ? ` style="--ic:${mid.dot}; --ict:${mid.tint}"` : ''}>
-          <span class="tbox"><svg class="hi"><use href="#icon-check"/></svg></span>
+          <span class="tbox"><svg class="hi"><use href="#icon-${r ? 'return' : 'check'}"/></svg></span>
           <span class="tpic"><svg class="hi"><use href="#icon-box"/></svg>${i.img ? `<img src="${esc(i.img)}" alt="" loading="lazy" onerror="this.remove()" />` : ''}${
-            mid ? `<span class="tibadge"><svg class="hi"><use href="#icon-${mid.icon}"/></svg></span>` : ''}</span>
+            mid && !r ? `<span class="tibadge"><svg class="hi"><use href="#icon-${mid.icon}"/></svg></span>` : ''}</span>
           <span class="tmid">
             <span class="tname">${esc(i.name || 'Item')}</span>
             ${sub.length ? `<span class="tsub">${sub.join(' · ')}</span>` : ''}
@@ -2390,6 +2567,9 @@ function renderDetail(){
     ${o.items.length > 1 ? '<div class="phhint" style="margin:0 4px 10px">Tap to tick off · hold to move one parcel along</div>' : ''}
     ${rows}
 
+    <button class="addrow" id="startRet" style="border-color:rgba(184,63,121,.4); color:var(--ret)">
+      <svg class="hi"><use href="#icon-return"/></svg>${anyReturn(o) ? 'Send something else back' : 'Send something back'}</button>
+
     <div class="sect">Follow-ups<span class="gline"></span></div>
     ${todos}
     ${suggHtml}
@@ -2403,21 +2583,30 @@ function renderDetail(){
   main.querySelectorAll('[data-phase]').forEach(b =>
     b.addEventListener('click', () => stepOrderTo(o.id, b.dataset.phase)));
 
+  const RSTEP = ['todo', 'sent', 'done'];
+  const nextRet = (r) => RSTEP[(RSTEP.indexOf(r.phase) + 1) % RSTEP.length];
   main.querySelectorAll('[data-item]').forEach(b => attachHold(b, {
     next: () => {
       const it = o.items.find(x => x.id === b.dataset.item);
       if(!it) return null;
+      const r = retOf(it);
+      /* something going back has its own journey; walk that one instead */
+      if(r) return { dot:RT[nextRet(r)].dot, fallback:'var(--ret)' };
       const n = PH[PHASE_ORDER[(PHASE_ORDER.indexOf(itemPhase(it)) + 1) % PHASE_ORDER.length]];
       return { dot:n.dot, fallback:colourOf(o).dot };
     },
     hold: () => {
       const it = o.items.find(x => x.id === b.dataset.item);
       if(!it) return;
+      const r = retOf(it);
+      if(r) return stepReturnTo(o.id, it.id, nextRet(r));
       stepItemTo(o.id, it.id, PHASE_ORDER[(PHASE_ORDER.indexOf(itemPhase(it)) + 1) % PHASE_ORDER.length]);
     },
     tap: () => {
       const it = o.items.find(x => x.id === b.dataset.item);
       if(!it) return;
+      /* ticking a returning item off would mean nothing, so open its return */
+      if(retOf(it)) return openReturnSheet(o.id, it.id);
       it.got = !it.got;
       it.gotAt = it.got ? todayISO() : '';
       if(it.got) it.phase = '';
@@ -2452,6 +2641,10 @@ function renderDetail(){
     if(!txt || !txt.trim()) return;
     o.todos.push({ id:uid(), text:txt.trim().slice(0, 200), due:'', done:false, doneAt:'' });
     save(); render();
+  });
+  $('startRet').addEventListener('click', () => {
+    const spare = o.items.find(x => !retOf(x));
+    openReturnSheet(o.id, spare ? spare.id : null);
   });
   $('editBtn2').addEventListener('click', () => openEditor(o, false, null));
 }
@@ -2502,7 +2695,8 @@ function renderTimeline(){
   const main = $('main');
   const live = state.orders.filter(o => !allIn(o));
   const anyTodo = state.orders.some(o => o.todos.some(t => !t.done && t.due));
-  if(!live.length && !anyTodo){
+  const anyRet = state.orders.some(o => o.items.some(i => { const r = retOf(i); return r && r.phase === 'todo' && r.by; }));
+  if(!live.length && !anyTodo && !anyRet){
     main.innerHTML = `<div class="empty">
       <svg class="hi"><use href="#icon-calendar"/></svg>
       <div class="big">Nothing on the way</div>
@@ -2517,6 +2711,10 @@ function renderTimeline(){
   dated.forEach(o => { const d = daysTo(lastDue(o)); if(d > span) span = d; });
   state.orders.forEach(o => o.todos.forEach(t => {
     if(!t.done && t.due){ const d = daysTo(t.due); if(d > span) span = d; }
+  }));
+  state.orders.forEach(o => o.items.forEach(i => {
+    const r = retOf(i);
+    if(r && r.phase === 'todo' && r.by){ const d = daysTo(r.by); if(d > span) span = d; }
   }));
   span = Math.min(45, Math.max(span, 6));            // always show at least the week ahead
 
@@ -2533,16 +2731,24 @@ function renderTimeline(){
     state.orders.forEach(o => o.todos.forEach(t => {
       if(!t.done && t.due === iso) dueTodos.push({ o, t });
     }));
+    const dueRets = [];
+    state.orders.forEach(o => o.items.forEach(i => {
+      const r = retOf(i);
+      if(r && r.phase === 'todo' && r.by === iso) dueRets.push({ o, i });
+    }));
     const cls = (i === 0 ? ' today' : '') + ((dow === 0 || dow === 6) ? ' weekend' : '');
     html += `<div class="tlrow${cls}">
       <div class="tlday">
         <div class="tldow">${i === 0 ? 'Today' : day.toLocaleDateString('en-GB', { weekday:'short' })}</div>
         <div class="tlnum">${day.getDate()}</div>
       </div>
-      <div class="tlitems">${(on.length || dueTodos.length)
+      <div class="tlitems">${(on.length || dueTodos.length || dueRets.length)
         ? on.map(o => tlPill(o, !hasItemDates(o) && !!(o.dueTo && o.dueTo !== o.due), dayLabel(o, iso))).join('') +
           dueTodos.map(({o, t}) => `<button class="tlpill window todopill" data-id="${o.id}" style="--oc:${colourOf(o).dot}; --oct:${colourOf(o).tint}">
-             <span class="tlps">${esc(t.text)}</span><span class="tlpd">${esc(o.shop || 'follow-up')}</span></button>`).join('')
+             <span class="tlps">${esc(t.text)}</span><span class="tlpd">${esc(o.shop || 'follow-up')}</span></button>`).join('') +
+          dueRets.map(({o, i}) => `<button class="tlpill todopill" data-id="${o.id}" style="--oc:var(--ret); --oct:var(--ret-t)">
+             <svg class="hi tlic"><use href="#icon-return"/></svg>
+             <span class="tlps">${esc((i.name || 'Item').slice(0, 26))}</span><span class="tlpd">send back</span></button>`).join('')
         : '<div class="tlgap"></div>'}</div>
     </div>`;
   }
@@ -2604,13 +2810,13 @@ function harvestRows(){
   const items = [];
   document.querySelectorAll('#itemRows .eitem').forEach(row => {
     const id = row.dataset.row;
-    const old = draft.items.find(i => i.id === id) || { id, got:false, gotAt:'', img:'', phase:'' };
+    const old = draft.items.find(i => i.id === id) || { id, got:false, gotAt:'', img:'', phase:'', ret:null };
     const name = row.querySelector('.iname').value.trim();
     const qty = row.querySelector('.qty').value.trim();
     const due = row.querySelector('.idue').value;
     if(!name && !old.img) return;
     items.push({ id:old.id, name:name || 'Item', qty, img:old.img || '', due,
-                 got:!!old.got, gotAt:old.gotAt || '', phase:old.phase || '' });
+                 got:!!old.got, gotAt:old.gotAt || '', phase:old.phase || '', ret:old.ret || null });
   });
   draft.items = items;
 
@@ -2740,6 +2946,142 @@ function refreshAutoColour(){
 }
 
 function closeEditor(){ $('ovEdit').classList.remove('show'); draft = null; draftFound = null; }
+
+/* ============ the return sheet ============ */
+let retOrderId = null, retItemId = null, retDraft = null;
+
+/* The shop's window is the thing people miss, and the app already knows when
+   the item landed, so the deadline offers itself rather than being looked up. */
+function suggestReturnBy(o, it){
+  const from = (it && it.gotAt) || lastArrivalDate(o) || (it && it.due) || o.due || '';
+  return from ? { by:addDays(from, 14), from } : null;
+}
+function openReturnSheet(orderId, itemId){
+  const o = orderById(orderId);
+  if(!o || !o.items.length) return;
+  retOrderId = orderId;
+  retItemId = itemId || (o.items.length === 1 ? o.items[0].id : (o.items.find(isReturning) || o.items[0]).id);
+  const it = o.items.find(x => x.id === retItemId);
+  const r = retOf(it);
+  retDraft = r ? JSON.parse(JSON.stringify(r))
+              : { phase:'todo', reason:'', by:'', no:'', url:'', amount:'', openedAt:todayISO(), sentAt:'', doneAt:'' };
+
+  $('retTitle').textContent = r ? 'This return' : 'Send it back';
+  $('retDrop').hidden = !r;
+  $('retPickWrap').hidden = o.items.length < 2 || !!r;
+  renderRetSheet();
+  $('ovRet').classList.add('show');
+  $('ovRet').querySelector('.sheet').scrollTop = 0;
+}
+function renderRetSheet(){
+  const o = orderById(retOrderId);
+  if(!o) return;
+  const it = o.items.find(x => x.id === retItemId);
+
+  $('retPick').innerHTML = o.items.map(i =>
+    `<button class="pickitem${i.id === retItemId ? ' sel' : ''}" data-pick="${i.id}" type="button">
+       <svg class="hi"><use href="#icon-${i.id === retItemId ? 'return' : 'box'}"/></svg>
+       <span class="pn">${esc(i.name || 'Item')}</span></button>`).join('');
+  $('retPick').querySelectorAll('[data-pick]').forEach(b => b.addEventListener('click', () => {
+    harvestRet();
+    retItemId = b.dataset.pick;
+    const t = o.items.find(x => x.id === retItemId);
+    if(!retDraft.amount && o.items.length === 1) retDraft.amount = o.total || '';
+    if(!retDraft.by){ const g = suggestReturnBy(o, t); if(g) retDraft.by = g.by; }
+    renderRetSheet();
+  }));
+
+  $('retReasons').innerHTML = RET_REASONS.map(x =>
+    `<button class="rchip${retDraft.reason === x ? ' sel' : ''}" data-reason="${esc(x)}" type="button">${esc(x)}</button>`).join('');
+  $('retReasons').querySelectorAll('[data-reason]').forEach(b => b.addEventListener('click', () => {
+    harvestRet();
+    retDraft.reason = (retDraft.reason === b.dataset.reason) ? '' : b.dataset.reason;
+    renderRetSheet();
+  }));
+
+  const known = RET_REASONS.includes(retDraft.reason);
+  $('fRetReason').value = known ? '' : (retDraft.reason || '');
+  $('fRetBy').value = retDraft.by || '';
+  $('fRetNo').value = retDraft.no || '';
+  $('fRetUrl').value = retDraft.url || '';
+  $('fRetAmount').value = retDraft.amount || '';
+
+  const g = suggestReturnBy(o, it);
+  const why = $('retByWhy');
+  if(g && !retDraft.by){
+    why.hidden = false;
+    why.innerHTML = `Most shops give you 14 days. From <b>${esc(prettyDate(g.from))}</b> that is <b>${esc(prettyDate(g.by))}</b>. ` +
+                    `<button class="nbtn" id="useRetBy" type="button">Use it</button>`;
+    $('useRetBy').addEventListener('click', (e) => { $('fRetBy').value = g.by; retDraft.by = g.by; flashBtn(e.currentTarget, 'Set ✓'); });
+  } else { why.hidden = true; why.innerHTML = ''; }
+
+  $('retSteps').innerHTML = ['todo', 'sent', 'done'].map(k =>
+    `<button class="phbtn${retDraft.phase === k ? ' on' : ''}" data-rstep="${k}" type="button" style="--pc:${RT[k].dot}">
+       <svg class="hi"><use href="#icon-${k === 'done' ? 'check' : 'return'}"/></svg>${esc(RT[k].tab)}
+     </button>`).join('');
+  $('retSteps').querySelectorAll('[data-rstep]').forEach(b => b.addEventListener('click', () => {
+    harvestRet(); retDraft.phase = b.dataset.rstep; renderRetSheet();
+  }));
+}
+function harvestRet(){
+  if(!retDraft) return;
+  const typed = $('fRetReason').value.trim();
+  if(typed) retDraft.reason = typed.slice(0, 90);
+  else if(!RET_REASONS.includes(retDraft.reason)) retDraft.reason = '';
+  retDraft.by = $('fRetBy').value;
+  retDraft.no = $('fRetNo').value.trim();
+  retDraft.url = $('fRetUrl').value.trim();
+  retDraft.amount = $('fRetAmount').value.trim();
+}
+function closeReturnSheet(){
+  $('ovRet').classList.remove('show');
+  retOrderId = retItemId = retDraft = null;
+}
+function saveReturn(){
+  harvestRet();
+  const o = orderById(retOrderId);
+  const it = o && o.items.find(x => x.id === retItemId);
+  if(!it) return closeReturnSheet();
+  const today = todayISO();
+  const was = retOf(it);
+  const r = retDraft;
+  if(!r.openedAt) r.openedAt = today;
+  if(r.phase === 'sent' && !r.sentAt) r.sentAt = today;
+  if(r.phase === 'done' && !r.doneAt) r.doneAt = today;
+  it.ret = normRet(r);
+  save(); closeReturnSheet(); render();
+  showToast(was ? 'Return updated' : 'Going back to ' + (o.shop || 'the shop'));
+}
+function dropReturn(){
+  const o = orderById(retOrderId);
+  const it = o && o.items.find(x => x.id === retItemId);
+  if(!it) return closeReturnSheet();
+  if(!confirm(`Stop returning “${it.name || 'this item'}”?\n\nEverything you filled in about the return is thrown away.`)) return;
+  it.ret = null;
+  save(); closeReturnSheet(); render();
+  showToast('Not going back after all');
+}
+/* holding a returning row walks it along its own three steps */
+function stepReturnTo(orderId, itemId, ph){
+  const o = orderById(orderId);
+  const it = o && o.items.find(x => x.id === itemId);
+  const r = it && retOf(it);
+  if(!r || r.phase === ph) return;
+  const before = JSON.parse(JSON.stringify(r));
+  const today = todayISO();
+  r.phase = ph;
+  if(ph === 'sent' && !r.sentAt) r.sentAt = today;
+  if(ph === 'done' && !r.doneAt) r.doneAt = today;
+  save();
+  keepScroll = $('main').scrollTop;
+  render();
+  showToast((it.name || 'Item').slice(0, 22) + ' · ' + RT[ph].word, () => {
+    const t = orderById(orderId);
+    const ti = t && t.items.find(x => x.id === itemId);
+    if(ti){ ti.ret = normRet(before); save(); keepScroll = $('main').scrollTop; render(); }
+    hideToast();
+  }, 'Undo', 6000);
+}
 
 /* When the dispatch mail follows the order mail, fold it into the order we have. */
 const nameKey = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9äöüß]+/g, '').slice(0, 40);
@@ -3047,6 +3389,10 @@ function applyUpdate(){
 function openSettings(){ $('ovSettings').classList.add('show'); $('ovSettings').querySelector('.sheet').scrollTop = 0; }
 
 /* ============ wiring ============ */
+$('retClose').addEventListener('click', closeReturnSheet);
+$('retCancel').addEventListener('click', closeReturnSheet);
+$('retSave').addEventListener('click', saveReturn);
+$('retDrop').addEventListener('click', dropReturn);
 $('pasteClose').addEventListener('click', () => $('ovPaste').classList.remove('show'));
 $('pasteCancel').addEventListener('click', () => $('ovPaste').classList.remove('show'));
 $('pasteGo').addEventListener('click', readPastedMail);
