@@ -882,7 +882,7 @@
         <p>The app checks for a new version when you open it (and when you come back to it, at most every 5 minutes). When one is live a bar appears at the bottom with an <b>Update</b> button — one tap loads it. <b>Check for app update</b> below asks immediately.</p>
 
         <h3>Backups</h3>
-        <p>Under <b>Your data</b> you can save all your orders as a backup file, copy them to the clipboard, or restore. A restore <b>shows its work</b>: it tells you exactly how many orders came back, and a bad file leaves your live data untouched. The app also keeps its own daily snapshots on the device, and the <b>Check the safety net works</b> button proves that in front of you with real numbers.</p>
+        <p>Under <b>Your data</b> you can save all your orders as a backup file, copy them to the clipboard, or restore. <b>Export my data</b> opens the iPhone share sheet so you can put the file in Files, Mail or anywhere else, and the app only notes that you have a backup once the file has really been saved — cancelling counts as no backup. A restore <b>shows its work</b>: it tells you exactly how many orders came back, and a bad file leaves your live data untouched. The app also keeps its own daily snapshots on the device, and the <b>Check the safety net works</b> button proves that in front of you with real numbers.</p>
 
         <h3>Where your data lives</h3>
         <p>Everything is stored only on this device, inside this app. Nothing is synced or sent anywhere — which is exactly why the backup buttons exist.</p>
@@ -941,6 +941,8 @@
 
 /* ============ version log — newest first; [0].v is THE app version ============ */
 const VERSIONLOG = [
+  { v:'1.16', when:'10 Sep 2026',
+    what:'<b>Export my data could save nothing and still say it had worked.</b> It used a plain download link, which does nothing inside an app opened from the Home Screen — and then noted that you had a backup anyway, which also switched off the reminder to make one for the next stretch. Since your orders live only on this phone, that was the one safety net that mattered.\n\nIt now hands the file to the normal iPhone share sheet, so you can drop it into Files, Mail or anywhere else — and it only writes down that you have a backup once a file has actually been saved. If you cancel the share sheet it says <b>Cancelled</b> and does not count it. The same fault has been fixed in AMS CountDown, and it is being worked through the other apps.' },
   { v:'1.15', when:'7 Sep 2026',
     what:'<b>Arrived</b> is now <b>Collected</b>. The last of the four states said what the parcel did; it now says what you did, which is the moment that actually matters \u2014 and it is the natural end of the journey that begins at <b>Ready to collect</b>.\n\nThe new word stands everywhere the old one stood: the state itself and the tick badge on the picture, the green group at the foot of the home screen, the chip along the top, the line on an order (“Collected”, or “All 3 items collected” for an order that came in several parcels), the little message when you hold a card, and the button in Settings that clears finished orders out.\n\nNothing else moved. The colour is still green, the tick is still the tick, holding a card still walks it through the same four states, and every order you already have sits exactly where it sat \u2014 the app only ever stored your ticks, never the word.' },
   { v:'1.14', when:'4 Sep 2026',
@@ -3468,16 +3470,35 @@ $('tidyBtn').addEventListener('click', () => {
   alert(`Cleared. ${state.orders.length} order${state.orders.length === 1 ? '' : 's'} left on this device.`);
 });
 
-$('exportBtn').addEventListener('click', () => {
+/* A plain download link is inert inside an app opened from the Home Screen, so this
+   could save NOTHING and still call stampBackup() — recording a backup that did not
+   exist and silencing the reminder about it. Share sheet first; the stamp is only
+   written once a save has actually happened. A cancelled share is not a backup. */
+$('exportBtn').addEventListener('click', async (e) => {
+  const btn = e.currentTarget;
   const text = JSON.stringify(buildBackup(), null, 2);
-  const blob = new Blob([text], { type:'application/json' });
-  const url = URL.createObjectURL(blob);
   const stamp = new Date().toISOString().slice(0,16).replace(/[:T]/g,'-');
-  const a = document.createElement('a');
-  a.href = url; a.download = `ams-packtrack-backup-${stamp}.json`;
-  document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
-  stampBackup();
+  const name = `ams-packtrack-backup-${stamp}.json`;
+  const blob = new Blob([text], { type:'application/json' });
+  const file = new File([blob], name, { type:'application/json' });
+
+  if(navigator.canShare && navigator.canShare({ files: [file] })){
+    try{
+      await navigator.share({ files: [file], title: 'AMS PackTrack backup' });
+      stampBackup(); flashBtn(btn, 'Saved ✓');
+    }catch(err){
+      flashBtn(btn, (err && err.name === 'AbortError') ? 'Cancelled' : 'Not saved');
+    }
+    return;
+  }
+  try{                                   // desktop browsers, where a download works
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    stampBackup(); flashBtn(btn, 'Saved ✓');
+  }catch(err){ flashBtn(btn, 'Not saved'); }
 });
 $('copyBtn').addEventListener('click', async (e) => {
   const btn = e.currentTarget;
